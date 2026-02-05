@@ -2,6 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 400 700;
+  src: url('/assets/fonts/PretendardVariable.woff2') format('woff-variations');
+}
+
 :root {
   font-size: 10px;
+}
+
+*,
+body {
+  font-family: 'Pretendard';
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  margin: 0;
+}
+
+input {
+  box-sizing: border-box;
+  outline: none;
+}
+
+textarea {
+  outline: none;
+  resize: none;
+}
+
+.spin-once {
+    animation: spin 0.35s linear 1;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
