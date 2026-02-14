@@ -27,8 +27,20 @@ export const CHIP_SELECTED_STYLES: ChipSelectedStyles = {
     unselected: 'border-black-30 bg-black-5 text-black-80 hover:bg-hover-5',
   },
   card: {
-    selected: 'border-blue-80 bg-blue-5 text-black-100',
-    unselected: 'border-black-30 bg-black-5 text-black-80 hover:bg-hover-5',
+    normal: {
+      selected: 'border-blue-80 bg-blue-5 text-black-100',
+      unselected: 'border-black-30 bg-black-5 text-black-80 hover:bg-hover-5',
+    },
+    liked: {
+      selected: 'border-blue-70 bg-blue-5 text-black-100',
+      unselected:
+        'border-black-30 bg-black-5 text-black-80 hover:border-blue-70 hover:text-black-100',
+    },
+    unliked: {
+      selected: 'border-error bg-[#FFEEEA] text-black-100',
+      unselected:
+        'border-black-30 bg-black-5 text-black-80 hover:border-error hover:text-black-100',
+    },
   },
 };
 

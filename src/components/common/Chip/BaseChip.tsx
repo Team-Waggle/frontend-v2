@@ -13,6 +13,7 @@ const BaseChip = memo(
       {
         variant = 'outline',
         isSelected = false,
+        status = 'normal', // variant가 card일 때만 적용
         mainIcon,
         subIcon,
         disabled,
@@ -24,10 +25,27 @@ const BaseChip = memo(
     ) => {
       const chipStyles = useMemo(() => {
         const selected = isSelected ? 'selected' : 'unselected';
-        return `${BASE_CHIP_STYLES} ${CHIP_VARIANT_STYLES[variant]} ${CHIP_SELECTED_STYLES[variant][selected]} ${className || ''}`;
-      }, [variant, isSelected, className]);
+
+        let selectedStyle = '';
+
+        if (variant === 'card') {
+          selectedStyle = CHIP_SELECTED_STYLES.card[status][selected];
+        } else {
+          // 타입 캐스팅으로 접근 (상위 interface에 card 외의 나머지들이 있음을 TS에 알림)
+          const styles = CHIP_SELECTED_STYLES[variant];
+          selectedStyle = styles[selected];
+        }
+
+        return `${BASE_CHIP_STYLES} ${CHIP_VARIANT_STYLES[variant]} ${selectedStyle} ${className || ''}`;
+      }, [variant, status, isSelected, className]);
       return (
-        <button ref={ref} disabled={disabled} className={chipStyles} {...props}>
+        <button
+          type="button"
+          ref={ref}
+          disabled={disabled}
+          className={chipStyles}
+          {...props}
+        >
           {mainIcon && (
             <span className={`${CHIP_ICON_SIZE[variant]} empty:hidden`}>
               {mainIcon}
