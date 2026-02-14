@@ -1,0 +1,3 @@
+env=stg
+sha=manual
+time=2026-02-14 23:55
