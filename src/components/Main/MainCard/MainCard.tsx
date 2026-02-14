@@ -1,13 +1,13 @@
 import MainCardTag from './MainCardTag';
 
 /* 임시 SkillIcon */
-import SkillJava from '../../../../public/assets/icons/skill/large/ic_skill_Java_large.svg?react';
-import SkillFigma from '../../../../public/assets/icons/skill/large/ic_skill_Figma_large.svg?react';
-import SkillDjango from '../../../../public/assets/icons/skill/large/ic_skill_Django_large.svg?react';
-import SkillJavaScript from '../../../../public/assets/icons/skill/large/ic_skill_JavaScript_large.svg?react';
-import SkillTypescript from '../../../../public/assets/icons/skill/large/ic_skill_TypeScript_large.svg?react';
+import SkillJava from '../../../assets/icons/skill/large/ic_skill_Java_large.svg?react';
+import SkillFigma from '../../../assets/icons/skill/large/ic_skill_Figma_large.svg?react';
+import SkillDjango from '../../../assets/icons/skill/large/ic_skill_Django_large.svg?react';
+import SkillJavaScript from '../../../assets/icons/skill/large/ic_skill_JavaScript_large.svg?react';
+import SkillTypescript from '../../../assets/icons/skill/large/ic_skill_TypeScript_large.svg?react';
 
-import MeatBallIcon from '../../../../public/assets/icons/skill/large/ic_skill_meatball_large.svg?react';
+import MeatBallIcon from '../../../assets/icons/skill/large/ic_skill_meatball_large.svg?react';
 
 /**
  * Main Components: MainCard
