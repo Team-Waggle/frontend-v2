@@ -4,7 +4,7 @@ export const BASE_CHIP_STYLES = 'flex items-center';
 
 export const CHIP_VARIANT_STYLES: Record<ChipVariant, string> = {
   outline:
-    'h-[4rem] gap-[0.5rem] rounded-full border border-solid px-[1.2rem] text-[1.4rem] font-medium',
+    'h-[4rem] gap-[0.5rem] justify-center rounded-full border border-solid px-[1.2rem] text-[1.4rem] font-medium',
   filled:
     'h-[4rem] w-[10rem] justify-center rounded-full text-[1.6rem] font-bold',
   teamOutline:
