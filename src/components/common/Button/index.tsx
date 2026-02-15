@@ -1,5 +1,5 @@
 import { forwardRef, memo, useMemo } from 'react';
-import type { BaseButtonProps } from '../../types/button';
+import type { BaseButtonProps } from '../../../types/button';
 import {
   BASE_BUTTON_STYLES,
   BUTTON_COLOR_STYLES,

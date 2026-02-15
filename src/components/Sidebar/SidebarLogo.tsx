@@ -36,7 +36,7 @@ const SidebarLogo = ({
         onClick={onToggle}
         className={`${
           isFolded
-            ? 'absolute left-[7.3rem] top-[0.9rem] flex h-[3rem] w-[3rem] items-center justify-center rounded-full border border-solid border-black-20 hover:bg-black-20'
+            ? 'absolute left-[7.3rem] top-[0.9rem] z-10 flex h-[3rem] w-[3rem] items-center justify-center rounded-full border border-solid border-black-20 hover:bg-black-20'
             : 'h-[1.6rem] w-[1.6rem]'
         }`}
       >

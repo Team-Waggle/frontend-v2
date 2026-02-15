@@ -1,13 +1,13 @@
-import type { ButtonColor, ButtonSize } from '../../types/button';
+import type { ButtonColor, ButtonSize } from '../../../types/button';
 
 export const BASE_BUTTON_STYLES =
-  'flex justify-center items-center py-[1.2rem] gap-[1rem]';
+  'flex justify-center items-center py-[1.2rem]';
 
 export const BUTTON_SIZE_STYLES: Record<ButtonSize, string> = {
-  sm: 'h-[3.2rem] px-[1.6rem] rounded-[0.8rem] text-[1.4rem]',
-  md: 'h-[4.4rem] px-[4rem] rounded-[0.8rem] text-[1.6rem]',
-  lg: 'h-[5.4rem] px-[4rem] rounded-[0.8rem] text-[1.7rem]',
-  xl: 'h-[6rem] px-[4rem] rounded-[1rem] text-[1.8rem]',
+  sm: 'h-[3.2rem] px-[1.6rem] rounded-[0.8rem] text-[1.4rem] gap-[1rem]',
+  md: 'h-[4.4rem] px-[4rem] rounded-[0.8rem] text-[1.6rem] gap-[1rem]',
+  lg: 'h-[5.4rem] px-[4rem] rounded-[0.8rem] text-[1.7rem] gap-[1rem]',
+  xl: 'h-[6rem] px-[4rem] rounded-[1rem] text-[1.8rem] gap-[0.8rem]',
 };
 export const BUTTON_COLOR_STYLES: Record<ButtonColor, string> = {
   primary:

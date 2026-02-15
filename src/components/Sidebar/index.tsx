@@ -1,7 +1,9 @@
 import { Link } from 'react-router';
 import { useState } from 'react';
-import BaseButton from '../common/BaseButton';
+import { useAuthStore } from '../../stores/authStore';
 import LoginModal from '../Modal/LoginModal';
+import BaseButton from '../common/Button';
+import IconWrapper from '../common/IconWrapper';
 
 // Sidebar Components
 import SidebarLogo from './SidebarLogo';
@@ -9,14 +11,15 @@ import SidebarProfile from './SidebarProfile';
 import SidebarMenu from './SidebarMenu';
 
 // Icons
-import PersonPlusIcon from '../../assets/icons/normal/ic_personPlus.svg?react';
+import PencilIcon from '../../assets/icons/normal/ic_pencil.svg?react';
 import LogInIcon from '../../assets/icons/normal/ic_login.svg?react';
 import LogoIcon from '../../assets/icons/ic_logo.svg?react';
 
 const Sidebar = () => {
   const [isFolded, setIsFolded] = useState(false);
-  const [isLoggedin, setIsLoggedin] = useState(false);
   const [isLogInModalOpen, setIsLogInModalOpen] = useState(false);
+
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
   return (
     <>
@@ -36,23 +39,20 @@ const Sidebar = () => {
           {/* 프로필 및 모집글 작성 버튼 */}
           <div
             className={`flex flex-col ${
-              isLoggedin ? 'gap-[1.8rem] py-[2rem]' : 'gap-[1rem] py-[2rem]'
+              isLoggedIn ? 'gap-[1.8rem] py-[2rem]' : 'gap-[1rem] py-[2rem]'
             } `}
           >
-            <SidebarProfile isFolded={isFolded} isLoggedIn={isLoggedin} />
+            <SidebarProfile isFolded={isFolded} isLoggedIn={isLoggedIn} />
 
             {isFolded ? (
-              <button className="flex h-[4.4rem] w-[4.4rem] items-center justify-center rounded-[0.8rem] bg-blue-80 hover:bg-[#0057d9]">
-                {isLoggedin ? (
-                  <PersonPlusIcon className="text-black-5" />
-                ) : (
-                  <LogInIcon
-                    onClick={() => setIsLogInModalOpen(true)}
-                    className="text-black-5"
-                  />
-                )}
-              </button>
-            ) : isLoggedin ? (
+              <IconWrapper
+                onClick={() => {
+                  if (!isLoggedIn) setIsLogInModalOpen(true);
+                }}
+              >
+                {isLoggedIn ? <PencilIcon /> : <LogInIcon />}
+              </IconWrapper>
+            ) : isLoggedIn ? (
               <Link
                 to="/team/new"
                 className="flex h-[4.4rem] w-full items-center justify-center rounded-[0.8rem] bg-blue-80 px-[3.7rem] py-[1.2rem] text-[1.8rem] font-bold text-white"
