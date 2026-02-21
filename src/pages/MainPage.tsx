@@ -1,5 +1,7 @@
 import MainCard from '../components/Main/MainCard/MainCard';
 import MainSearch from '../components/Main/MainSearch/MainSearch';
+import OnboardingModal from '../components/Modal/OnboardingModal';
+import { useGetIsUserProfileComplete } from '../hooks/userUser';
 
 /**
  *
@@ -10,8 +12,12 @@ import MainSearch from '../components/Main/MainSearch/MainSearch';
  */
 
 const MainPage = () => {
+  const { data } = useGetIsUserProfileComplete();
+
+  const isOnboardingModalOpen = data?.isComplete === false;
+
   return (
-    <div className="flex h-[108rem] w-[192rem] flex-row items-start bg-white">
+    <div className="flex w-[192rem] flex-row items-start bg-white">
       {/** Main */}
       <div className="flex flex-col items-center gap-[5.6rem] px-[4.8rem]">
         {/** Frame 01 */}
@@ -41,6 +47,7 @@ const MainPage = () => {
           <MainCard MainCardTitle="[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)" />
         </div>
       </div>
+      <OnboardingModal isOpen={isOnboardingModalOpen} onClose={() => {}} />
     </div>
   );
 };
