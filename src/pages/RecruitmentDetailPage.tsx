@@ -13,7 +13,7 @@ import IcMongoSkill from '../assets/icons/skill/large/ic_skill_MongoDB_large.svg
 import IcNodejsSkill from '../assets/icons/skill/large/ic_skill_Node.js_large.svg?react';
 
 import TeamCard from '../components/RecruitmentDetail/TeamCard';
-import SideTeamCard from '../components/RecruitmentDetail/SideTeamCard';
+import SideTeamCard from '../components/common/Cards/SideTeamCard';
 
 import BaseButton from '../components/common/Button/index';
 
@@ -275,7 +275,7 @@ const RecruitmentDetailPage = () => {
       {/** 팀 구간 */}
       <div className="flex self-start pt-[17.8rem]">
         <div ref={sideWrapRef} className="self-start will-change-transform">
-          <SideTeamCard />
+          <SideTeamCard variant="recruitment" />
         </div>
       </div>
 
