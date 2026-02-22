@@ -46,6 +46,15 @@ export default {
         'search-select-box':
           '0 2px 16.6px 0 rgba(0, 0, 0, 0.15), 0 1px 4px 0 rgba(0, 0, 0, 0.08)',
       },
+      backgroundImage: {
+        'team-home-left-slide-background':
+          'linear-gradient(270deg, rgba(255, 255, 255, 0) 0%, #FFF 100%)',
+        'team-home-right-slide-background':
+          'linear-gradient(270deg, #FFF 0%, rgba(255, 255, 255, 0) 100%)',
+      },
+      screens: {
+        'max-1440': { max: '1440px' },
+      },
     },
   },
   plugins: [scrollbarHide],

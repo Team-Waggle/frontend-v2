@@ -10,16 +10,17 @@ import BaseButton from '../common/Button';
 import BaseChip from '../common/Chip/BaseChip';
 import FieldMaster from '../Field/FieldMaster';
 import { SkillIcon } from '../../utils/SkillIcon';
+import { useCreateUserProfile } from '../../hooks/userUser';
 
 // Icons
 import RequireIcon from '../../assets/icons/ic_require.svg?react';
 
 interface FormValues {
-  nickname: string;
+  username: string;
   position: PositionType;
   skills: string[];
-  portfolio: string;
-  intro: string;
+  portfolioUrls: string;
+  bio: string;
 }
 
 const positionData = {
@@ -86,10 +87,54 @@ const positionData = {
   ],
 };
 
+const POSITION_MAP: Record<string, string> = {
+  기획: 'PLANNER',
+  디자인: 'DESIGNER',
+  프론트엔드: 'FRONTEND',
+  백엔드: 'BACKEND',
+  마케팅: 'MARKETER',
+  기타: 'OTHER',
+};
+
+const SKILL_MAP: Record<string, string> = {
+  'After Effects': 'AFTER_EFFECTS',
+  AWS: 'AWS',
+  'C#': 'CSHARP',
+  CRM: 'CRM',
+  Django: 'DJANGO',
+  'express.js': 'EXPRESS',
+  FastAPI: 'FAST_API',
+  Figma: 'FIGMA',
+  GA4: 'GA4',
+  Illustrator: 'ILLUSTRATOR',
+  Java: 'JAVA',
+  Javascript: 'JAVASCRIPT',
+  Jira: 'JIRA',
+  Kotlin: 'KOTLIN',
+  NestJS: 'NEST_JS',
+  'Next.js': 'NEXT_JS',
+  'Node.js': 'NODE_JS',
+  Notion: 'NOTION',
+  Photoshop: 'PHOTOSHOP',
+  ProtoPie: 'PROTO_PIE',
+  Python: 'PYTHON',
+  React: 'REACT',
+  'React Native': 'REACT_NATIVE',
+  SEO: 'SEO',
+  SNS마케팅: 'SNS_MARKETING',
+  Spring: 'SPRING',
+  SQL: 'SQL',
+  TypeScript: 'TYPESCRIPT',
+  UE: 'UE',
+  Unity: 'UNITY',
+  'Vue.js': 'VUE',
+  콘텐츠제작: 'CONTENT_CREATION',
+};
+
 const positions = Object.keys(positionData) as (keyof typeof positionData)[];
 type PositionType = keyof typeof positionData;
 
-const OnboardingModal = ({ isOpen, onClose, handleDone }: ModalProps) => {
+const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
   const {
     register,
     handleSubmit,
@@ -99,17 +144,20 @@ const OnboardingModal = ({ isOpen, onClose, handleDone }: ModalProps) => {
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
-      nickname: '',
+      username: '',
       position: '기획',
       skills: [],
-      portfolio: '',
-      intro: '',
+      portfolioUrls: '',
+      bio: '',
     },
   });
+
+  const { mutate: updateUserProfile } = useCreateUserProfile();
 
   // 현재 선택된 값들 구독
   const activePosition = watch('position');
   const activeSkills = watch('skills');
+  const introValue = watch('bio', '');
 
   useEffect(() => {
     register('skills', {
@@ -119,9 +167,20 @@ const OnboardingModal = ({ isOpen, onClose, handleDone }: ModalProps) => {
   }, [register]);
 
   const onSubmit = (data: FormValues) => {
-    console.log(data);
-    handleDone?.(data);
-    onClose();
+    const transformedData = {
+      ...data,
+      position:
+        POSITION_MAP[data.position as keyof typeof POSITION_MAP] ||
+        data.position,
+
+      skills: data.skills.map(
+        (skill) => SKILL_MAP[skill as keyof typeof SKILL_MAP] ?? data.skills,
+      ),
+
+      portfolioUrls: data.portfolioUrls ? [data.portfolioUrls] : [],
+    };
+
+    updateUserProfile(transformedData);
   };
 
   useModal({ isOpen, isOnboarding: true, onClose });
@@ -147,13 +206,13 @@ const OnboardingModal = ({ isOpen, onClose, handleDone }: ModalProps) => {
             <div className="flex flex-col gap-[3.4rem]">
               <FieldMaster
                 title="닉네임 입력"
-                id="nickname"
+                id="username"
                 variant="input"
                 isRequired
-                errorMessage={errors.nickname?.message}
+                errorMessage={errors.username?.message}
                 inputProps={{
                   placeholder: '최대 10자 제한 / 특수문자 불가',
-                  ...register('nickname', {
+                  ...register('username', {
                     required: '닉네임은 필수입니다.',
                     maxLength: {
                       value: 10,
@@ -205,6 +264,7 @@ const OnboardingModal = ({ isOpen, onClose, handleDone }: ModalProps) => {
                               shouldValidate: true,
                             });
                           }}
+                          isSelected={isSelected}
                           mainIcon={<SkillIcon name={skill} />}
                         >
                           {skill}
@@ -216,24 +276,26 @@ const OnboardingModal = ({ isOpen, onClose, handleDone }: ModalProps) => {
               </div>
               <FieldMaster
                 title="포트폴리오"
-                id="portfolio"
+                id="portfolioUrls"
                 variant="input"
                 inputProps={{
+                  ...register('portfolioUrls'),
                   placeholder:
                     '현재 가지고 있는 포트폴리오 사이트가 있다면 URL을 입력해 주세요.',
                 }}
               />
               <FieldMaster
                 title="한줄소개"
-                id="intro"
+                id="bio"
                 variant="textarea"
                 textareaProps={{
                   placeholder: '한 줄 소개를 입력해주세요. (100자 이내)',
-                  ...register('intro', {
+                  value: introValue,
+                  ...register('bio', {
                     onChange: (e) => {
                       const value = e.target.value;
                       if (value.length > 100) {
-                        setValue('intro', value.slice(0, 100));
+                        setValue('bio', value.slice(0, 100));
                       }
                     },
                     validate: (value) =>
@@ -245,7 +307,12 @@ const OnboardingModal = ({ isOpen, onClose, handleDone }: ModalProps) => {
             </div>
           </div>
           <div className="flex w-full justify-center pb-[3.8rem]">
-            <BaseButton size="xl" disabled={!isValid} className="w-[25rem]">
+            <BaseButton
+              type="submit"
+              size="xl"
+              disabled={!isValid}
+              className="w-[25rem]"
+            >
               완료
             </BaseButton>
           </div>

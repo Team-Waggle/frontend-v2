@@ -26,6 +26,7 @@ const BaseButton = memo(
       }, [size, color, className]);
       return (
         <button
+          type="button"
           ref={ref}
           disabled={disabled}
           className={buttonStyles}

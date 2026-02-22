@@ -46,7 +46,7 @@ function App() {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen mx-auto max-w-[192rem] max-1440:w-[144rem]">
       <Sidebar />
       <Outlet />
       <ScrollRestoration />
