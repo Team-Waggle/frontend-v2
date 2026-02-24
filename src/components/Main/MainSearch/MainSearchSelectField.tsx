@@ -30,7 +30,7 @@ const MainSearchSelectField = ({
   hasKeyword = false,
 }: MainSearchSelectFieldProps) => {
   const baseCommon =
-    'flex-1 flex h-[5rem] px-[2rem] items-center gap-[1rem] border-solid bg-white';
+    'flex-1 flex h-[5rem] min-w-[23.1rem] px-[2rem] items-center gap-[1rem] border-solid bg-white';
 
   const baseVariant =
     variant === 'job' ? 'border rounded-l-[0.8rem]' : 'border border-l-0';
