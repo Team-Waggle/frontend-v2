@@ -3,6 +3,7 @@ import type { DropzoneInputProps, DropzoneRootProps } from 'react-dropzone';
 import BaseChip from '../common/Chip/BaseChip';
 import BaseButton from '../common/Button';
 import IconWrapper from '../common/IconWrapper';
+import { SkillIcon } from '../../utils/SkillIcon';
 
 // @tiptap
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -26,13 +27,16 @@ import Heading1Icon from '../../assets/icons/normal/ic_heading1.svg?react';
 import Heading2Icon from '../../assets/icons/normal/ic_heading2.svg?react';
 import Heading3Icon from '../../assets/icons/normal/ic_heading3.svg?react';
 import Heading4Icon from '../../assets/icons/normal/ic_heading4.svg?react';
+import ProfileBasicIcon from '../../assets/icons/ic_profile_basic.svg?react';
 
 interface FieldInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
+  error?: string;
 }
 
 interface FieldTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   id: string;
+  error?: string;
   maxLength?: number;
 }
 
@@ -43,7 +47,7 @@ interface FieldThumbnailProps extends React.ButtonHTMLAttributes<HTMLButtonEleme
   preview?: string;
 }
 
-type WorkmodeType = 'online' | 'offline' | 'both';
+type WorkmodeType = 'ONLINE' | 'OFFLINE' | 'BOTH';
 
 interface FieldWorkmodeProps {
   value?: WorkmodeType;
@@ -55,20 +59,69 @@ interface FieldEditorProps {
   onChange: (content: string) => void;
 }
 
-interface FieldTeamNameProps {
-  icon: React.ReactNode;
+interface TeamData {
+  teamId: number;
   name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface FieldTeamNameProps {
+  data: TeamData[];
+  value: number;
+  onChange: (teamId: number) => void;
+}
+
+export type PositionType =
+  | 'PM'
+  | 'Design'
+  | 'Frontend'
+  | 'Backend'
+  | 'Marketing'
+  | 'etc'
+  | '';
+
+export type PositionValue = {
+  position: PositionType | null;
+  recruitingCount: number;
+};
+
+interface FieldSinglePositionProps {
+  value?: PositionType | null;
+  onChange?: (value: PositionType) => void;
+}
+
+interface FieldMultiPositionProps {
+  value?: PositionValue[];
+  onChange?: (value: PositionValue[]) => void;
+  hasButton?: boolean;
+}
+
+interface FieldSkillProps {
+  value?: string[];
+  onChange?: (value: string[]) => void;
+}
+
+interface FieldTabProps {
+  value?: string[];
+  onChange?: (value: string[]) => void;
+  options?: string[];
 }
 
 export const FieldInput = memo(
   forwardRef<HTMLInputElement, FieldInputProps>(
-    ({ id, className, ...props }, ref) => {
+    ({ id, error, className, ...props }, ref) => {
       return (
         <input
           ref={ref}
           id={id}
           autoComplete="off"
-          className={`h-[6rem] rounded-[0.8rem] border border-black-40 px-[1.8rem] py-[1.7rem] text-[1.6rem] font-medium ${className || ''}`}
+          className={`h-[6rem] rounded-[0.8rem] border px-[1.8rem] py-[1.7rem] text-[1.6rem] font-medium ${
+            error
+              ? 'border-error'
+              : 'border-black-100 placeholder-shown:border-black-30 focus:border-blue-80'
+          } ${className || ''}`}
           {...props}
         />
       );
@@ -78,15 +131,24 @@ export const FieldInput = memo(
 
 export const FieldTextarea = memo(
   forwardRef<HTMLTextAreaElement, FieldTextareaProps>(
-    ({ id, maxLength, className, ...props }, ref) => {
+    ({ id, error, maxLength = 500, className, ...props }, ref) => {
       return (
-        <textarea
-          ref={ref}
-          id={id}
-          maxLength={maxLength}
-          className={`h-[10.8rem] rounded-[0.8rem] border border-black-40 px-[1.8rem] py-[1.7rem] text-[1.6rem] font-medium ${className || ''}`}
-          {...props}
-        />
+        <div className="flex flex-col items-end gap-[0.4rem]">
+          <textarea
+            ref={ref}
+            id={id}
+            maxLength={maxLength}
+            className={`h-[10.8rem] w-full rounded-[0.8rem] border px-[1.8rem] py-[1.7rem] text-[1.6rem] font-medium ${
+              error
+                ? 'border-error'
+                : 'border-black-100 placeholder-shown:border-black-30 focus:border-blue-80'
+            } ${className || ''}`}
+            {...props}
+          />
+          <span className="text-[1.4rem] font-medium text-black-60">
+            {String(props.value || '').length}/{maxLength}
+          </span>
+        </div>
       );
     },
   ),
@@ -130,7 +192,7 @@ export const FieldThumbnail = memo(
 );
 
 export const FieldWorkmode = ({
-  value = 'online',
+  value = 'ONLINE',
   onChange,
 }: FieldWorkmodeProps) => {
   return (
@@ -138,27 +200,27 @@ export const FieldWorkmode = ({
       <BaseChip
         variant="card"
         mainIcon={<DesktopIcon />}
-        isSelected={value === 'online'}
+        isSelected={value === 'ONLINE'}
         className="h-[13.6rem] w-[29.4rem]"
-        onClick={() => onChange?.('online')}
+        onClick={() => onChange?.('ONLINE')}
       >
         온라인
       </BaseChip>
       <BaseChip
         variant="card"
         mainIcon={<LocationIcon />}
-        isSelected={value === 'offline'}
+        isSelected={value === 'OFFLINE'}
         className="h-[13.6rem] w-[29.4rem]"
-        onClick={() => onChange?.('offline')}
+        onClick={() => onChange?.('OFFLINE')}
       >
         오프라인
       </BaseChip>
       <BaseChip
         variant="card"
         mainIcon={<GlobeIcon />}
-        isSelected={value === 'both'}
+        isSelected={value === 'BOTH'}
         className="h-[13.6rem] w-[29.4rem]"
-        onClick={() => onChange?.('both')}
+        onClick={() => onChange?.('BOTH')}
       >
         온라인 + 오프라인
       </BaseChip>
@@ -227,7 +289,7 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
 
   return (
     <div className="h-[47.1rem] w-full">
-      <div className="flex h-[6.4rem] gap-[2.4rem] rounded-tl-[0.8rem] rounded-tr-[0.8rem] border-x border-t border-black-30 bg-black-10 px-[1.8rem] py-[1.4rem]">
+      <div className="flex h-[6.4rem] items-center gap-[2.4rem] rounded-tl-[0.8rem] rounded-tr-[0.8rem] border-x border-t border-black-30 bg-black-10 px-[1.8rem] py-[1.4rem]">
         <div className="flex gap-[0.2rem]">
           <IconWrapper
             color="transparent"
@@ -321,51 +383,308 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
 
 FieldEditor.displayName = 'FieldEditor';
 
-export const FieldTeamName = ({ icon, name }: FieldTeamNameProps) => {
+export const FieldTeamName = ({
+  data,
+  value,
+  onChange,
+}: FieldTeamNameProps) => {
   return (
     <div className="grid grid-cols-4 gap-[1rem]">
-      <BaseChip variant="teamOutline" mainIcon={icon}>
-        {name}
+      {data?.map((team) => (
+        <BaseChip
+          key={team.teamId}
+          variant="teamOutline"
+          mainIcon={<ProfileBasicIcon />}
+          isSelected={value === team.teamId}
+          onClick={() => onChange?.(team.teamId)}
+        >
+          {team.name}
+        </BaseChip>
+      ))}
+    </div>
+  );
+};
+
+export const FieldSinglePosition = ({
+  value,
+  onChange,
+}: FieldSinglePositionProps) => {
+  const handleChange = (newValue: PositionType) => {
+    onChange?.(newValue);
+  };
+
+  return (
+    <div className="flex gap-[0.6rem]">
+      <BaseChip
+        isSelected={value === 'PM'}
+        onClick={() => handleChange('PM')}
+        className="w-[9.2rem]"
+      >
+        기획
+      </BaseChip>
+      <BaseChip
+        isSelected={value === 'Design'}
+        onClick={() => handleChange('Design')}
+        className="w-[9.2rem]"
+      >
+        디자인
+      </BaseChip>
+      <BaseChip
+        isSelected={value === 'Frontend'}
+        onClick={() => handleChange('Frontend')}
+        className="w-[9.2rem]"
+      >
+        프론트엔드
+      </BaseChip>
+      <BaseChip
+        isSelected={value === 'Backend'}
+        onClick={() => handleChange('Backend')}
+        className="w-[9.2rem]"
+      >
+        백엔드
+      </BaseChip>
+      <BaseChip
+        isSelected={value === 'Marketing'}
+        onClick={() => handleChange('Marketing')}
+        className="w-[9.2rem]"
+      >
+        마케팅
+      </BaseChip>
+      <BaseChip
+        isSelected={value === 'etc'}
+        onClick={() => handleChange('etc')}
+        className="w-[9.2rem]"
+      >
+        기타
       </BaseChip>
     </div>
   );
 };
 
-export const FieldPosition = () => {
+export const FieldPosition = ({
+  value = [{ position: null, recruitingCount: 1 }],
+  onChange,
+  hasButton = false,
+}: FieldMultiPositionProps) => {
+  const positions = value;
+
+  const handleChange = (index: number, newValue: PositionType) => {
+    const updated = positions.map((item, i) =>
+      i === index ? { ...item, position: newValue } : item,
+    );
+    onChange?.(updated);
+  };
+
+  const handleCountChange = (index: number, delta: number) => {
+    const updated = positions.map((item, i) => {
+      if (i === index) {
+        const newCount = Math.max(1, item.recruitingCount + delta);
+        return { ...item, recruitingCount: newCount };
+      }
+      return item;
+    });
+    onChange?.(updated);
+  };
+
+  const handleAdd = () => {
+    onChange?.([...positions, { position: null, recruitingCount: 1 }]);
+  };
+
+  const handleRemove = (index: number) => {
+    if (positions.length === 1) return; // 최소 1개 유지
+    onChange?.(positions.filter((_, i) => i !== index));
+  };
+
   return (
-    <div className="flex items-center gap-[0.8rem]">
-      <div className="grid grid-cols-6 gap-[0.6rem]">
-        <BaseChip className="w-[9.2rem]">기획</BaseChip>
-        <BaseChip className="w-[9.2rem]">디자인</BaseChip>
-        <BaseChip className="w-[9.2rem]">프론트엔드</BaseChip>
-        <BaseChip className="w-[9.2rem]">백엔드</BaseChip>
-        <BaseChip className="w-[9.2rem]">마케팅</BaseChip>
-        <BaseChip className="w-[9.2rem]">기타</BaseChip>
-      </div>
-      <div className="flex items-center gap-[3.6rem]">
-        <div className="flex items-center gap-[0.8rem] py-[0.8rem]">
-          <button
-            type="button"
-            className="flex h-[3.2rem] w-[3.2rem] items-center justify-center rounded-full border border-solid border-black-30 bg-black-5"
-          >
-            <MinusIcon className="h-[1.745rem] w-[1.745rem]" />
-          </button>
-          <div className="flex h-[4rem] w-[4rem] items-center justify-center px-[0.8rem] text-[2rem] font-semibold text-blue-80">
-            1
+    <div className="flex flex-col gap-[0.8rem]">
+      {positions.map((selevtedValue, index) => (
+        <div key={index} className="flex items-center gap-[0.8rem]">
+          <div className="grid grid-cols-6 gap-[0.6rem]">
+            <BaseChip
+              isSelected={selevtedValue.position === 'PM'}
+              onClick={() => handleChange(index, 'PM')}
+              className="w-[9.2rem]"
+            >
+              기획
+            </BaseChip>
+            <BaseChip
+              isSelected={selevtedValue.position === 'Design'}
+              onClick={() => handleChange(index, 'Design')}
+              className="w-[9.2rem]"
+            >
+              디자인
+            </BaseChip>
+            <BaseChip
+              isSelected={selevtedValue.position === 'Frontend'}
+              onClick={() => handleChange(index, 'Frontend')}
+              className="w-[9.2rem]"
+            >
+              프론트엔드
+            </BaseChip>
+            <BaseChip
+              isSelected={selevtedValue.position === 'Backend'}
+              onClick={() => handleChange(index, 'Backend')}
+              className="w-[9.2rem]"
+            >
+              백엔드
+            </BaseChip>
+            <BaseChip
+              isSelected={selevtedValue.position === 'Marketing'}
+              onClick={() => handleChange(index, 'Marketing')}
+              className="w-[9.2rem]"
+            >
+              마케팅
+            </BaseChip>
+            <BaseChip
+              isSelected={selevtedValue.position === 'etc'}
+              onClick={() => handleChange(index, 'etc')}
+              className="w-[9.2rem]"
+            >
+              기타
+            </BaseChip>
           </div>
-          <button
-            type="button"
-            className="flex h-[3.2rem] w-[3.2rem] items-center justify-center rounded-full border border-solid border-black-30 bg-black-5"
+          {hasButton && (
+            <div className="flex items-center gap-[3.6rem]">
+              <div className="flex items-center gap-[0.8rem] py-[0.8rem]">
+                <button
+                  type="button"
+                  onClick={() => handleCountChange(index, -1)}
+                  className="flex h-[3.2rem] w-[3.2rem] items-center justify-center rounded-full border border-solid border-black-30 bg-black-5"
+                >
+                  <MinusIcon className="h-[1.745rem] w-[1.745rem]" />
+                </button>
+                <div className="flex h-[4rem] w-[4rem] items-center justify-center px-[0.8rem] text-[2rem] font-semibold text-blue-80">
+                  {selevtedValue.recruitingCount}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleCountChange(index, 1)}
+                  className="flex h-[3.2rem] w-[3.2rem] items-center justify-center rounded-full border border-solid border-black-30 bg-black-5"
+                >
+                  <PlusIcon className="h-[1.745rem] w-[1.745rem]" />
+                </button>
+              </div>
+              <div className="flex gap-[0.8rem]">
+                {positions.length > 1 && (
+                  <BaseButton
+                    size="sm"
+                    color="secondary"
+                    onClick={() => handleRemove(index)}
+                    className="w-[6.8rem]"
+                  >
+                    삭제
+                  </BaseButton>
+                )}
+                {index === positions.length - 1 && (
+                  <BaseButton
+                    size="sm"
+                    className="w-[6.8rem]"
+                    onClick={handleAdd}
+                  >
+                    추가
+                  </BaseButton>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export const FieldSkill = ({ value = [], onChange }: FieldSkillProps) => {
+  const skills = [
+    'After Effects',
+    'AWS',
+    'C#',
+    'CRM',
+    'Django',
+    'express.js',
+    'FastAPI',
+    'Figma',
+    'GA4',
+    'Illustrator',
+    'Java',
+    'Javascript',
+    'Jira',
+    'Kotlin',
+    'NestJS',
+    'Next.js',
+    'Node.js',
+    'Notion',
+    'Photoshop',
+    'ProtoPie',
+    'Python',
+    'React',
+    'React Native',
+    'SEO',
+    'SNS마케팅',
+    'Spring',
+    'SQL',
+    'TypeScript',
+    'UE',
+    'Unity',
+    'Vue.js',
+    '콘텐츠제작',
+  ];
+
+  const handleToggle = (skill: string) => {
+    if (value.includes(skill)) {
+      onChange?.(value.filter((v) => v !== skill));
+    } else {
+      onChange?.([...value, skill]);
+    }
+  };
+
+  return (
+    <div className="flex flex-wrap gap-x-[0.6rem] gap-y-[1rem] pr-[2rem]">
+      {skills.map((skill, idx) => (
+        <BaseChip
+          key={idx}
+          isSelected={value.includes(skill)}
+          onClick={() => handleToggle(skill)}
+          mainIcon={<SkillIcon name={skill} />}
+        >
+          {skill}
+        </BaseChip>
+      ))}
+    </div>
+  );
+};
+
+export const FieldTab = ({ value = [], onChange, options }: FieldTabProps) => {
+  const handleClick = (item: string) => {
+    const isSelected = value.includes(item);
+
+    // 선택 해제
+    if (isSelected) {
+      onChange?.(value.filter((v) => v !== item));
+      return;
+    }
+
+    // 3개 초과 방지
+    if (value.length >= 3) return;
+
+    // 선택 추가
+    onChange?.([...value, item]);
+  };
+  return (
+    <div className="flex flex-wrap gap-x-[0.6rem] gap-y-[1rem] pr-[2rem]">
+      {options?.map((item, idx) => {
+        const isSelected = value.includes(item);
+        const isDisabled = !isSelected && value.length >= 3;
+        return (
+          <BaseChip
+            key={idx}
+            isSelected={isSelected}
+            disabled={isDisabled}
+            onClick={() => handleClick(item)}
           >
-            <PlusIcon className="h-[1.745rem] w-[1.745rem]" />
-          </button>
-        </div>
-        <div className="flex gap-[0.8rem]">
-          <BaseButton size="sm" className="w-[6.8rem]">
-            추가
-          </BaseButton>
-        </div>
-      </div>
+            {item}
+          </BaseChip>
+        );
+      })}
     </div>
   );
 };

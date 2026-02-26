@@ -6,6 +6,7 @@ import {
   getUserMe,
   getIsUserProfileComplete,
   postUserProfile,
+  getUserMeTeam,
 } from '../api/user';
 
 // 사용자 조회
@@ -20,9 +21,11 @@ export const useGetUserDetail = (userId: string) => {
 
 // 본인 프로필 조회
 export const useGetUserMe = () => {
+  const accessToken = useAuthStore((state) => state.accessToken);
   return useQuery({
     queryKey: ['me'],
     queryFn: () => getUserMe(),
+    enabled: !!accessToken,
   });
 };
 
@@ -53,5 +56,13 @@ export const useGetIsUserProfileComplete = () => {
     queryFn: () => getIsUserProfileComplete(),
     enabled: !!accessToken,
     refetchOnWindowFocus: false,
+  });
+};
+
+// 본인 참여 팀 목록 조회
+export const useGetUserMeTeam = () => {
+  return useQuery({
+    queryKey: ['user-me-team'],
+    queryFn: () => getUserMeTeam(),
   });
 };

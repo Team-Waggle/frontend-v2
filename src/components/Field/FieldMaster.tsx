@@ -9,6 +9,11 @@ import {
   FieldWorkmode,
   FieldTeamName,
   FieldPosition,
+  FieldSkill,
+  type PositionValue,
+  FieldTab,
+  type PositionType,
+  FieldSinglePosition,
 } from './FieldBody';
 import type { DropzoneInputProps, DropzoneRootProps } from 'react-dropzone';
 
@@ -23,6 +28,14 @@ import type { DropzoneInputProps, DropzoneRootProps } from 'react-dropzone';
   textareaProps: textarea에 쓰이는 placeholder, register
 */
 
+interface TeamData {
+  teamId: number;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface FiledMasterProps {
   title: string;
   id?: string;
@@ -33,7 +46,10 @@ interface FiledMasterProps {
     | 'workmode'
     | 'detail'
     | 'teamname'
-    | 'position';
+    | 'singlePosition'
+    | 'multiPosition'
+    | 'skill'
+    | 'tab';
   isRequired?: boolean;
   errorMessage?: string;
   maxLength?: number;
@@ -44,16 +60,35 @@ interface FiledMasterProps {
     preview?: string;
   };
   workmodeProps?: {
-    value?: 'online' | 'offline' | 'both';
-    onChange?: (value: 'online' | 'offline' | 'both') => void;
+    value?: 'ONLINE' | 'OFFLINE' | 'BOTH';
+    onChange?: (value: 'ONLINE' | 'OFFLINE' | 'BOTH') => void;
   };
   detailProps?: {
     value: string;
     onChange: (content: string) => void;
   };
   teamnameProps?: {
-    icon: React.ReactNode;
-    name: string;
+    data: TeamData[];
+    value: number;
+    onChange: (teamId: number) => void;
+  };
+  singlePositionProps?: {
+    value?: PositionType | null;
+    onChange?: (value: PositionType) => void;
+  };
+  multiPositionProps?: {
+    value?: PositionValue[];
+    onChange?: (value: PositionValue[]) => void;
+    hasButton?: boolean;
+  };
+  skillProps?: {
+    value?: string[];
+    onChange?: (value: string[]) => void;
+  };
+  tabProps?: {
+    value?: string[];
+    onChange?: (value: string[]) => void;
+    options: string[];
   };
 }
 
@@ -70,17 +105,32 @@ const FieldMaster = ({
   workmodeProps,
   detailProps,
   teamnameProps,
+  singlePositionProps,
+  multiPositionProps,
+  skillProps,
+  tabProps,
 }: FiledMasterProps) => {
   const renderBody = {
-    input: () => <FieldInput id={id || ''} {...inputProps} />,
+    input: () => (
+      <FieldInput id={id || ''} {...inputProps} error={errorMessage} />
+    ),
     textarea: () => (
-      <FieldTextarea id={id || ''} maxLength={maxLength} {...textareaProps} />
+      <FieldTextarea
+        id={id || ''}
+        maxLength={maxLength}
+        error={errorMessage}
+        {...textareaProps}
+      />
     ),
     thumbnail: () => <FieldThumbnail id={id || ''} {...thumbnailProps} />,
     workmode: () => <FieldWorkmode {...workmodeProps} />,
     detail: () => detailProps && <FieldEditor {...detailProps} />,
     teamname: () => teamnameProps && <FieldTeamName {...teamnameProps} />,
-    position: () => <FieldPosition />,
+    singlePosition: () => <FieldSinglePosition {...singlePositionProps} />,
+    multiPosition: () =>
+      multiPositionProps && <FieldPosition {...multiPositionProps} />,
+    skill: () => skillProps && <FieldSkill {...skillProps} />,
+    tab: () => tabProps && <FieldTab {...tabProps} />,
   };
 
   return (

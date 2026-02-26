@@ -12,7 +12,7 @@ import LoginPage from './pages/LoginPage';
 import TeamNewPage from './pages/TeamNewPage';
 import TeamHomePage from './pages/TeamHomePage';
 import RecruitmentDetailPage from './pages/RecruitmentDetailPage';
-// import PostFormPage from './pages/PostFormPage';
+import PostFormPage from './pages/PostFormPage';
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -22,7 +22,7 @@ export const router = createBrowserRouter(
       <Route path="/recruitment" element={<RecruitmentDetailPage />} />
       <Route path="/team/new" element={<TeamNewPage />} />
       <Route path="/team/home" element={<TeamHomePage />} />
-      {/* <Route path="/post/new" element={<PostFormPage />} /> */}
+      <Route path="/post/new" element={<PostFormPage />} />
     </Route>,
   ),
 );
