@@ -1,21 +1,29 @@
+import axios from 'axios';
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { Controller, useForm } from 'react-hook-form';
 import BaseButton from '../components/common/Button';
 import FieldMaster from '../components/Field/FieldMaster';
-import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { useCreateTeam, useCreateTeamImage } from '../hooks/useTeam';
 
 // Icons
 import NewTeamIcon from '../assets/icons/ic_character_new_team.svg?react';
 
 interface FormValues {
-  title: string;
-  thumbnail: File | null;
-  workmode: 'online' | 'offline' | 'both';
-  detail: string;
+  name: string;
+  description: string;
+  workMode: 'ONLINE' | 'OFFLINE' | 'BOTH';
+  profileImageUrl: string;
 }
 
 const TeamNewPage = () => {
+  const { mutateAsync: createImage } = useCreateTeamImage();
+  const { mutate: createTeam } = useCreateTeam();
   const [preview, setPreview] = useState<string | undefined>(undefined);
+  const [file, setFile] = useState<File | null>(null);
+  const [presignedUrl, setPresignedUrl] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -26,10 +34,10 @@ const TeamNewPage = () => {
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
-      title: '',
-      thumbnail: null,
-      workmode: 'online',
-      detail: '',
+      name: '',
+      description: '',
+      workMode: 'ONLINE',
+      profileImageUrl: '',
     },
   });
 
@@ -37,17 +45,40 @@ const TeamNewPage = () => {
     accept: { 'image/*': ['.png', '.jpg'] },
     multiple: false,
     onDrop: (acceptedFiles) => {
-      const file = acceptedFiles[0];
-      if (file) {
-        setPreview(URL.createObjectURL(file));
-        // 여기에 React Hook Form의 setValue 등을 사용해 파일 값을 저장하세요.
-        setValue('thumbnail', file);
-      }
+      const selectedFile = acceptedFiles[0];
+      if (!selectedFile) return;
+
+      setFile(selectedFile);
+      setPreview(URL.createObjectURL(selectedFile));
+
+      const type = selectedFile.type.split('/')[1].toUpperCase();
+
+      createImage(type, {
+        onSuccess: ({ presignedUrl, objectUrl }) => {
+          setPresignedUrl(presignedUrl);
+          setValue('profileImageUrl', objectUrl, { shouldValidate: true });
+        },
+        onError: (error) => {
+          console.error(error);
+        },
+      });
     },
   });
 
-  const onSubmit = (data: FormValues) => {
-    console.log(data);
+  const onSubmit = async (data: FormValues) => {
+    if (!file || !presignedUrl) return;
+
+    createTeam(data, {
+      onSuccess: () => {
+        axios.put(presignedUrl, file, {
+          headers: { 'Content-Type': file.type },
+        });
+        // 변경할 것! 모집글 작성 완료 후 페이지 이동 모집글 작성일지 내팀일지 정하기
+        // 현재는 모집글 작성 페이지
+        navigate('/post/new');
+      },
+      onError: (error) => console.error(error),
+    });
   };
 
   return (
@@ -68,10 +99,10 @@ const TeamNewPage = () => {
             id="title"
             variant="input"
             isRequired
-            errorMessage={errors.title?.message}
+            errorMessage={errors.name?.message}
             inputProps={{
               placeholder: '특수문자 제한, 최대 글자 수 20자',
-              ...register('title', {
+              ...register('name', {
                 required: '팀 이름을 입력해주세요.',
                 maxLength: { value: 20, message: '최대 20자까지 가능합니다.' },
                 pattern: {
@@ -81,6 +112,7 @@ const TeamNewPage = () => {
               }),
             }}
           />
+
           <FieldMaster
             title="대표 이미지"
             id="thumbnail"
@@ -94,7 +126,7 @@ const TeamNewPage = () => {
           />
 
           <Controller
-            name="workmode"
+            name="workMode"
             control={control}
             render={({ field }) => (
               <FieldMaster
@@ -111,7 +143,7 @@ const TeamNewPage = () => {
           />
 
           <Controller
-            name="detail"
+            name="description"
             control={control}
             rules={{ required: '상세 내용을 입력해주세요.' }}
             render={({ field }) => (
@@ -120,7 +152,7 @@ const TeamNewPage = () => {
                 id="detail"
                 variant="detail"
                 isRequired
-                errorMessage={errors.detail?.message}
+                errorMessage={errors.description?.message}
                 detailProps={{
                   value: field.value,
                   onChange: field.onChange,
@@ -129,7 +161,12 @@ const TeamNewPage = () => {
             )}
           />
         </div>
-        <BaseButton size="lg" disabled={!isValid} className="mx-auto w-[32rem]">
+        <BaseButton
+          type="submit"
+          size="lg"
+          disabled={!isValid}
+          className="mx-auto w-[32rem]"
+        >
           팀 만들기
         </BaseButton>
       </form>

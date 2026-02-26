@@ -50,3 +50,9 @@ export const CHIP_ICON_SIZE: Record<ChipVariant, string> = {
   teamOutline: 'h-[4.4rem] w-[4.4rem]',
   card: 'h-[2.4rem] w-[2.4rem]',
 };
+
+export const CHIP_ICON_COLOR = {
+  normal: '',
+  liked: 'text-blue-80',
+  unliked: 'text-error',
+};

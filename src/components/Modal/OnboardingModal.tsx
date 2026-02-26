@@ -168,16 +168,21 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
 
   const onSubmit = (data: FormValues) => {
     const transformedData = {
-      ...data,
+      username: data.username,
+
       position:
         POSITION_MAP[data.position as keyof typeof POSITION_MAP] ||
         data.position,
 
       skills: data.skills.map(
-        (skill) => SKILL_MAP[skill as keyof typeof SKILL_MAP] ?? data.skills,
+        (skill) => SKILL_MAP[skill as keyof typeof SKILL_MAP] ?? skill,
       ),
 
-      portfolioUrls: data.portfolioUrls ? [data.portfolioUrls] : [],
+      ...(data.portfolioUrls?.trim() && {
+        portfolioUrls: [data.portfolioUrls.trim()],
+      }),
+
+      ...(data.bio?.trim() && { bio: data.bio.trim() }),
     };
 
     updateUserProfile(transformedData);

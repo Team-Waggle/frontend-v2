@@ -25,19 +25,16 @@ interface MainCardProps {
 const MainCard = ({
   mainCardTitle,
   variant = 'main',
-  isActvie=false,
-  onClick
+  isActvie = false,
+  onClick,
 }: MainCardProps) => {
-
-  const baseStyle = "pointer-events-auto flex w-[36.8rem] min-w-[33.6rem] cursor-pointer flex-col items-start gap-[3.2rem] rounded-[1.2rem] border border-solid border-[#E7E8EA] bg-white px-[2.8rem] py-[2.4rem]";
+  const baseStyle =
+    'pointer-events-auto flex w-[36.8rem] max-1440:w-auto min-w-[33.6rem] cursor-pointer flex-col items-start gap-[3.2rem] rounded-[1.2rem] border border-solid border-[#E7E8EA] bg-white px-[2.8rem] py-[2.4rem]';
 
   const hoverStyle =
     variant === 'main' ? 'hover:shadow-main-card' : 'hover:bg-hover-5';
 
-  const activeStyle =
-    isActvie
-      ? "border-blue-70"
-      : "";
+  const activeStyle = isActvie ? 'border-blue-70' : '';
 
   return (
     <div

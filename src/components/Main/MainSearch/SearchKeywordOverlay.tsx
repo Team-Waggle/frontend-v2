@@ -29,7 +29,7 @@ export default function SearchKeywordOverlay({
   }, []);
 
   return (
-    <div className="absolute left-0 top-0 z-[30] flex h-[5rem] w-[129.2rem] items-start">
+    <div className="max-1440:w-full absolute left-0 top-0 z-[30] flex h-[5rem] w-[129.2rem] items-start">
       <div
         className={[
           'flex flex-1 items-center gap-[1rem] self-stretch rounded-l-[0.8rem] border border-solid border-[#237BFF] bg-white px-[2rem]',
