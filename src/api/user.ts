@@ -2,6 +2,7 @@ import axiosInstance from './axiosInstance';
 import {
   USERS_ME_PROFILE_COMPLETION_URL,
   USERS_ME_PROFILE_URL,
+  USERS_ME_TEAMS_URL,
   USERS_ME_URL,
   USERS_URL,
 } from '../constants/endpoint';
@@ -27,5 +28,11 @@ export const postUserProfile = async (profileData: object) => {
 // 프로필 완성 여부 조회
 export const getIsUserProfileComplete = async () => {
   const { data } = await axiosInstance.get(USERS_ME_PROFILE_COMPLETION_URL);
+  return data;
+};
+
+// 본인 참여 팀 목록 조회
+export const getUserMeTeam = async () => {
+  const { data } = await axiosInstance.get(USERS_ME_TEAMS_URL);
   return data;
 };
