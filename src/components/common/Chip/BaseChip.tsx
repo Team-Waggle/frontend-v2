@@ -1,6 +1,7 @@
 import { forwardRef, memo, useMemo } from 'react';
 import {
   BASE_CHIP_STYLES,
+  CHIP_ICON_COLOR,
   CHIP_ICON_SIZE,
   CHIP_SELECTED_STYLES,
   CHIP_VARIANT_STYLES,
@@ -23,6 +24,9 @@ const BaseChip = memo(
       },
       ref,
     ) => {
+      const iconColorClass =
+        variant === 'card' && isSelected ? CHIP_ICON_COLOR[status] : '';
+
       const chipStyles = useMemo(() => {
         const selected = isSelected ? 'selected' : 'unselected';
 
@@ -47,7 +51,9 @@ const BaseChip = memo(
           {...props}
         >
           {mainIcon && (
-            <span className={`${CHIP_ICON_SIZE[variant]} empty:hidden`}>
+            <span
+              className={`${CHIP_ICON_SIZE[variant]} ${iconColorClass} empty:hidden`}
+            >
               {mainIcon}
             </span>
           )}
