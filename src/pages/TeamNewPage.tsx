@@ -1,13 +1,14 @@
+import axios from 'axios';
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { Controller, useForm } from 'react-hook-form';
 import BaseButton from '../components/common/Button';
 import FieldMaster from '../components/Field/FieldMaster';
-import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import axios from 'axios';
+import { useCreateTeam, useCreateTeamImage } from '../hooks/useTeam';
 
 // Icons
 import NewTeamIcon from '../assets/icons/ic_character_new_team.svg?react';
-import { useCreateTeamImage } from '../hooks/useTeam';
 
 interface FormValues {
   name: string;
@@ -17,10 +18,12 @@ interface FormValues {
 }
 
 const TeamNewPage = () => {
-  const { mutateAsync } = useCreateTeamImage();
+  const { mutateAsync: createImage } = useCreateTeamImage();
+  const { mutate: createTeam } = useCreateTeam();
   const [preview, setPreview] = useState<string | undefined>(undefined);
   const [file, setFile] = useState<File | null>(null);
   const [presignedUrl, setPresignedUrl] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -50,7 +53,7 @@ const TeamNewPage = () => {
 
       const type = selectedFile.type.split('/')[1].toUpperCase();
 
-      mutateAsync(selectedFile.type, {
+      createImage(type, {
         onSuccess: ({ presignedUrl, objectUrl }) => {
           setPresignedUrl(presignedUrl);
           setValue('profileImageUrl', objectUrl, { shouldValidate: true });
@@ -65,16 +68,17 @@ const TeamNewPage = () => {
   const onSubmit = async (data: FormValues) => {
     if (!file || !presignedUrl) return;
 
-    const type = file.type.split('/')[1].toUpperCase();
-
-    await axios
-      .put(presignedUrl, file, {
-        headers: {
-          'Content-Type': file.type,
-        },
-      })
-      .then((data) => console.log(data))
-      .catch((error) => console.log(error));
+    createTeam(data, {
+      onSuccess: () => {
+        axios.put(presignedUrl, file, {
+          headers: { 'Content-Type': file.type },
+        });
+        // 변경할 것! 모집글 작성 완료 후 페이지 이동 모집글 작성일지 내팀일지 정하기
+        // 현재는 모집글 작성 페이지
+        navigate('/post/new');
+      },
+      onError: (error) => console.error(error),
+    });
   };
 
   return (

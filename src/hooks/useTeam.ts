@@ -1,6 +1,14 @@
 import { useMutation } from '@tanstack/react-query';
-import { PostTeamImage } from '../api/team';
+import { PostTeam, PostTeamImage } from '../api/team';
 
+// 팀 생성
+export const useCreateTeam = () => {
+  return useMutation({
+    mutationFn: (teamData: object) => PostTeam(teamData),
+  });
+};
+
+// 팀 프로필 이미지 업로드용 Presigned URL 생성
 export const useCreateTeamImage = () => {
   return useMutation({
     mutationFn: (contentType: string) => PostTeamImage(contentType),
