@@ -38,11 +38,11 @@ const PostFormPage = () => {
   return (
     <div className="flex w-full flex-col items-center gap-[7rem]">
       <div className="relative flex h-[20rem] w-full justify-center bg-blue-10">
-        <NewTeamIcon className="absolute top-[8.887rem]" />
+        <NewTeamIcon className="absolute top-[8.887rem] max-w-full" />
       </div>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex w-[90rem] flex-col gap-[4rem] pb-[4.4rem]"
+        className="flex w-[90rem] max-w-full flex-col gap-[4rem] pb-[4.4rem]"
       >
         <span className="text-[2.4rem] font-bold">모집글 작성해요!</span>
         <div className="flex flex-col gap-[3.6rem]">
