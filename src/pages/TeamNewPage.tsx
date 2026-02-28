@@ -69,13 +69,11 @@ const TeamNewPage = () => {
     if (!file || !presignedUrl) return;
 
     createTeam(data, {
-      onSuccess: () => {
+      onSuccess: (data) => {
         axios.put(presignedUrl, file, {
           headers: { 'Content-Type': file.type },
         });
-        // 변경할 것! 모집글 작성 완료 후 페이지 이동 모집글 작성일지 내팀일지 정하기
-        // 현재는 모집글 작성 페이지
-        navigate('/post/new');
+        // navigate(`/team/${data.teamId}`);
       },
       onError: (error) => console.error(error),
     });
@@ -84,11 +82,11 @@ const TeamNewPage = () => {
   return (
     <div className="flex w-full flex-col items-center gap-[7rem]">
       <div className="relative flex h-[20rem] w-full justify-center bg-blue-10">
-        <NewTeamIcon className="absolute top-[8.887rem]" />
+        <NewTeamIcon className="absolute top-[8.887rem] max-w-full" />
       </div>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mb-[17.9rem] flex w-[90rem] flex-col gap-[4rem]"
+        className="mb-[17.9rem] flex w-[90rem] max-w-full flex-col gap-[4rem]"
       >
         <span className="text-[2.4rem] font-bold text-black-100">
           새로운 팀을 만들어요!
@@ -104,7 +102,10 @@ const TeamNewPage = () => {
               placeholder: '특수문자 제한, 최대 글자 수 20자',
               ...register('name', {
                 required: '팀 이름을 입력해주세요.',
-                maxLength: { value: 20, message: '최대 20자까지 가능합니다.' },
+                maxLength: {
+                  value: 20,
+                  message: '최대 20자까지 가능합니다.',
+                },
                 pattern: {
                   value: /^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ]*$/,
                   message: '특수문자는 사용 불가합니다.',
