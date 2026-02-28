@@ -18,7 +18,7 @@ const MainSearchKeywordField = ({
   const hasValue = value.trim().length > 0;
 
   return (
-    <div className="flex h-[5rem] flex-1 items-center gap-[1rem] border-y border-r border-solid border-[#B7B9C0] px-[2rem]">
+    <div className="flex h-[5rem] flex-1 items-center gap-[1rem] border-y border-r border-solid border-[#B7B9C0] px-[2rem] min-w-0">
       <div className="flex h-[2rem] w-[2rem] flex-col items-center justify-center">
         <IcSearch className="text-[#878B96]" />
       </div>
