@@ -165,11 +165,11 @@ const MainSearch = () => {
   };
 
   return (
-    <div className="max-w-[152.6rem] flex w-[152.6rem] max-1440:w-full max-1440:max-w-full flex-col items-start gap-[2rem] pt-[5.4rem]">
+    <div className="max-w-[152.6rem] flex w-full flex-col items-start gap-[2rem] pt-[5.4rem]">
       <div className="flex h-[5rem] max-1440:w-full items-center gap-[2.4rem] self-stretch">
         <div className="flex flex-1 min-w-0 items-center self-stretch">
           <div ref={containerRef} className="relative flex-1 min-w-0">
-            <div className="flex h-[5rem] w-[129.2rem] max-1440:w-full items-center rounded-[0.8rem] rounded-r-none border border-x-0 border-solid border-[#B7B9C0] bg-white">
+            <div className="flex h-[5rem] w-full items-center rounded-[0.8rem] rounded-r-none border border-x-0 border-solid border-[#B7B9C0] bg-white">
               <MainSearchSelectField
                 variant="job"
                 isSelected={selectedJobs.length > 0}

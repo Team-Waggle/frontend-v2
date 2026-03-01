@@ -109,11 +109,11 @@ const TeamHomePage = () => {
 
   return (
     <div className="flex flex-1 flex-col items-center gap-[6rem] self-stretch pt-[9.2rem]">
-      <div className="max-1440:w-[98.2rem] flex w-[130rem] flex-col items-start gap-[4rem]">
+      <div className="flex w-full max-w-[clamp(98.2rem,70vw,130rem)] flex-col items-start gap-[4rem]">
         {/** 팀 설명 */}
         <div className="flex items-start gap-[4rem] self-stretch">
           {/** 팀 이미지: default 값 */}
-          <div className="max-1440:w-[42.4762rem] flex aspect-[40/21] w-[37.3333rem] flex-col items-center justify-center gap-[1rem] self-stretch rounded-[1rem] bg-blue-5 py-[1.9rem]">
+          <div className="max-1440:w-[42.4762rem] flex aspect-[40/21] w-full max-w-[37.3333rem] flex-col items-center justify-center gap-[1rem] self-stretch rounded-[1rem] bg-blue-5 py-[1.9rem]">
             <TeamDefaultImg className="h-[15.8rem] w-[15.8rem]" />
           </div>
           {/** 팀 상세 내용 */}
@@ -229,7 +229,7 @@ const TeamHomePage = () => {
               </p>
             </div>
             {/** 팀원 명단 카드 */}
-            <div className="max-1440:grid-cols-4 inline-grid grid-cols-5 gap-x-[1.8rem] gap-y-[2.4rem] self-stretch [grid-template-rows:repeat(2,fit-content(100%))]">
+            <div className="grid w-full self-stretch gap-x-[1.8rem] gap-y-[2.4rem] [grid-template-columns:repeat(auto-fit,minmax(23.4rem,1fr))]">
               {members.map((member) => (
                 <SideTeamCard
                   key={member.id}
