@@ -6,15 +6,16 @@ import ModalPortal from './ModalPortal';
 import { useModal } from '../../hooks/useModal';
 import type { ModalProps } from '../../types/modal';
 
+import { getUserCheck } from '../../api/user';
 import BaseButton from '../common/Button';
 import BaseChip from '../common/Chip/BaseChip';
 import FieldMaster from '../Field/FieldMaster';
 import { SkillIcon } from '../../utils/SkillIcon';
+import { POSITION_CONVERTER } from '../../utils/position';
 import { useCreateUserProfile } from '../../hooks/useUser';
 
 // Icons
 import RequireIcon from '../../assets/icons/ic_require.svg?react';
-import { POSITION_CONVERTER } from '../../utils/position';
 
 interface FormValues {
   username: string;
@@ -132,6 +133,7 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
     handleSubmit,
     watch,
     setValue,
+    setError,
     formState: { errors, isValid },
   } = useForm<FormValues>({
     mode: 'onChange',
@@ -158,24 +160,41 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
     });
   }, [register]);
 
-  const onSubmit = (data: FormValues) => {
-    const transformedData = {
-      username: data.username,
+  const onSubmit = async (data: FormValues) => {
+    try {
+      const response = await getUserCheck(data.username);
+      if (response?.isAvailable === false) {
+        setError(
+          'username',
+          {
+            type: 'manual',
+            message: '중복된 닉네임입니다.',
+          },
+          { shouldFocus: true },
+        );
+        return;
+      }
 
-      position: POSITION_CONVERTER[data.position] || data.position,
+      const transformedData = {
+        username: data.username,
 
-      skills: data.skills.map(
-        (skill) => SKILL_MAP[skill as keyof typeof SKILL_MAP] ?? skill,
-      ),
+        position: POSITION_CONVERTER[data.position] || data.position,
 
-      ...(data.portfolioUrls?.trim() && {
-        portfolioUrls: [data.portfolioUrls.trim()],
-      }),
+        skills: data.skills.map(
+          (skill) => SKILL_MAP[skill as keyof typeof SKILL_MAP] ?? skill,
+        ),
 
-      ...(data.bio?.trim() && { bio: data.bio.trim() }),
-    };
+        ...(data.portfolioUrls?.trim() && {
+          portfolioUrls: [data.portfolioUrls.trim()],
+        }),
 
-    updateUserProfile(transformedData);
+        ...(data.bio?.trim() && { bio: data.bio.trim() }),
+      };
+
+      updateUserProfile(transformedData);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useModal({ isOpen, isOnboarding: true, onClose });
@@ -191,7 +210,7 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
         <ModalOverlay onClose={onClose} isOnboarding={true} />
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="relative flex h-[63.2rem] w-[73.8rem] flex-col gap-[4rem] overflow-scroll overflow-y-scroll rounded-[2rem] bg-white px-[4rem] pt-[4.4rem] scrollbar-hide"
+          className="relative flex h-[63.2rem] w-[73.8rem] flex-col gap-[4rem] overflow-scroll overflow-y-scroll scroll-smooth rounded-[2rem] bg-white px-[4rem] pt-[4.4rem] scrollbar-hide"
         >
           <div className="flex w-full flex-col gap-[3.4rem]">
             <div className="flex flex-col text-[3rem] font-bold">
