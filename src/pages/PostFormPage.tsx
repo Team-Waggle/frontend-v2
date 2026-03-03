@@ -2,7 +2,7 @@ import { Controller, useForm } from 'react-hook-form';
 import BaseButton from '../components/common/Button';
 import FieldMaster from '../components/Field/FieldMaster';
 import type { PositionValue } from '../components/Field/FieldBody';
-import { useGetUserMeTeam } from '../hooks/userUser';
+import { useGetUserMeTeam } from '../hooks/useUser';
 
 // Icons
 import NewTeamIcon from '../assets/icons/ic_character_new_post.svg?react';

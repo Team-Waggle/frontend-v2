@@ -1,7 +1,7 @@
 import MainCard from '../components/common/Cards/MainCard/MainCard';
 import MainSearch from '../components/Main/MainSearch/MainSearch';
 import OnboardingModal from '../components/Modal/OnboardingModal';
-import { useGetIsUserProfileComplete } from '../hooks/userUser';
+import { useGetIsUserProfileComplete } from '../hooks/useUser';
 
 /**
  *
