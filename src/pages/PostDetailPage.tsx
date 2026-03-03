@@ -1,4 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useParams } from 'react-router-dom';
+
+import { useGetPostDetail } from '../hooks/usePost';
 
 import IcProfileBasic from '../assets/icons/ic_profile_basic.svg?react';
 
@@ -12,16 +15,29 @@ import IcJavaScriptSkill from '../assets/icons/skill/large/ic_skill_JavaScript_l
 import IcMongoSkill from '../assets/icons/skill/large/ic_skill_MongoDB_large.svg?react';
 import IcNodejsSkill from '../assets/icons/skill/large/ic_skill_Node.js_large.svg?react';
 
-import TeamCard from '../components/RecruitmentDetail/TeamCard';
+import TeamCard from '../components/PostDetail/TeamCard';
 import SideTeamCard from '../components/common/Cards/SideTeamCard';
 
 import BaseButton from '../components/common/Button/index';
 
 import ButtonBlur from '../assets/blur/recruitment_detail_button_blur.svg?react';
 
-/** 하단 여백만 수정하면 퍼블리싱 작업 끝 */
+const PostDetailPage = () => {
+  const { postId } = useParams<{ postId: string }>();
 
-const RecruitmentDetailPage = () => {
+  const parsedPostId = useMemo(() => {
+    if (!postId) return 0;
+
+    const n = Number(postId);
+    if (!Number.isInteger(n) || n <= 0) return 0;
+
+    return n;
+  }, [postId]);
+
+  const {
+    data: postDetail,
+  } = useGetPostDetail(parsedPostId);
+
   const [applyButtonPx, setApplyButtonPx] = useState<number | null>(null);
 
   const leftColRef = useRef<HTMLDivElement | null>(null);
@@ -197,17 +213,14 @@ const RecruitmentDetailPage = () => {
             <div className="flex flex-col items-start gap-[2rem] self-stretch">
               <div className="overflow-hidden overflow-ellipsis">
                 <span className="line-clamp-2 overflow-ellipsis text-[3.4rem] font-[600] leading-[1.5] tracking-[-0.068rem] text-black-100">
-                  팀 dtdt에서 [팀 팀 빌딩 웹사이트]를 같이 제작할 프론트엔드
-                  개발자`님을 찾습니다!! 모집글제목팀 dtdt에서 [팀 팀 빌딩
-                  웹사이트]를 같이 제작할 프론트엔드 개발자`님을 찾습니다!!
-                  모집글제목
+                  {postDetail?.title}
                 </span>
               </div>
               <div className="flex items-center gap-[0.8rem]">
                 <div className="flex items-center gap-[0.8rem]">
                   <IcProfileBasic className="h-[2.4rem] w-[2.4rem]" />
                   <span className="text-[1.6rem] font-[600] leading-[1.5] tracking-[-0.032rem] text-black-100">
-                    일이삼사오육칠팔구십
+                    {postDetail?.user.username}
                   </span>
                 </div>
                 <div className="h-[1.7rem] w-[0.1rem] bg-black-40" />
@@ -275,7 +288,9 @@ const RecruitmentDetailPage = () => {
           </div>
         </div>
         {/** 모집글 상세조회 내용 */}
-        <div className={`flex flex-col items-start gap-[4rem] self-stretch ${!isMyPost && "mb-[6.6rem]"}`}>
+        <div
+          className={`flex flex-col items-start gap-[4rem] self-stretch ${!isMyPost && 'mb-[6.6rem]'}`}
+        >
           <TeamCard />
           <div className="w-[68.8rem]">
             <span className="text-[1.6rem] font-[600] leading-[1.5] tracking-[-0.032rem] text-black-100">
@@ -337,7 +352,7 @@ const RecruitmentDetailPage = () => {
       {/** 팀 구간 */}
       <div className="flex self-start pt-[17.8rem]">
         <div ref={sideWrapRef} className="self-start will-change-transform">
-          <SideTeamCard variant="recruitment" />
+          <SideTeamCard variant="post" />
         </div>
       </div>
 
@@ -366,4 +381,4 @@ const RecruitmentDetailPage = () => {
   );
 };
 
-export default RecruitmentDetailPage;
+export default PostDetailPage;
