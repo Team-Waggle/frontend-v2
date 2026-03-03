@@ -15,14 +15,14 @@ import IcJavaScriptSkill from '../assets/icons/skill/large/ic_skill_JavaScript_l
 import IcMongoSkill from '../assets/icons/skill/large/ic_skill_MongoDB_large.svg?react';
 import IcNodejsSkill from '../assets/icons/skill/large/ic_skill_Node.js_large.svg?react';
 
-import TeamCard from '../components/RecruitmentDetail/TeamCard';
+import TeamCard from '../components/PostDetail/TeamCard';
 import SideTeamCard from '../components/common/Cards/SideTeamCard';
 
 import BaseButton from '../components/common/Button/index';
 
 import ButtonBlur from '../assets/blur/recruitment_detail_button_blur.svg?react';
 
-const RecruitmentDetailPage = () => {
+const PostDetailPage = () => {
   const { postId } = useParams<{ postId: string }>();
 
   const parsedPostId = useMemo(() => {
@@ -352,7 +352,7 @@ const RecruitmentDetailPage = () => {
       {/** 팀 구간 */}
       <div className="flex self-start pt-[17.8rem]">
         <div ref={sideWrapRef} className="self-start will-change-transform">
-          <SideTeamCard variant="recruitment" />
+          <SideTeamCard variant="post" />
         </div>
       </div>
 
@@ -381,4 +381,4 @@ const RecruitmentDetailPage = () => {
   );
 };
 
-export default RecruitmentDetailPage;
+export default PostDetailPage;
