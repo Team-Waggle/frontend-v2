@@ -1,6 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
 
 import useHorizontalScroll from '../hooks/useHorizontalScroll';
+import { useGetTeamDetail } from '../hooks/useTeam';
 
 import TeamDefaultImg from '../assets/icons/image/ic_character_circle_primary_60.svg?react';
 
@@ -17,6 +19,21 @@ import SideTeamCard from '../components/common/Cards/SideTeamCard';
 import IconWrapper from '../components/common/IconWrapper';
 
 const TeamHomePage = () => {
+  const { teamId } = useParams<{ teamId: string }>();
+
+  const parsedTeamId = useMemo(() => {
+    if (!teamId) return 0;
+
+    const n = Number(teamId);
+    if (!Number.isInteger(n) || n <= 0) return 0;
+
+    return n;
+  }, [teamId]);
+
+  const {
+    data: teamDetail
+  } = useGetTeamDetail(parsedTeamId);
+
   const [activeCard, setActiveCard] = useState<number | null>(null);
   const [activeTeamMember, setActiveTeamMember] = useState<number | null>(null);
 
@@ -75,7 +92,7 @@ const TeamHomePage = () => {
               {/** 팀명 */}
               <div>
                 <span className="text-[3.8rem] font-[600] leading-[1.5] tracking-[-0.076rem] text-black">
-                  일이삼사오육칠팔구
+                  {teamDetail?.name ?? "WAGGLE"}
                 </span>
               </div>
               {/** 팀원 수, 오프라인/온라인, 날짜 */}
@@ -89,7 +106,7 @@ const TeamHomePage = () => {
                 <div className="flex h-[4.2rem] min-w-[4.8rem] items-center justify-center gap-[0.2rem] rounded-[9.9rem] bg-black-10 px-[1.4rem]">
                   <IcDesktop className="h-[1.2rem] w-[1.2rem]" />
                   <span className="flex-1 text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black-100">
-                    온라인
+                    {teamDetail?.workMode ?? "온라인"}
                   </span>
                 </div>
                 <div className="flex h-[4.2rem] min-w-[4.8rem] items-center justify-center gap-[0.2rem] rounded-[9.9rem] bg-black-10 px-[1.4rem]">
@@ -102,10 +119,7 @@ const TeamHomePage = () => {
             </div>
             <div>
               <span className="text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black">
-                안녕하세요 :) 이번 팀에서는 우리 일상 속에서 당연하게 겪고 있던
-                불편함을 조금 더 나은 방향으로 해결하고자 모였습니다. 팀 와글은
-                사용자 경험을 최우선으로 생각하며, 창의적인 솔루션을 제안하고
-                있습니다.
+                {teamDetail?.description ?? "팀 소개가 들어가는 자리입니다."}
               </span>
             </div>
           </div>
