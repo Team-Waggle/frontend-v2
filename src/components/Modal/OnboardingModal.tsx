@@ -10,10 +10,11 @@ import BaseButton from '../common/Button';
 import BaseChip from '../common/Chip/BaseChip';
 import FieldMaster from '../Field/FieldMaster';
 import { SkillIcon } from '../../utils/SkillIcon';
-import { useCreateUserProfile } from '../../hooks/userUser';
+import { useCreateUserProfile } from '../../hooks/useUser';
 
 // Icons
 import RequireIcon from '../../assets/icons/ic_require.svg?react';
+import { POSITION_CONVERTER } from '../../utils/position';
 
 interface FormValues {
   username: string;
@@ -85,15 +86,6 @@ const positionData = {
     'Vue.js',
     '콘텐츠제작',
   ],
-};
-
-const POSITION_MAP: Record<string, string> = {
-  기획: 'PLANNER',
-  디자인: 'DESIGNER',
-  프론트엔드: 'FRONTEND',
-  백엔드: 'BACKEND',
-  마케팅: 'MARKETER',
-  기타: 'OTHER',
 };
 
 const SKILL_MAP: Record<string, string> = {
@@ -170,9 +162,7 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
     const transformedData = {
       username: data.username,
 
-      position:
-        POSITION_MAP[data.position as keyof typeof POSITION_MAP] ||
-        data.position,
+      position: POSITION_CONVERTER[data.position] || data.position,
 
       skills: data.skills.map(
         (skill) => SKILL_MAP[skill as keyof typeof SKILL_MAP] ?? skill,

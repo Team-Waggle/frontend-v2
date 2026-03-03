@@ -1,7 +1,6 @@
-import axiosInstance from '../../api/axiosInstance';
-import { useNavigate } from 'react-router';
-import { useAuthStore } from '../../stores/authStore';
-import { LOGOUT_URL } from '../../constants/endpoint';
+import { useGetUserMe } from '../../hooks/useUser';
+import { usePostLogout } from '../../hooks/useAuth';
+import { POSITION_CONVERTER } from '../../utils/position';
 
 // Icons
 import BaicProfileIcon from '../../assets/icons/ic_profile_basic.svg?react';
@@ -15,19 +14,9 @@ const SidebarProfile = ({
   isFolded: boolean;
   isLoggedIn: boolean;
 }) => {
-  const navigate = useNavigate();
-  const logout = useAuthStore((state) => state.logout);
+  const { mutate: logout } = usePostLogout();
 
-  const handleLogout = async () => {
-    try {
-      await axiosInstance.post(LOGOUT_URL);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      logout();
-      navigate('/');
-    }
-  };
+  const { data } = useGetUserMe();
 
   if (isFolded) return <BaicProfileIcon />;
 
@@ -40,14 +29,14 @@ const SidebarProfile = ({
           <BaicProfileIcon />
           <div className="flex w-[14.8rem] flex-col justify-center">
             <span className="text-[1.6rem] font-semibold text-black-100">
-              일이삼사오육칠팔구십
+              {data?.username || '닉네임'}
             </span>
             <span className="h-[2rem] text-[1.3rem] font-medium text-black-60">
-              프론트엔드
+              {POSITION_CONVERTER[data?.position] || '포지션'}
             </span>
           </div>
           <button
-            onClick={handleLogout}
+            onClick={() => logout()}
             className="h-[3.2rem] w-[3.2rem] rounded-full px-[0.8rem] py-[0.8rem] hover:bg-black-10"
           >
             <LogoutIcon className="h-[1.6rem] w-[1.6rem] text-black-40" />

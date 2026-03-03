@@ -33,13 +33,13 @@ export const useGetUserMe = () => {
 export const useCreateUserProfile = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const setUserId = useAuthStore((state) => state.setUserId);
+  const { setProfileComplete } = useAuthStore();
   return useMutation({
     mutationFn: (profileData: object) => postUserProfile(profileData),
-    onSuccess: (data) => {
+    onSuccess: () => {
+      setProfileComplete(true);
       queryClient.invalidateQueries({ queryKey: ['profile-complete'] });
-      const { userId } = data;
-      setUserId(userId);
+      queryClient.invalidateQueries({ queryKey: ['me'] });
       navigate('/');
     },
     onError: (error) => {
@@ -61,8 +61,10 @@ export const useGetIsUserProfileComplete = () => {
 
 // 본인 참여 팀 목록 조회
 export const useGetUserMeTeam = () => {
+  const accessToken = useAuthStore((state) => state.accessToken);
   return useQuery({
     queryKey: ['user-me-team'],
     queryFn: () => getUserMeTeam(),
+    enabled: !!accessToken,
   });
 };
