@@ -11,6 +11,7 @@ import IcCompany from '../assets/icons/normal/ic_company.svg?react';
 import ChevronLeft from '../assets/icons/normal/chevron/ic_chevronLeft.svg?react';
 import ChevronRight from '../assets/icons/normal/chevron/ic_chevronRight.svg?react';
 
+import TeamNav from '../components/Team/TeamNav';
 import MainCard from '../components/common/Cards/MainCard/MainCard';
 import SideTeamCard from '../components/common/Cards/SideTeamCard';
 import IconWrapper from '../components/common/IconWrapper';
@@ -59,6 +60,8 @@ const TeamHomePage = () => {
 
   return (
     <div className="flex flex-1 flex-col items-center gap-[6rem] self-stretch pt-[9.2rem]">
+      <TeamNav />
+
       <div className="flex w-full max-w-[clamp(98.2rem,70vw,130rem)] flex-col items-start gap-[4rem]">
         {/** 팀 설명 */}
         <div className="flex items-start gap-[4rem] self-stretch">
