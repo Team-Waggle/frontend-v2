@@ -68,11 +68,11 @@ const Sidebar = () => {
               </IconWrapper>
             ) : isProfileComplete ? (
               myteamData?.length === 0 ? (
-                <BaseButton onClick={() => navigate('/post/new')}>
+                <BaseButton onClick={() => navigate('/team/new')}>
                   팀 만들기
                 </BaseButton>
               ) : (
-                <BaseButton onClick={() => navigate('/team/new')}>
+                <BaseButton onClick={() => navigate('/post/new')}>
                   모집글 작성
                 </BaseButton>
               )
