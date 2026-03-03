@@ -51,9 +51,7 @@ const TeamNewPage = () => {
       setFile(selectedFile);
       setPreview(URL.createObjectURL(selectedFile));
 
-      const type = selectedFile.type.split('/')[1].toUpperCase();
-
-      createImage(type, {
+      createImage(selectedFile.type, {
         onSuccess: ({ presignedUrl, objectUrl }) => {
           setPresignedUrl(presignedUrl);
           setValue('profileImageUrl', objectUrl, { shouldValidate: true });
@@ -73,7 +71,7 @@ const TeamNewPage = () => {
         axios.put(presignedUrl, file, {
           headers: { 'Content-Type': file.type },
         });
-        // navigate(`/team/${data.teamId}`);
+        navigate(`/team/${data.teamId}`);
       },
       onError: (error) => console.error(error),
     });
