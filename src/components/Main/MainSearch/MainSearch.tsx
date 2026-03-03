@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import useHorizontalScroll from '../../../hooks/useHorizontalScroll';
+
 import IcBusinessBag from '../../../../src/assets/icons/normal/ic_businessBag.svg?react';
 import IcFolder from '../../../../src/assets/icons/normal/ic_folder.svg?react';
 import IcRefresh from '../../../../src/assets/icons/normal/ic_refresh.svg?react';
+import ChevronLeft from '../../../assets/icons/normal/chevron/ic_chevronLeft.svg?react';
+import ChevronRight from '../../../assets/icons/normal/chevron/ic_chevronRight.svg?react';
 
 import MainSearchTag from './MainSearchTag';
 import MainSearchSelectText from './MainSearchSelectText';
@@ -13,6 +17,7 @@ import SearchKeywordOverlay from './SearchKeywordOverlay';
 
 import SearchSkillSelectBox from './SearchSkillSelectBox';
 import SearchJobSelectBox from './SearchJobSelectBox';
+import IconWrapper from '../../common/IconWrapper';
 
 /**
  *
@@ -164,11 +169,18 @@ const MainSearch = () => {
     setSelectedSkills((prev) => prev.filter((s) => s.id !== tag.id));
   };
 
+  const { trackRef, canScrollLeft, canScrollRight, scrollByItem } =
+    useHorizontalScroll({
+      itemSelector: '[data-search-tag="true"]',
+      gapPx: 8,
+      deps: [searchTags.length],
+    });
+
   return (
-    <div className="max-w-[152.6rem] flex w-full flex-col items-start gap-[2rem] pt-[5.4rem]">
-      <div className="flex h-[5rem] max-1440:w-full items-center gap-[2.4rem] self-stretch">
-        <div className="flex flex-1 min-w-0 items-center self-stretch">
-          <div ref={containerRef} className="relative flex-1 min-w-0">
+    <div className="flex w-full max-w-[152.6rem] flex-col items-start gap-[2rem] pt-[5.4rem]">
+      <div className="flex h-[5rem] items-center gap-[2.4rem] self-stretch max-1440:w-full">
+        <div className="flex min-w-0 flex-1 items-center self-stretch">
+          <div ref={containerRef} className="relative min-w-0 flex-1">
             <div className="flex h-[5rem] w-full items-center rounded-[0.8rem] rounded-r-none border border-x-0 border-solid border-[#B7B9C0] bg-white">
               <MainSearchSelectField
                 variant="job"
@@ -221,7 +233,10 @@ const MainSearch = () => {
             )}
           </div>
 
-          <button type="button" className="flex w-[16rem] items-center justify-center gap-[1rem] self-stretch rounded-r-[0.8rem] bg-[#06F] px-[2rem]">
+          <button
+            type="button"
+            className="flex w-[16rem] items-center justify-center gap-[1rem] self-stretch rounded-r-[0.8rem] bg-[#06F] px-[2rem]"
+          >
             <span className="text-[1.6rem] font-[700] text-white">확인</span>
           </button>
         </div>
@@ -244,14 +259,56 @@ const MainSearch = () => {
       </div>
 
       <div className="flex items-center justify-between self-stretch">
-        <div className="flex items-center gap-[0.8rem]">
-          {searchTags.map((t) => (
-            <MainSearchTag
-              key={`${t.type}-${t.id}`}
-              TagTitle={t.title}
-              onRemove={() => removeSearchTag(t)}
-            />
-          ))}
+        <div className="relative min-w-0 flex-1 self-stretch overflow-hidden">
+          {canScrollLeft && (
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 flex">
+              <div className="flex h-full w-[9.2rem] items-center bg-team-home-left-slide-background pl-[1.2rem] pr-[1.2rem] backdrop-blur-none">
+                <IconWrapper
+                  shape="circle"
+                  color="outline"
+                  children={
+                    <ChevronLeft className="h-[1.7455rem] w-[1.7455rem]" />
+                  }
+                  className="pointer-events-auto !h-[3.2rem] !min-h-[3.2rem] !w-[3.2rem] !min-w-[3.2rem] p-0"
+                  onClick={() => {
+                    scrollByItem('left');
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          {canScrollRight && (
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 flex">
+              <div className="flex h-full w-[9.2rem] items-center justify-end bg-team-home-right-slide-background pl-[1.2rem] pr-[1.2rem] backdrop-blur-none">
+                <IconWrapper
+                  shape="circle"
+                  color="outline"
+                  children={
+                    <ChevronRight className="h-[1.7455rem] w-[1.7455rem]" />
+                  }
+                  className="pointer-events-auto !h-[3.2rem] !min-h-[3.2rem] !w-[3.2rem] !min-w-[3.2rem] p-0"
+                  onClick={() => {
+                    scrollByItem('right');
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          <div
+            ref={trackRef}
+            className="flex h-full min-w-0 items-center gap-[0.8rem] overflow-x-auto scroll-smooth scrollbar-hide"
+          >
+            {searchTags.map((t) => (
+              <div key={`${t.type}-${t.id}`} data-search-tag="true">
+                <MainSearchTag
+                  TagTitle={t.title}
+                  onRemove={() => removeSearchTag(t)}
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         <MainSearchSelectText />
