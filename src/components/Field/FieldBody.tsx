@@ -1,4 +1,4 @@
-import React, { forwardRef, memo } from 'react';
+import React, { forwardRef, memo, useEffect, useRef, useState } from 'react';
 import type { DropzoneInputProps, DropzoneRootProps } from 'react-dropzone';
 import BaseChip from '../common/Chip/BaseChip';
 import BaseButton from '../common/Button';
@@ -63,6 +63,7 @@ interface TeamData {
   teamId: number;
   name: string;
   description: string;
+  profileImageUrl: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -229,6 +230,34 @@ export const FieldWorkmode = ({
 };
 
 export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
+  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+  const [urlInput, setUrlInput] = useState('');
+  const [isLinkActiveUI, setIsLinkActiveUI] = useState(false);
+
+  const linkModalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        linkModalRef.current &&
+        !linkModalRef.current.contains(event.target as Node)
+      ) {
+        setIsLinkModalOpen(false);
+        setIsLinkActiveUI(false);
+      }
+    };
+
+    if (isLinkModalOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isLinkModalOpen]);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -258,37 +287,48 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
 
   if (!editor) return null;
 
-  const setLink = () => {
-    // 1. 이미 링크가 걸려있다면 해제(unset)
+  const openLinkModal = () => {
+    // 이미 링크가 활성화된 상태라면 링크 해제
     if (editor.isActive('link')) {
       editor.chain().focus().unsetLink().run();
       return;
     }
 
-    // 2. 링크가 없다면 주소 입력받기
-    const url = window.prompt('연결할 URL 주소를 입력하세요:');
+    // 링크가 없다면 입력 모달 열기
+    setIsLinkActiveUI(true);
+    setUrlInput(''); // 이전 입력값 초기화
+    setIsLinkModalOpen(true);
+  };
 
-    // 취소 눌렀을 때 처리
-    if (url === null) return;
-
-    // 주소가 비어있으면 링크 해제, 있으면 링크 설정
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+  // 2. 모달에서 '확인' 버튼을 눌렀을 때 호출
+  const applyLink = () => {
+    if (urlInput.trim() === '') {
+      setIsLinkModalOpen(false);
+      setIsLinkActiveUI(false);
       return;
     }
 
-    // 링크 적용
+    const from = editor.state.selection.from;
+    const to = from + urlInput.length;
+
     editor
       .chain()
       .focus()
-      .extendMarkRange('link')
-      .setLink({ href: url })
-      .insertContent(url)
+      .insertContent(urlInput)
+      .setTextSelection({ from, to }) // 방금 삽입한 텍스트 선택
+      .setLink({ href: urlInput }) // 링크 적용
+      .setTextSelection(to) // 커서를 링크 끝으로 이동
       .run();
+
+    editor.commands.unsetMark('link');
+
+    setIsLinkModalOpen(false);
+    setIsLinkActiveUI(false);
+    setUrlInput('');
   };
 
   return (
-    <div className="h-[47.1rem] w-full">
+    <div className="relative h-[47.1rem] w-full">
       <div className="flex h-[6.4rem] items-center gap-[2.4rem] rounded-tl-[0.8rem] rounded-tr-[0.8rem] border-x border-t border-black-30 bg-black-10 px-[1.8rem] py-[1.4rem]">
         <div className="flex gap-[0.2rem]">
           <IconWrapper
@@ -359,8 +399,8 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
           </IconWrapper>
           <IconWrapper
             color="transparent"
-            onClick={setLink}
-            isSelected={editor.isActive('link')}
+            onClick={openLinkModal}
+            isSelected={isLinkActiveUI}
             className="h-[3.6rem] w-[3.6rem]"
           >
             <LinkIcon />
@@ -377,6 +417,36 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
       <div className="h-[39.9rem] w-full rounded-bl-[0.8rem] rounded-br-[0.8rem] border-x border-b border-black-30 bg-black-5 px-[1.8rem] py-[1.7rem] text-[1.6rem] font-medium">
         <EditorContent editor={editor} className="prose-list h-full" />
       </div>
+      {isLinkModalOpen && (
+        <div
+          ref={linkModalRef}
+          className="absolute left-[6.3rem] top-[6.2rem] z-50 flex w-[36.2rem] gap-[0.8rem] rounded-lg border bg-white px-[1rem] py-[0.8rem]"
+        >
+          <input
+            autoFocus
+            className="h-[3.2rem] w-[27.7rem] rounded-[0.6rem] border-2 border-blue-90 px-[1rem] py-[0.6rem] text-[1.6rem] font-medium"
+            placeholder="링크를 입력해 주세요."
+            value={urlInput}
+            onChange={(e) => setUrlInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') applyLink();
+              if (e.key === 'Escape') {
+                setIsLinkModalOpen(false);
+                setIsLinkActiveUI(false);
+              }
+            }}
+          />
+          <BaseButton
+            size="sm"
+            color="tertiary"
+            disabled={!urlInput}
+            onClick={applyLink}
+            className="w-[5.7rem] whitespace-nowrap"
+          >
+            확인
+          </BaseButton>
+        </div>
+      )}
     </div>
   );
 });
@@ -394,7 +464,7 @@ export const FieldTeamName = ({
         <BaseChip
           key={team.teamId}
           variant="teamOutline"
-          mainIcon={<ProfileBasicIcon />}
+          mainIcon={team?.profileImageUrl || <ProfileBasicIcon />}
           isSelected={value === team.teamId}
           onClick={() => onChange?.(team.teamId)}
         >
