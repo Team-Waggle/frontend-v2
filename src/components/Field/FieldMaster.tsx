@@ -32,6 +32,7 @@ interface TeamData {
   teamId: number;
   name: string;
   description: string;
+  profileImageUrl: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -1,5 +1,5 @@
-import { useMutation } from '@tanstack/react-query';
-import { PostTeam, PostTeamImage } from '../api/team';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { PostTeam, PostTeamImage, GetTeamDetail } from '../api/team';
 
 // 팀 생성
 export const useCreateTeam = () => {
@@ -12,5 +12,17 @@ export const useCreateTeam = () => {
 export const useCreateTeamImage = () => {
   return useMutation({
     mutationFn: (contentType: string) => PostTeamImage(contentType),
+  });
+};
+
+// 팀 상세조회
+export const useGetTeamDetail = (teamId: number) => {
+  const isValidTeamId = Number.isInteger(teamId) && teamId > 0;
+
+  return useQuery({
+    queryKey: ['team-detail', teamId],
+    queryFn: () => GetTeamDetail(teamId),
+    enabled: isValidTeamId,
+    refetchOnWindowFocus: false,
   });
 };

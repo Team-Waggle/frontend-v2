@@ -1,4 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
+
+import useHorizontalScroll from '../hooks/useHorizontalScroll';
+import { useGetTeamDetail } from '../hooks/useTeam';
 
 import TeamDefaultImg from '../assets/icons/image/ic_character_circle_primary_60.svg?react';
 
@@ -9,17 +13,29 @@ import IcCompany from '../assets/icons/normal/ic_company.svg?react';
 import ChevronLeft from '../assets/icons/normal/chevron/ic_chevronLeft.svg?react';
 import ChevronRight from '../assets/icons/normal/chevron/ic_chevronRight.svg?react';
 
+import TeamNav from '../components/Team/TeamNav';
 import MainCard from '../components/common/Cards/MainCard/MainCard';
 import SideTeamCard from '../components/common/Cards/SideTeamCard';
 import IconWrapper from '../components/common/IconWrapper';
 
 const TeamHomePage = () => {
+  const { teamId } = useParams<{ teamId: string }>();
+
+  const parsedTeamId = useMemo(() => {
+    if (!teamId) return 0;
+
+    const n = Number(teamId);
+    if (!Number.isInteger(n) || n <= 0) return 0;
+
+    return n;
+  }, [teamId]);
+
+  const {
+    data: teamDetail
+  } = useGetTeamDetail(parsedTeamId);
+
   const [activeCard, setActiveCard] = useState<number | null>(null);
   const [activeTeamMember, setActiveTeamMember] = useState<number | null>(null);
-
-  const trackRef = useRef<HTMLDivElement | null>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
 
   const posts = [
     {
@@ -52,68 +68,22 @@ const TeamHomePage = () => {
     { id: 5, title: 'title5', job: '프론트엔드' },
   ];
 
-  const updateScrollButtons = () => {
-    const el = trackRef.current;
-    if (!el) return;
-
-    const threshold = 1;
-    const left = el.scrollLeft;
-    const maxLeft = el.scrollWidth - el.clientWidth;
-
-    setCanScrollLeft(left > threshold);
-    setCanScrollRight(maxLeft - left > threshold);
-  };
-
-  useEffect(() => {
-    updateScrollButtons();
-  }, [posts.length]);
-
-  useEffect(() => {
-    const el = trackRef.current;
-    if (!el) return;
-
-    const handleScroll = () => {
-      updateScrollButtons();
-    };
-
-    const handleResize = () => {
-      updateScrollButtons();
-    };
-
-    el.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleResize);
-
-    updateScrollButtons();
-
-    return () => {
-      el.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
-  const scrollByCard = (direction: 'left' | 'right') => {
-    const el = trackRef.current;
-    if (!el) return;
-
-    const firstCard = el.querySelector<HTMLElement>('[data-main-card="true"]');
-    const cardWidth = firstCard ? firstCard.offsetWidth : 0;
-
-    const gap = 18;
-    const step = cardWidth > 0 ? cardWidth + gap : el.clientWidth;
-
-    el.scrollBy({
-      left: direction === 'right' ? step : -step,
-      behavior: 'smooth',
+  const { trackRef, canScrollLeft, canScrollRight, scrollByItem } =
+    useHorizontalScroll({
+      itemSelector: '[data-main-card="true"]',
+      gapPx: 18,
+      deps: [posts.length],
     });
-  };
 
   return (
     <div className="flex flex-1 flex-col items-center gap-[6rem] self-stretch pt-[9.2rem]">
+      <TeamNav />
+
       <div className="flex w-full max-w-[clamp(98.2rem,70vw,130rem)] flex-col items-start gap-[4rem]">
         {/** 팀 설명 */}
         <div className="flex items-start gap-[4rem] self-stretch">
           {/** 팀 이미지: default 값 */}
-          <div className="max-1440:w-[42.4762rem] flex aspect-[40/21] w-full max-w-[37.3333rem] flex-col items-center justify-center gap-[1rem] self-stretch rounded-[1rem] bg-blue-5 py-[1.9rem]">
+          <div className="flex aspect-[40/21] w-full max-w-[37.3333rem] flex-col items-center justify-center gap-[1rem] self-stretch rounded-[1rem] bg-blue-5 py-[1.9rem] max-1440:w-[42.4762rem]">
             <TeamDefaultImg className="h-[15.8rem] w-[15.8rem]" />
           </div>
           {/** 팀 상세 내용 */}
@@ -122,7 +92,7 @@ const TeamHomePage = () => {
               {/** 팀명 */}
               <div>
                 <span className="text-[3.8rem] font-[600] leading-[1.5] tracking-[-0.076rem] text-black">
-                  일이삼사오육칠팔구
+                  {teamDetail?.name ?? "WAGGLE"}
                 </span>
               </div>
               {/** 팀원 수, 오프라인/온라인, 날짜 */}
@@ -136,7 +106,7 @@ const TeamHomePage = () => {
                 <div className="flex h-[4.2rem] min-w-[4.8rem] items-center justify-center gap-[0.2rem] rounded-[9.9rem] bg-black-10 px-[1.4rem]">
                   <IcDesktop className="h-[1.2rem] w-[1.2rem]" />
                   <span className="flex-1 text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black-100">
-                    온라인
+                    {teamDetail?.workMode ?? "온라인"}
                   </span>
                 </div>
                 <div className="flex h-[4.2rem] min-w-[4.8rem] items-center justify-center gap-[0.2rem] rounded-[9.9rem] bg-black-10 px-[1.4rem]">
@@ -149,10 +119,7 @@ const TeamHomePage = () => {
             </div>
             <div>
               <span className="text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black">
-                안녕하세요 :) 이번 팀에서는 우리 일상 속에서 당연하게 겪고 있던
-                불편함을 조금 더 나은 방향으로 해결하고자 모였습니다. 팀 와글은
-                사용자 경험을 최우선으로 생각하며, 창의적인 솔루션을 제안하고
-                있습니다.
+                {teamDetail?.description ?? "팀 소개가 들어가는 자리입니다."}
               </span>
             </div>
           </div>
@@ -178,7 +145,7 @@ const TeamHomePage = () => {
                       children={<ChevronLeft />}
                       className="pointer-events-auto"
                       onClick={() => {
-                        scrollByCard('left');
+                        scrollByItem('left');
                       }}
                     />
                   </div>
@@ -194,7 +161,7 @@ const TeamHomePage = () => {
                       children={<ChevronRight />}
                       className="pointer-events-auto"
                       onClick={() => {
-                        scrollByCard('right');
+                        scrollByItem('right');
                       }}
                     />
                   </div>
@@ -229,7 +196,7 @@ const TeamHomePage = () => {
               </p>
             </div>
             {/** 팀원 명단 카드 */}
-            <div className="grid w-full self-stretch gap-x-[1.8rem] gap-y-[2.4rem] [grid-template-columns:repeat(auto-fit,minmax(23.4rem,1fr))]">
+            <div className="grid w-full gap-x-[1.8rem] gap-y-[2.4rem] self-stretch [grid-template-columns:repeat(auto-fit,minmax(23.4rem,1fr))]">
               {members.map((member) => (
                 <SideTeamCard
                   key={member.id}

@@ -1,9 +1,13 @@
-import { Link } from 'react-router';
+import { useNavigate } from 'react-router';
 import { useState } from 'react';
 import { useAuthStore } from '../../stores/authStore';
 import LoginModal from '../Modal/LoginModal';
 import BaseButton from '../common/Button';
 import IconWrapper from '../common/IconWrapper';
+import {
+  useGetIsUserProfileComplete,
+  useGetUserMeTeam,
+} from '../../hooks/useUser';
 
 // Sidebar Components
 import SidebarLogo from './SidebarLogo';
@@ -16,10 +20,17 @@ import LogInIcon from '../../assets/icons/normal/ic_login.svg?react';
 import LogoIcon from '../../assets/icons/ic_logo.svg?react';
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+  const { data: isProfileCompleteData } = useGetIsUserProfileComplete();
+  const { data: myteamData } = useGetUserMeTeam();
+
   const [isFolded, setIsFolded] = useState(false);
   const [isLogInModalOpen, setIsLogInModalOpen] = useState(false);
 
-  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const isLoggedIn = !!accessToken;
+
+  const isProfileComplete = isLoggedIn && isProfileCompleteData?.isComplete;
 
   return (
     <>
@@ -42,7 +53,10 @@ const Sidebar = () => {
               isLoggedIn ? 'gap-[1.8rem] py-[2rem]' : 'gap-[1rem] py-[2rem]'
             } `}
           >
-            <SidebarProfile isFolded={isFolded} isLoggedIn={isLoggedIn} />
+            <SidebarProfile
+              isFolded={isFolded}
+              isLoggedIn={isProfileComplete}
+            />
 
             {isFolded ? (
               <IconWrapper
@@ -52,35 +66,27 @@ const Sidebar = () => {
               >
                 {isLoggedIn ? <PencilIcon /> : <LogInIcon />}
               </IconWrapper>
-            ) : isLoggedIn ? (
-              <Link
-                to="/team/new"
-                className="flex h-[4.4rem] w-full items-center justify-center rounded-[0.8rem] bg-blue-80 px-[3.7rem] py-[1.2rem] text-[1.8rem] font-bold text-white"
-              >
-                팀 만들기
-              </Link>
+            ) : isProfileComplete ? (
+              myteamData?.length === 0 ? (
+                <BaseButton onClick={() => navigate('/team/new')}>
+                  팀 만들기
+                </BaseButton>
+              ) : (
+                <BaseButton onClick={() => navigate('/post/new')}>
+                  모집글 작성
+                </BaseButton>
+              )
             ) : (
               <BaseButton onClick={() => setIsLogInModalOpen(true)}>
                 로그인
               </BaseButton>
             )}
-
-            {/* 팀 만들기 & 모집글 작성 사이드 바 접을 때 버튼 정하기 */}
-
-            {/* <div className="flex w-[25.8rem] gap-[1.2rem]">
-              <button className="flex h-[4.4rem] w-[12.3rem] items-center justify-center whitespace-nowrap rounded-[0.8rem] border border-solid border-black-30 px-[4rem] py-[1.2rem] text-[1.6rem] font-semibold text-black-100 hover:bg-hover-5">
-                팀 만들기
-              </button>
-              <button className="flex h-[4.4rem] w-[12.3rem] items-center justify-center whitespace-nowrap rounded-[0.8rem] bg-blue-80 px-[4rem] py-[1.2rem] text-[1.6rem] font-bold text-black-5 hover:bg-hover-80">
-                모집글 작성
-              </button>
-            </div> */}
           </div>
 
           <SidebarMenu isFolded={isFolded} />
         </div>
 
-        {/* 로그아웃 및 고객지원 문의 */}
+        {/* 고객지원 문의 */}
         {!isFolded && (
           <div className="flex h-[17.1rem] flex-col gap-[2.4rem] pb-[2.8rem]">
             <div className="h-[0.1rem] bg-black-10" />

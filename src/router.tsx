@@ -11,7 +11,7 @@ import MainPage from './pages/MainPage';
 import LoginPage from './pages/LoginPage';
 import TeamNewPage from './pages/TeamNewPage';
 import TeamHomePage from './pages/TeamHomePage';
-import RecruitmentDetailPage from './pages/RecruitmentDetailPage';
+import PostDetailPage from './pages/PostDetailPage';
 import PostFormPage from './pages/PostFormPage';
 
 export const router = createBrowserRouter(
@@ -19,10 +19,10 @@ export const router = createBrowserRouter(
     <Route element={<App />}>
       <Route path="/" element={<MainPage />} />
       <Route path="/oauth/callback" element={<LoginPage />} />
-      <Route path="/recruitment" element={<RecruitmentDetailPage />} />
       <Route path="/team/new" element={<TeamNewPage />} />
-      <Route path="/team/home" element={<TeamHomePage />} />
+      <Route path="/team/:teamId" element={<TeamHomePage />} />
       <Route path="/post/new" element={<PostFormPage />} />
+      <Route path="/post/:postId" element={<PostDetailPage />} />
     </Route>,
   ),
 );

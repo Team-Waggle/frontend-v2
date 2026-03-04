@@ -1,4 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useParams } from 'react-router-dom';
+
+import { useGetPostDetail } from '../hooks/usePost';
 
 import IcProfileBasic from '../assets/icons/ic_profile_basic.svg?react';
 
@@ -12,16 +15,36 @@ import IcJavaScriptSkill from '../assets/icons/skill/large/ic_skill_JavaScript_l
 import IcMongoSkill from '../assets/icons/skill/large/ic_skill_MongoDB_large.svg?react';
 import IcNodejsSkill from '../assets/icons/skill/large/ic_skill_Node.js_large.svg?react';
 
-import TeamCard from '../components/RecruitmentDetail/TeamCard';
+import TeamCard from '../components/PostDetail/TeamCard';
 import SideTeamCard from '../components/common/Cards/SideTeamCard';
 
 import BaseButton from '../components/common/Button/index';
 
 import ButtonBlur from '../assets/blur/recruitment_detail_button_blur.svg?react';
 
-/** 하단 여백만 수정하면 퍼블리싱 작업 끝 */
+const PostDetailPage = () => {
+  const { postId } = useParams<{ postId: string }>();
 
-const RecruitmentDetailPage = () => {
+  const parsedPostId = useMemo(() => {
+    if (!postId) return 0;
+
+    const n = Number(postId);
+    if (!Number.isInteger(n) || n <= 0) return 0;
+
+    return n;
+  }, [postId]);
+
+  const {
+    data: postDetail,
+  } = useGetPostDetail(parsedPostId);
+
+  const [applyButtonPx, setApplyButtonPx] = useState<number | null>(null);
+
+  const leftColRef = useRef<HTMLDivElement | null>(null);
+  const sideWrapRef = useRef<HTMLDivElement | null>(null);
+
+  const isMyPost = false;
+
   const labelClassNameBase =
     'text-[1.4rem] font-[500] leading-[1.5] tracking-[-0.028rem] text-black-100';
   const labelClassNameNoWrap =
@@ -49,9 +72,62 @@ const RecruitmentDetailPage = () => {
     { key: 'etc', label: '기타' },
   ];
 
-  // sideTeamCard Scroll
-  const leftColRef = useRef<HTMLDivElement | null>(null);
-  const sideWrapRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const leftEl = leftColRef.current;
+
+    if (!leftEl) return;
+
+    let rafId: number | null = null;
+
+    const updateApplyButton = () => {
+      const rect = leftEl.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+
+      setApplyButtonPx(centerX);
+    };
+
+    const scheduleUpdate = () => {
+      if (rafId !== null) return;
+
+      rafId = window.requestAnimationFrame(() => {
+        rafId = null;
+        updateApplyButton();
+      });
+    };
+
+    scheduleUpdate();
+
+    window.addEventListener('resize', scheduleUpdate);
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+
+    const resizeObserver = new ResizeObserver(() => {
+      scheduleUpdate();
+    });
+
+    resizeObserver.observe(leftEl);
+
+    const mutationObserver = new MutationObserver(() => {
+      scheduleUpdate();
+    });
+
+    mutationObserver.observe(document.body, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      window.removeEventListener('resize', scheduleUpdate);
+      window.removeEventListener('scroll', scheduleUpdate);
+
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
+
+      if (rafId !== null) {
+        window.cancelAnimationFrame(rafId);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const leftEl = leftColRef.current;
@@ -137,17 +213,14 @@ const RecruitmentDetailPage = () => {
             <div className="flex flex-col items-start gap-[2rem] self-stretch">
               <div className="overflow-hidden overflow-ellipsis">
                 <span className="line-clamp-2 overflow-ellipsis text-[3.4rem] font-[600] leading-[1.5] tracking-[-0.068rem] text-black-100">
-                  팀 dtdt에서 [팀 팀 빌딩 웹사이트]를 같이 제작할 프론트엔드
-                  개발자`님을 찾습니다!! 모집글제목팀 dtdt에서 [팀 팀 빌딩
-                  웹사이트]를 같이 제작할 프론트엔드 개발자`님을 찾습니다!!
-                  모집글제목
+                  {postDetail?.title}
                 </span>
               </div>
               <div className="flex items-center gap-[0.8rem]">
                 <div className="flex items-center gap-[0.8rem]">
                   <IcProfileBasic className="h-[2.4rem] w-[2.4rem]" />
                   <span className="text-[1.6rem] font-[600] leading-[1.5] tracking-[-0.032rem] text-black-100">
-                    일이삼사오육칠팔구십
+                    {postDetail?.user.username}
                   </span>
                 </div>
                 <div className="h-[1.7rem] w-[0.1rem] bg-black-40" />
@@ -215,7 +288,9 @@ const RecruitmentDetailPage = () => {
           </div>
         </div>
         {/** 모집글 상세조회 내용 */}
-        <div className="flex flex-col items-start gap-[4rem] self-stretch">
+        <div
+          className={`flex flex-col items-start gap-[4rem] self-stretch ${!isMyPost && 'mb-[6.6rem]'}`}
+        >
           <TeamCard />
           <div className="w-[68.8rem]">
             <span className="text-[1.6rem] font-[600] leading-[1.5] tracking-[-0.032rem] text-black-100">
@@ -266,37 +341,44 @@ const RecruitmentDetailPage = () => {
         </div>
 
         {/** 작성자 기준 화면: 마감하기, 수정하기 버튼 */}
-        <div className="flex w-[32rem] items-start gap-[1.2rem] pb-[6.6rem] pt-[1.2rem]">
-          <BaseButton size="lg" color="secondary" children="마감하기" />
-          <BaseButton size="lg" color="primary" children="수정하기" />
-        </div>
+        {isMyPost && (
+          <div className="flex w-[32rem] items-start gap-[1.2rem] pb-[6.6rem] pt-[1.2rem]">
+            <BaseButton size="lg" color="secondary" children="마감하기" />
+            <BaseButton size="lg" color="primary" children="수정하기" />
+          </div>
+        )}
       </div>
 
       {/** 팀 구간 */}
       <div className="flex self-start pt-[17.8rem]">
         <div ref={sideWrapRef} className="self-start will-change-transform">
-          <SideTeamCard variant="recruitment" />
+          <SideTeamCard variant="post" />
         </div>
       </div>
 
       {/** 지원자 기준 화면: 지원하기 버튼 */}
-      <div className="fixed bottom-[3.6rem] left-1/2 z-50 -translate-x-1/2">
-        <div className="relative w-[32rem]">
-          <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2">
-            <ButtonBlur className="h-[10rem] w-[40rem]" />
-          </div>
+      {!isMyPost && applyButtonPx !== null && (
+        <div
+          className="fixed bottom-[3.6rem] z-50 -translate-x-1/2"
+          style={{ left: applyButtonPx ?? undefined }}
+        >
+          <div className="relative w-[32rem]">
+            <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2">
+              <ButtonBlur className="h-[10rem] w-[40rem]" />
+            </div>
 
-          <BaseButton
-            className="relative z-10 w-[32rem]"
-            size="lg"
-            color="primary"
-          >
-            지원하기
-          </BaseButton>
+            <BaseButton
+              className="relative z-10 w-[32rem]"
+              size="lg"
+              color="primary"
+            >
+              지원하기
+            </BaseButton>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
 
-export default RecruitmentDetailPage;
+export default PostDetailPage;

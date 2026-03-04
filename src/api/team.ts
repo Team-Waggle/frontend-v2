@@ -1,4 +1,4 @@
-import { TEAMS_PRESIGNED_URL, TEAMS_URL } from '../constants/endpoint';
+import { TEAMS_DETAIL_URL, TEAMS_PRESIGNED_URL, TEAMS_URL } from '../constants/endpoint';
 import axiosInstance from './axiosInstance';
 
 // 팀 생성
@@ -14,3 +14,9 @@ export const PostTeamImage = async (contentType: string) => {
   });
   return data;
 };
+
+// 팀 상세 조회
+export const GetTeamDetail = async (teamId: number) => {
+  const { data } = await axiosInstance.get(TEAMS_DETAIL_URL(teamId));
+  return data;
+}

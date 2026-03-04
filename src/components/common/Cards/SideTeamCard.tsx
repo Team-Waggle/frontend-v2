@@ -13,7 +13,7 @@ import { SkillIcon } from '../../../utils/SkillIcon';
 interface SideTeamCardProps {
   title?: string;
   job?: string;
-  variant?: 'team' | 'recruitment';
+  variant?: 'team' | 'post';
   isActvie?: boolean;
   disabled?: boolean;
   onClick?: () => void;
@@ -51,7 +51,7 @@ const SideTeamCard = ({
     >
       <div className="absolute flex w-[17.8rem] items-center justify-between">
         <div className="flex items-center gap-[0.4rem]">
-          {variant === 'recruitment' && <IcCrown />}
+          {variant === 'post' && <IcCrown />}
           {variant === 'team' && (
             <>
               <IcCrown />
@@ -96,7 +96,7 @@ const SideTeamCard = ({
           </div>
         </div>
       </div>
-      {variant === 'recruitment' && (
+      {variant === 'post' && (
         <BaseButton size="md" color="secondary" children="문의하기" />
       )}
 

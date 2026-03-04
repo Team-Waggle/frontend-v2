@@ -1,5 +1,6 @@
 import axiosInstance from './axiosInstance';
 import {
+  USERS_CHECK_URL,
   USERS_ME_PROFILE_COMPLETION_URL,
   USERS_ME_PROFILE_URL,
   USERS_ME_TEAMS_URL,
@@ -10,6 +11,14 @@ import {
 // 사용자 조회
 export const getUserDetail = async (userId: string) => {
   const { data } = await axiosInstance.get(USERS_URL(userId));
+  return data;
+};
+
+// 사용자명 사용 가능 여부 조회
+export const getUserCheck = async (username: string) => {
+  const { data } = await axiosInstance.get(
+    `${USERS_CHECK_URL}?username=${username}`,
+  );
   return data;
 };
 
