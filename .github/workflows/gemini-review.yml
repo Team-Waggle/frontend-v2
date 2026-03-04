@@ -65,6 +65,17 @@ jobs:
           head -c 30000 diff.txt > diff_trimmed.txt
           echo "diff_size=$(wc -c < diff.txt)" >> $GITHUB_OUTPUT
 
+      - name: Get comment instruction
+        id: instruction
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.comment?.body ?? '';
+            const match = body.match(/\/gemini\s*([\s\S]*)/);
+            const instruction = match?.[1]?.trim() ?? '';
+            core.setOutput('text', instruction);
+
       - name: 리액션 추가 (처리 중)
         if: github.event_name == 'issue_comment'
         uses: actions/github-script@v7
@@ -81,6 +92,7 @@ jobs:
         id: gemini
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          EXTRA_INSTRUCTION: ${{ steps.instruction.outputs.text }}
         run: |
           DIFF_CONTENT=$(cat diff_trimmed.txt)
 
@@ -89,23 +101,33 @@ jobs:
             exit 0
           fi
 
-          PROMPT="당신은 시니어 프론트엔드 개발자입니다. 아래 git diff를 리뷰해주세요.
+          EXTRA=""
+          if [ -n "$EXTRA_INSTRUCTION" ]; then
+            EXTRA="추가 요청사항: $EXTRA_INSTRUCTION"
+          fi
 
-          **반드시 한국어로만 작성하세요. 영어 사용 금지.**
+          PROMPT=$(cat <<PROMPT_EOF
+당신은 시니어 프론트엔드 개발자입니다. 아래 git diff를 리뷰해주세요.
 
-          다음 항목만 마크다운으로 작성하세요:
-          1. 🐛 잠재적 버그 / 문제점
-          2. ♿ 접근성 (a11y) 문제
-          3. ⚡ 렌더링 성능 (불필요한 리렌더링, 메모이제이션 누락 등)
-          4. 🎨 CSS / 스타일 개선
-          5. 💡 코드 품질 개선 (컴포넌트 분리, 타입 누락, 네이밍 등)
+**반드시 한국어로만 작성하세요. 영어 사용 금지.**
 
-          문제없는 부분은 언급하지 말고, 각 항목이 없으면 해당 섹션을 생략하세요.
+${EXTRA}
 
-          Git Diff:
-          \`\`\`
-          ${DIFF_CONTENT}
-          \`\`\`"
+다음 항목만 마크다운으로 작성하세요:
+1. 🐛 잠재적 버그 / 문제점
+2. ♿ 접근성 (a11y) 문제
+3. ⚡ 렌더링 성능 (불필요한 리렌더링, 메모이제이션 누락 등)
+4. 🎨 CSS / 스타일 개선
+5. 💡 코드 품질 개선 (컴포넌트 분리, 타입 누락, 네이밍 등)
+
+문제없는 부분은 언급하지 말고, 각 항목이 없으면 해당 섹션을 생략하세요.
+
+Git Diff:
+\`\`\`
+${DIFF_CONTENT}
+\`\`\`
+PROMPT_EOF
+)
 
           RESPONSE=$(curl -s \
             -H "Content-Type: application/json" \
@@ -130,14 +152,11 @@ jobs:
 
       - name: Post review comment
         uses: actions/github-script@v7
+        env:
+          REVIEW_BODY: ${{ steps.gemini.outputs.review }}
         with:
           script: |
-            const review = `## 🤖 Gemini AI 코드 리뷰
-
-            ${{ steps.gemini.outputs.review }}
-
-            ---
-            *Gemini 2.5 Flash | Diff 크기: ${{ steps.diff.outputs.diff_size }} bytes*`;
+            const review = `## 🤖 Gemini AI 코드 리뷰\n\n${process.env.REVIEW_BODY}\n\n---\n*Gemini 2.5 Flash | Diff 크기: ${{ steps.diff.outputs.diff_size }} bytes*`;
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
