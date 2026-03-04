@@ -109,7 +109,7 @@ jobs:
 
           RESPONSE=$(curl -s \
             -H "Content-Type: application/json" \
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}" \
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}" \
             -d "{
               \"contents\": [{
                 \"parts\": [{\"text\": $(echo "$PROMPT" | jq -Rs .)}]
@@ -137,7 +137,7 @@ jobs:
             ${{ steps.gemini.outputs.review }}
 
             ---
-            *Gemini 1.5 Flash | Diff 크기: ${{ steps.diff.outputs.diff_size }} bytes*`;
+            *Gemini 2.5 Flash | Diff 크기: ${{ steps.diff.outputs.diff_size }} bytes*`;
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
