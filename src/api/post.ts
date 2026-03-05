@@ -1,23 +1,24 @@
-import { POST_DETAIL_URL, POST_URL } from '../constants/endpoint';
 import axiosInstance from './axiosInstance';
 
+import { POST_DETAIL_URL } from '../constants/endpoint';
+import type { GetPostsParams, GetPostsResponse } from '../types/api/posts';
+
 // 모집글 상세조회
-export const GetPostDetail = async (postId: number) => {
+export const getPostDetail = async (postId: number) => {
   const { data } = await axiosInstance.get(POST_DETAIL_URL(postId));
   return data;
-}
+};
 
 // 모집글 목록 페이지네이션
-// 기본값: 12개씩, sort는 최신순
-export const getPosts = async ({ q, page = 0 }: { q?: string; page?: number } = {}) => {
-    const { data } = await axiosInstance.get(POST_URL, {
-        params: {
-            q,
-            page,
-            size: 4,
-            sort: ["postId,desc"],
-        },
-    });
+export const getPosts = async (
+  params: GetPostsParams,
+): Promise<GetPostsResponse> => {
+  const response = await axiosInstance.get<GetPostsResponse>('/posts', {
+    params: {
+      ...params,
+      q: params.q || undefined,
+    },
+  });
 
-    return data;
+  return response.data;
 };
