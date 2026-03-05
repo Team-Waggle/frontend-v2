@@ -6,6 +6,12 @@ type KstParts = {
   minutes: number;
 };
 
+// formatPostListCreatedAt는 nowMs를 외부에서 주입 받습니다.
+
+// example.
+// const nowMs = Date.now();
+// const createdAtText = post.createdAt ? formatPostListCreatedAt(post.createdAt, nowMs) : '';
+
 const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
 
 const pad2 = (value: number): string => {
