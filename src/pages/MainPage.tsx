@@ -1,9 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
+
 import MainCard from '../components/common/Cards/MainCard/MainCard';
+import { usePostsInfinite } from '../hooks/usePost';
+import { useGetIsUserProfileComplete } from '../hooks/useUser';
+
 import MainSearch from '../components/Main/MainSearch/MainSearch';
 import OnboardingModal from '../components/Modal/OnboardingModal';
-import { useGetIsUserProfileComplete } from '../hooks/useUser';
-import { useAuthStore } from '../stores/authStore';
+
+import { formatPostListCreatedAt } from '../utils/kst-time';
+import type { PostDetailResponse } from '../types/api/posts';
 
 /**
  *
@@ -14,17 +19,54 @@ import { useAuthStore } from '../stores/authStore';
  */
 
 const MainPage = () => {
-  const { data, isSuccess } = useGetIsUserProfileComplete();
-  const { setProfileComplete } = useAuthStore();
+  const {
+    data: postsData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+  } = usePostsInfinite();
 
-  const isOnboardingModalOpen = data?.isComplete === false;
+  const posts = useMemo<PostDetailResponse[]>(() => {
+    const pages = postsData?.pages ?? [];
+    return pages.flatMap((p) => p?.data ?? []);
+  }, [postsData]);
+
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (isSuccess && data !== undefined) {
-      setProfileComplete(data?.isComplete);
-    }
-  }, [data, isSuccess, setProfileComplete]);
+    const el = sentinelRef.current;
+    if (!el) return;
 
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (!first?.isIntersecting) return;
+        if (!hasNextPage) return;
+        if (isFetchingNextPage) return;
+
+        fetchNextPage();
+      },
+      {
+        root: null,
+        rootMargin: '200px',
+        threshold: 0,
+      },
+    );
+
+    observer.observe(el);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  const { data } = useGetIsUserProfileComplete();
+  const isOnboardingModalOpen = data?.isComplete === false;
+
+  const nowMs = Date.now();
+  
   return (
     <>
       {/** Main */}
@@ -35,25 +77,44 @@ const MainPage = () => {
           <div className="flex w-full flex-col items-start gap-[2rem]">
             <MainSearch />
           </div>
+
           {/** Frame 02 */}
-          <div className="inline-grid w-full max-w-[152.6rem] auto-rows-max grid-cols-[repeat(auto-fit,minmax(33.6rem,1fr))] gap-x-[1.8rem] gap-y-[1.8rem] max-1440:max-w-full">
-            <MainCard mainCardTitle="[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)" />
-            <MainCard mainCardTitle="[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)" />
-            <MainCard mainCardTitle="[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)" />
-            <MainCard mainCardTitle="[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)" />
+          <div className="inline-grid w-full max-w-[152.6rem] auto-rows-max grid-cols-[repeat(auto-fill,minmax(33.6rem,1fr))] gap-x-[1.8rem] gap-y-[1.8rem] max-1440:max-w-full">
+            {posts.map((post: PostDetailResponse) => {
+              const positionList: string[] = Array.from(
+                new Set(
+                  post.recruitments.map((r) => r.position).filter(Boolean),
+                ),
+              );
 
-            <MainCard mainCardTitle="[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)" />
-            <MainCard mainCardTitle="[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)" />
-            <MainCard mainCardTitle="[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)" />
-            <MainCard mainCardTitle="[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)" />
+              const skillsList: string[] = Array.from(
+                new Set(
+                  post.recruitments.flatMap((r) =>
+                    (r.skills ?? []).map((s) => s.trim()).filter(Boolean),
+                  ),
+                ),
+              );
 
-            <MainCard mainCardTitle="[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)" />
-            <MainCard mainCardTitle="[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)" />
-            <MainCard mainCardTitle="[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)" />
-            <MainCard mainCardTitle="[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)[네오플] 게임그래픽 직군 분야별 모집 (근무지 : 서울)" />
+              const createdAtText = post.createdAt
+                ? formatPostListCreatedAt(post.createdAt, nowMs)
+                : '';
+
+              return (
+                <MainCard
+                  key={post.postId}
+                  mainCardTitle={post.title}
+                  mainCardPositions={positionList}
+                  mainCardSkills={skillsList}
+                  mainCardCreatedAt={createdAtText}
+                />
+              );
+            })}
           </div>
+
+          <div ref={sentinelRef} className="h-[1px] w-full" />
         </div>
       </div>
+
       <OnboardingModal isOpen={isOnboardingModalOpen} onClose={() => {}} />
     </>
   );

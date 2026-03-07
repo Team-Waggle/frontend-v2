@@ -1,11 +1,9 @@
-import MainCardTag from './MainCardTag';
+import { useMemo } from 'react';
 
-/* 임시 SkillIcon */
-import SkillJava from '../../../../assets/icons/skill/large/ic_skill_Java_large.svg?react';
-import SkillFigma from '../../../../assets/icons/skill/large/ic_skill_Figma_large.svg?react';
-import SkillDjango from '../../../../assets/icons/skill/large/ic_skill_Django_large.svg?react';
-import SkillJavaScript from '../../../../assets/icons/skill/large/ic_skill_JavaScript_large.svg?react';
-import SkillTypescript from '../../../../assets/icons/skill/large/ic_skill_TypeScript_large.svg?react';
+import MainCardTag from './MainCardTag';
+import { SkillIconLarge } from '../../../../utils/SkillIcon';
+import { toSkillLabel } from '../../../../utils/skill';
+import { POSITION_CONVERTER } from '../../../../utils/position';
 
 import MeatBallIcon from '../../../../assets/icons/skill/large/ic_skill_meatball_large.svg?react';
 
@@ -15,29 +13,47 @@ import MeatBallIcon from '../../../../assets/icons/skill/large/ic_skill_meatball
  *  1-1. variant로 main, team 을 구분했습니다.
  */
 
+const toPositionLabel = (value: string): string => {
+  const trimmed = (value || '').trim();
+  return POSITION_CONVERTER[trimmed] || trimmed;
+};
+
 interface MainCardProps {
   mainCardTitle?: string;
+  mainCardPositions?: string[];
+  mainCardSkills?: string[];
+  mainCardCreatedAt?: string;
   variant?: 'main' | 'team';
-  isActvie?: boolean;
+  isActive?: boolean;
   onClick?: () => void;
 }
 
 const MainCard = ({
   mainCardTitle,
+  mainCardPositions,
+  mainCardSkills,
   variant = 'main',
-  isActvie = false,
+  isActive = false,
+  mainCardCreatedAt,
   onClick,
 }: MainCardProps) => {
   const baseStyle =
     'pointer-events-auto flex w-full min-w-[33.6rem] cursor-pointer flex-col items-start gap-[3.2rem] rounded-[1.2rem] border border-solid border-[#E7E8EA] bg-white px-[2.8rem] py-[2.4rem]';
-
   const hoverStyle =
     variant === 'main' ? 'hover:shadow-main-card' : 'hover:bg-hover-5';
+  const activeStyle = isActive ? 'border-blue-70' : '';
 
-  const activeStyle = isActvie ? 'border-blue-70' : '';
+  const uniquePositions = useMemo(() => {
+    const list = (mainCardPositions || [])
+      .map((j) => (j || '').trim())
+      .filter(Boolean);
+
+    return Array.from(new Set(list));
+  }, [mainCardPositions]);
 
   return (
-    <div
+    <button
+      type="button"
       data-main-card="true"
       className={`${baseStyle} ${hoverStyle} ${activeStyle}`}
       onClick={onClick}
@@ -52,10 +68,10 @@ const MainCard = ({
         </div>
         {/** MainCard Job Tag */}
         <div className="flex flex-wrap content-start items-start gap-[0.4rem] self-stretch">
-          <MainCardTag TagTitle="프론트엔드" />
-          <MainCardTag TagTitle="디자이너" />
-          <MainCardTag TagTitle="백엔드" />
-          <MeatBallIcon />
+          {uniquePositions.slice(0, 3).map((position) => (
+            <MainCardTag key={position} TagTitle={toPositionLabel(position)} />
+          ))}
+          {uniquePositions.length > 3 ? <MeatBallIcon /> : null}
         </div>
       </div>
 
@@ -64,20 +80,28 @@ const MainCard = ({
         {/* card-skill-box */}
         <div className="flex items-center gap-[0.6rem] self-stretch">
           <div className="flex items-center gap-[0.6rem]">
-            <SkillJava />
-            <SkillFigma />
-            <SkillDjango />
-            <SkillJavaScript />
-            <SkillTypescript />
-            <MeatBallIcon />
+            {(mainCardSkills || []).slice(0, 5).map((skill, index) => {
+              const enumValue = (skill || '').trim();
+              const iconName = toSkillLabel(enumValue);
+
+              return (
+                <SkillIconLarge
+                  key={`${enumValue}-${iconName}-${index}`}
+                  name={iconName}
+                />
+              );
+            })}
+            {(mainCardSkills || []).length > 5 ? <MeatBallIcon /> : null}
           </div>
         </div>
         {/* Time */}
         <div className="flex w-full justify-end">
-          <span className="text-[#878B96]"> 24시간 전 </span>
+          <span className="text-[1.2rem] font-[500] text-[#878B96]">
+            {mainCardCreatedAt}
+          </span>
         </div>
       </div>
-    </div>
+    </button>
   );
 };
 
