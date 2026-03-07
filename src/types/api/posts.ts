@@ -71,11 +71,18 @@ export type PostDetailResponse = {
   updatedAt?: string;
 };
 
+export type CursorResponsePostDetailResponse = {
+  data: PostDetailResponse[];
+  nextCursor: number | null;
+  hasNext: boolean;
+};
+
 export type GetPostsParams = {
-  page: number;
-  size: number;
-  sort?: string[];
   q?: string;
+  positions?: string[];
+  skills?: string[];
+  cursor?: number;
+  size?: number;
 };
 
 export type GetPostsResponse = PageResponse<PostDetailResponse>;
