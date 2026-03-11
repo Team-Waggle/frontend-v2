@@ -1,29 +1,57 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useMemo, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { useGetPostDetail } from '../hooks/usePost';
+import { useGetUserMe } from '../hooks/useUser';
+import usePostDetailApplyButtonPosition from '../hooks/usePostDetailApplyButtonPosition';
+import usePostDetailFloatingSideCard from '../hooks/usePostDetailFloatingSideCard';
+
+import { SkillIconLarge } from '../utils/SkillIcon';
+import { toSkillLabel } from '../utils/skill';
+import { formatPostDetailCreatedAt } from '../utils/kst-time';
 
 import IcProfileBasic from '../assets/icons/ic_profile_basic.svg?react';
-
 import IcPersons from '../assets/icons/normal/ic_persons.svg?react';
 import IcFolder from '../assets/icons/normal/ic_folder.svg?react';
-
-import IcJavaSkill from '../assets/icons/skill/large/ic_skill_Java_large.svg?react';
-import IcFigmaSkill from '../assets/icons/skill/large/ic_skill_Figma_large.svg?react';
-import IcDjSkill from '../assets/icons/skill/large/ic_skill_Django_large.svg?react';
-import IcJavaScriptSkill from '../assets/icons/skill/large/ic_skill_JavaScript_large.svg?react';
-import IcMongoSkill from '../assets/icons/skill/large/ic_skill_MongoDB_large.svg?react';
-import IcNodejsSkill from '../assets/icons/skill/large/ic_skill_Node.js_large.svg?react';
 
 import TeamCard from '../components/PostDetail/TeamCard';
 import SideTeamCard from '../components/common/Cards/SideTeamCard';
 
 import BaseButton from '../components/common/Button/index';
 
-import ButtonBlur from '../assets/blur/recruitment_detail_button_blur.svg?react';
+import ButtonBlur from '../assets/blur/RecruitmentDetail_Button_Blur.svg?react';
+
+type RecruitmentCountKey =
+  | 'plan'
+  | 'design'
+  | 'frontend'
+  | 'backend'
+  | 'marketing'
+  | 'etc';
+
+const POSITION_ITEMS: Array<{
+  key: RecruitmentCountKey;
+  label: string;
+  noWrap?: boolean;
+}> = [
+  { key: 'plan', label: '기획' },
+  { key: 'design', label: '디자인' },
+  { key: 'frontend', label: '프론트엔드', noWrap: true },
+  { key: 'backend', label: '백엔드' },
+  { key: 'marketing', label: '마케팅' },
+  { key: 'etc', label: '기타' },
+];
+
+const LABEL_BASE_STYLE =
+  'text-[1.4rem] font-[500] leading-[1.5] tracking-[-0.028rem] text-black-100';
+const LABEL_NOWRAP_STYLE =
+  'text-[1.4rem] font-[500] leading-[1.5] tracking-[-0.028rem] text-black-100 whitespace-nowrap';
+const VALUE_STYLE =
+  'text-[1.4rem] font-[500] leading-[1.5] tracking-[0.028rem] text-blue-80';
 
 const PostDetailPage = () => {
   const { postId } = useParams<{ postId: string }>();
+  const navigate = useNavigate();
 
   const parsedPostId = useMemo(() => {
     if (!postId) return 0;
@@ -34,171 +62,80 @@ const PostDetailPage = () => {
     return n;
   }, [postId]);
 
-  const {
-    data: postDetail,
-  } = useGetPostDetail(parsedPostId);
-
-  const [applyButtonPx, setApplyButtonPx] = useState<number | null>(null);
+  const { data: postDetail } = useGetPostDetail(parsedPostId);
+  const { data: me } = useGetUserMe();
 
   const leftColRef = useRef<HTMLDivElement | null>(null);
   const sideWrapRef = useRef<HTMLDivElement | null>(null);
 
-  const isMyPost = false;
+  const applyButtonPx = usePostDetailApplyButtonPosition(leftColRef);
 
-  const labelClassNameBase =
-    'text-[1.4rem] font-[500] leading-[1.5] tracking-[-0.028rem] text-black-100';
-  const labelClassNameNoWrap =
-    'text-[1.4rem] font-[500] leading-[1.5] tracking-[-0.028rem] text-black-100 whitespace-nowrap';
-  const valueClassName =
-    'text-[1.4rem] font-[500] leading-[1.5] tracking-[0.028rem] text-blue-80';
+  usePostDetailFloatingSideCard(leftColRef, sideWrapRef);
 
-  const apiCounts = {
-    plan: 10,
-    design: 10,
-    frontend: 10,
-    backend: 10,
-    marketing: 10,
-    etc: 10,
-  } as const;
+  const myUserId = me?.userId;
+  const postUserId = postDetail?.user?.userId;
 
-  type RoleKey = keyof typeof apiCounts;
+  const isMyPost =
+    Boolean(myUserId) && Boolean(postUserId) && myUserId === postUserId;
 
-  const roles: Array<{ key: RoleKey; label: string; noWrap?: boolean }> = [
-    { key: 'plan', label: '기획' },
-    { key: 'design', label: '디자인' },
-    { key: 'frontend', label: '프론트엔드', noWrap: true },
-    { key: 'backend', label: '백엔드' },
-    { key: 'marketing', label: '마케팅' },
-    { key: 'etc', label: '기타' },
-  ];
+  const getRecruitmentCountKey = (position?: string): RecruitmentCountKey => {
+    if (position === 'PLANNER') {
+      return 'plan';
+    }
 
-  useEffect(() => {
-    const leftEl = leftColRef.current;
+    if (position === 'DESIGNER') {
+      return 'design';
+    }
 
-    if (!leftEl) return;
+    if (position === 'FRONTEND') {
+      return 'frontend';
+    }
 
-    let rafId: number | null = null;
+    if (position === 'BACKEND') {
+      return 'backend';
+    }
 
-    const updateApplyButton = () => {
-      const rect = leftEl.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
+    if (position === 'MARKETER') {
+      return 'marketing';
+    }
 
-      setApplyButtonPx(centerX);
+    return 'etc';
+  };
+
+  const apiCounts = useMemo<Record<RecruitmentCountKey, number>>(() => {
+    const counts: Record<RecruitmentCountKey, number> = {
+      plan: 0,
+      design: 0,
+      frontend: 0,
+      backend: 0,
+      marketing: 0,
+      etc: 0,
     };
 
-    const scheduleUpdate = () => {
-      if (rafId !== null) return;
+    const recruitments = postDetail?.recruitments ?? [];
 
-      rafId = window.requestAnimationFrame(() => {
-        rafId = null;
-        updateApplyButton();
-      });
-    };
+    for (const recruitment of recruitments) {
+      const positionKey = getRecruitmentCountKey(recruitment.position);
 
-    scheduleUpdate();
+      counts[positionKey] += recruitment.recruitingCount ?? 0;
+    }
 
-    window.addEventListener('resize', scheduleUpdate);
-    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    return counts;
+  }, [postDetail?.recruitments]);
 
-    const resizeObserver = new ResizeObserver(() => {
-      scheduleUpdate();
+  const postSkills = useMemo(() => {
+    const recruitments = postDetail?.recruitments ?? [];
+
+    const mergedSkills = recruitments.flatMap((recruitment) => {
+      return recruitment.skills ?? [];
     });
 
-    resizeObserver.observe(leftEl);
+    const uniqueSkills = Array.from(new Set(mergedSkills));
 
-    const mutationObserver = new MutationObserver(() => {
-      scheduleUpdate();
-    });
-
-    mutationObserver.observe(document.body, {
-      attributes: true,
-      childList: true,
-      subtree: true,
-    });
-
-    return () => {
-      window.removeEventListener('resize', scheduleUpdate);
-      window.removeEventListener('scroll', scheduleUpdate);
-
-      resizeObserver.disconnect();
-      mutationObserver.disconnect();
-
-      if (rafId !== null) {
-        window.cancelAnimationFrame(rafId);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    const leftEl = leftColRef.current;
-    const sideEl = sideWrapRef.current;
-
-    if (!leftEl || !sideEl) return;
-
-    const topOffsetPx = 112;
-
-    let currentY = 0;
-    let targetY = 0;
-    let rafId: number | null = null;
-
-    const clamp = (value: number, min: number, max: number) => {
-      if (value < min) return min;
-      if (value > max) return max;
-      return value;
-    };
-
-    const calcTarget = () => {
-      const scrollY = window.scrollY || window.pageYOffset;
-
-      const leftRect = leftEl.getBoundingClientRect();
-      const leftTop = leftRect.top + scrollY;
-      const leftHeight = leftEl.offsetHeight;
-
-      const sideHeight = sideEl.offsetHeight;
-
-      const maxY = Math.max(0, leftHeight - sideHeight);
-      const raw = scrollY + topOffsetPx - leftTop;
-
-      targetY = clamp(raw, 0, maxY);
-    };
-
-    const tick = () => {
-      const diff = targetY - currentY;
-
-      if (Math.abs(diff) < 0.1) {
-        currentY = targetY;
-      } else {
-        currentY += diff * 0.12;
-      }
-
-      sideEl.style.transform = `translate3d(0, ${currentY}px, 0)`;
-
-      rafId = window.requestAnimationFrame(tick);
-    };
-
-    const onScroll = () => {
-      calcTarget();
-    };
-
-    const onResize = () => {
-      calcTarget();
-    };
-
-    calcTarget();
-    rafId = window.requestAnimationFrame(tick);
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onResize);
-
-      if (rafId !== null) {
-        window.cancelAnimationFrame(rafId);
-      }
-    };
-  }, []);
+    return uniqueSkills
+      .map((skill) => toSkillLabel(skill))
+      .filter((skillLabel) => Boolean(skillLabel));
+  }, [postDetail?.recruitments]);
 
   return (
     <div className="flex flex-1 items-start justify-center gap-[7.2rem] self-stretch pt-[11.2rem]">
@@ -211,21 +148,33 @@ const PostDetailPage = () => {
         <div className="flex flex-col items-start gap-[1rem] self-stretch">
           <div className="flex flex-col items-start gap-[3.2rem] self-stretch">
             <div className="flex flex-col items-start gap-[2rem] self-stretch">
-              <div className="overflow-hidden overflow-ellipsis">
-                <span className="line-clamp-2 overflow-ellipsis text-[3.4rem] font-[600] leading-[1.5] tracking-[-0.068rem] text-black-100">
+              <div className="overflow-hidden">
+                <h1 className="line-clamp-2 overflow-ellipsis text-[3.4rem] font-[600] leading-[1.5] tracking-[-0.068rem] text-black-100">
                   {postDetail?.title}
-                </span>
+                </h1>
               </div>
               <div className="flex items-center gap-[0.8rem]">
                 <div className="flex items-center gap-[0.8rem]">
-                  <IcProfileBasic className="h-[2.4rem] w-[2.4rem]" />
+                  {postDetail?.user?.profileImageUrl ? (
+                    <div className="shadow-insetBorderBlack10 flex aspect-[1/1] h-[2.4rem] w-[2.4rem] flex-col items-center justify-center gap-[1rem] rounded-[0.6rem] bg-black-10">
+                      <img
+                        alt={'프로필 이미지'}
+                        src={postDetail?.user?.profileImageUrl}
+                        className="h-[2.4rem] w-[2.4rem] rounded-[0.6rem] object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <IcProfileBasic className="h-[2.4rem] w-[2.4rem]" />
+                  )}
                   <span className="text-[1.6rem] font-[600] leading-[1.5] tracking-[-0.032rem] text-black-100">
-                    {postDetail?.user.username}
+                    {postDetail?.user?.username}
                   </span>
                 </div>
                 <div className="h-[1.7rem] w-[0.1rem] bg-black-40" />
                 <span className="text-[1.6rem] font-[400] leading-[1.5] tracking-[-0.032rem] text-black-60">
-                  24시간 전
+                  {postDetail?.createdAt
+                    ? formatPostDetailCreatedAt(postDetail.createdAt)
+                    : ''}
                 </span>
               </div>
             </div>
@@ -240,27 +189,24 @@ const PostDetailPage = () => {
                 </div>
                 <div className="inline-grid h-[6.2rem] gap-x-[48px] gap-y-[2rem] px-[1rem] [grid-template-columns:repeat(3,fit-content(100%))] [grid-template-rows:repeat(2,fit-content(100%))]">
                   {/** 모집인원 임시 데이터 */}
-                  {roles.map((role) => {
-                    const count =
-                      typeof apiCounts?.[role.key] === 'number'
-                        ? apiCounts[role.key]
-                        : 0;
+                  {POSITION_ITEMS.map((position) => {
+                    const count = apiCounts[position.key] ?? 0;
 
                     return (
                       <div
-                        key={role.key}
+                        key={position.key}
                         className="flex items-center gap-[1rem] self-stretch"
                       >
                         <span
                           className={
-                            role.noWrap
-                              ? labelClassNameNoWrap
-                              : labelClassNameBase
+                            position.noWrap
+                              ? LABEL_NOWRAP_STYLE
+                              : LABEL_BASE_STYLE
                           }
                         >
-                          {role.label}
+                          {position.label}
                         </span>
-                        <span className={valueClassName}>{count}</span>
+                        <span className={VALUE_STYLE}>{count}</span>
                       </div>
                     );
                   })}
@@ -276,12 +222,9 @@ const PostDetailPage = () => {
                   </span>
                 </div>
                 <div className="inline-grid gap-x-[20px] gap-y-[2rem] self-stretch px-[1rem] [grid-template-columns:repeat(5,minmax(0,1fr))] [grid-template-rows:repeat(2,fit-content(100%))]">
-                  <IcJavaSkill />
-                  <IcFigmaSkill />
-                  <IcDjSkill />
-                  <IcJavaScriptSkill />
-                  <IcMongoSkill />
-                  <IcNodejsSkill />
+                  {postSkills.map((skill) => (
+                    <SkillIconLarge key={skill} name={skill} />
+                  ))}
                 </div>
               </div>
             </div>
@@ -289,54 +232,32 @@ const PostDetailPage = () => {
         </div>
         {/** 모집글 상세조회 내용 */}
         <div
-          className={`flex flex-col items-start gap-[4rem] self-stretch ${!isMyPost && 'mb-[6.6rem]'}`}
+          className={[
+            'flex flex-col items-start gap-[4rem] self-stretch',
+            !isMyPost ? 'mb-[6.6rem]' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
         >
-          <TeamCard />
+          <TeamCard
+            teamImageUrl={postDetail?.team?.profileImageUrl}
+            title={postDetail?.team?.name}
+            memberCount={postDetail?.team?.memberCount}
+            workMode={postDetail?.team?.workMode}
+            createdAt={postDetail?.team?.createdAt}
+            description={postDetail?.team?.description}
+            onClick={() => {
+              if (!postDetail?.team?.teamId) {
+                return;
+              }
+
+              navigate(`/team/${postDetail.team.teamId}`);
+            }}
+          />
           <div className="w-[68.8rem]">
-            <span className="text-[1.6rem] font-[600] leading-[1.5] tracking-[-0.032rem] text-black-100">
-              🐰 회사소개 – 위시버니(Wish Bunny) 위시버니는 국내 최대 공동구매
-              일정 플랫폼으로, 공구 캘린더 및 공구 진행을 연결하는 이커머스 앱
-              서비스입니다. 현재 신규 시스템 구축을 본격화하며, 팀 단위로 함께
-              해주실 프런트엔드 개발자님을 모집합니다. 유저 니즈 기반으로 빠르게
-              성장하고 있어, 본인의 역량이 실제 기능으로 반영되는 경험을 하실 수
-              있습니다. 관심 있는 분들은 위시버니 앱을 직접 경험해보시고 편하게
-              지원해주세요! 🙂 <br />
-              <br />
-              📍 서비스 링크
-              <br />
-              웹사이트: https://www.wishbunny.me/🐰 회사소개 – 위시버니(Wish
-              Bunny)
-              <br />
-              위시버니는 국내 최대 공동구매 일정 플랫폼으로, 공구 캘린더 및 공구
-              진행을 연결하는 이커머스 앱 서비스입니다. 현재 신규 시스템 구축을
-              본격화하며, 팀 단위로 함께 해주실 프런트엔드 개발자님을
-              모집합니다. <br />
-              <br />
-              유저 니즈 기반으로 빠르게 성장하고 있어, 본인의 역량이 실제
-              기능으로 반영되는 경험을 하실 수 있습니다. 관심 있는 분들은
-              위시버니 앱을 직접 경험해보시고 편하게 지원해주세요! 🙂
-              <br />
-              <br />
-              📍 서비스 링크
-              <br />
-              웹사이트: https://www.wishbunny.me/🐰 회사소개 – 위시버니(Wish
-              Bunny)
-              <br />
-              위시버니는 국내 최대 공동구매 일정 플랫폼으로, 공구 캘린더 및 공구
-              진행을 연결하는 이커머스 앱 서비스입니다. 현재 신규 시스템 구축을
-              본격화하며, 팀 단위로 함께 해주실 프런트엔드 개발자님을
-              모집합니다. <br />
-              <br />
-              유저 니즈 기반으로 빠르게 성장하고 있어, 본인의 역량이 실제
-              기능으로 반영되는 경험을 하실 수 있습니다. 관심 있는 분들은
-              위시버니 앱을 직접 경험해보시고 편하게 지원해주세요! 🙂 <br />
-              <br />
-              📍 서비스 링크
-              <br />
-              웹사이트: https://www.wishbunny.me/
-            </span>
-            <br />
-            <br />
+            <p className="text-[1.6rem] font-[600] leading-[1.5] tracking-[-0.032rem] text-black-100">
+              {postDetail?.content}
+            </p>
           </div>
         </div>
 
@@ -352,7 +273,13 @@ const PostDetailPage = () => {
       {/** 팀 구간 */}
       <div className="flex self-start pt-[17.8rem]">
         <div ref={sideWrapRef} className="self-start will-change-transform">
-          <SideTeamCard variant="post" />
+          <SideTeamCard
+            title={postDetail?.user?.username}
+            position={postDetail?.user?.position}
+            profileImageUrl={postDetail?.user?.profileImageUrl}
+            skills={postDetail?.user?.skills}
+            variant="post"
+          />
         </div>
       </div>
 

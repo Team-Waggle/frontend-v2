@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import BaseButton from '../Button/index';
 
 import IcCrown from '../../../assets/icons/tag/ic_crown.svg?react';
@@ -9,28 +7,63 @@ import IcVertical from '../../../assets/icons/normal/ic_moreVertical_tight.svg?r
 import IcCharacter from '../../../assets/icons/image/ic_character_circle_gray_40.svg?react';
 
 import { SkillIcon } from '../../../utils/SkillIcon';
+import { toSkillLabel } from '../../../utils/skill';
 
 interface SideTeamCardProps {
   title?: string;
-  job?: string;
+  position?: string;
+  profileImageUrl?: string;
+  skills?: string[];
   variant?: 'team' | 'post';
-  isActvie?: boolean;
+  isActive?: boolean;
   disabled?: boolean;
-  onClick?: () => void;
 }
+
+const toPositionLabel = (position?: string): string => {
+  if (position === 'PLANNER') {
+    return '기획';
+  }
+
+  if (position === 'DESIGNER') {
+    return '디자인';
+  }
+
+  if (position === 'FRONTEND') {
+    return '프론트엔드';
+  }
+
+  if (position === 'BACKEND') {
+    return '백엔드';
+  }
+
+  if (position === 'MARKETER') {
+    return '마케팅';
+  }
+
+  return position ?? '';
+};
 
 const SideTeamCard = ({
   title = 'title',
-  job = '프론트엔드',
+  position = 'position',
+  profileImageUrl,
+  skills = [],
   variant = 'team',
-  isActvie = false,
+  isActive = false,
   disabled = false,
-  onClick,
 }: SideTeamCardProps) => {
-  const skills = ['Java', 'Figma', 'Node.js'];
+  const skillsIcon = Array.from(
+    new Set(
+      skills
+        .map((skill) => toSkillLabel(skill))
+        .filter((skillLabel): skillLabel is string => Boolean(skillLabel)),
+    ),
+  );
+
+  const positionLabel = toPositionLabel(position);
 
   const baseStyle =
-    'relative flex min-h-[27.2rem] w-[23.4rem] flex-col items-center gap-[2.4rem] rounded-[1.2rem] border border-solid border-black-30 bg-black-5 p-[2.8rem] cursor-pointer';
+    'relative flex min-h-[27.2rem] w-[23.4rem] flex-col items-center gap-[2.4rem] rounded-[1.2rem] border border-solid border-black-30 bg-black-5 p-[2.8rem]';
 
   // TeamHome에서만 사용하는 SideTeamCard Style (hover, active, disabled)
   const hoverStyle = 'hover:bg-black-20';
@@ -42,12 +75,11 @@ const SideTeamCard = ({
       className={[
         baseStyle,
         variant === 'team' && !disabled && hoverStyle,
-        isActvie && activeStyle,
+        isActive && activeStyle,
         disabled && disabledStyle,
       ]
         .filter(Boolean)
         .join(' ')}
-        onClick={onClick}
     >
       <div className="absolute flex w-[17.8rem] items-center justify-between">
         <div className="flex items-center gap-[0.4rem]">
@@ -75,17 +107,25 @@ const SideTeamCard = ({
           .join(' ')}
       >
         <div className="flex flex-col items-center gap-[1.7rem]">
-          <IcCharacter className="h-[6.1rem] w-[6.1rem] rounded-[9.9rem]" />
+          {profileImageUrl ? (
+            <img
+              alt={'프로필 이미지'}
+              src={profileImageUrl}
+              className="h-[6.1rem] w-[6.1rem] rounded-[9.9rem] object-cover"
+            />
+          ) : (
+            <IcCharacter className="h-[6.1rem] w-[6.1rem] rounded-[9.9rem]" />
+          )}
           <div className="flex flex-col items-center gap-[0.4rem]">
             <span className="text-[1.6rem] font-[600] leading-[1.5] text-black-100">
               {title}
             </span>
             <span className="text-[1.4rem] font-[500] leading-[1.5] text-black-60">
-              {job}
+              {positionLabel}
             </span>
           </div>
           <div className="flex items-start gap-[0.6rem]">
-            {skills.map((skill) => (
+            {skillsIcon.map((skill) => (
               <div
                 key={skill}
                 className="flex aspect-square h-[3.2rem] w-[3.2rem] items-center justify-center gap-[1rem] rounded-[9.9rem] bg-black-10 p-[0.6rem]"

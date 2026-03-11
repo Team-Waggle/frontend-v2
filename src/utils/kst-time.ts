@@ -135,3 +135,14 @@ export const formatPostListCreatedAt = (
 export const formatPostDetailCreatedAt = (createdAtUtcIso: string): string => {
   return formatKstYyMmDdHm(createdAtUtcIso);
 };
+
+/**
+ *
+ * 팀 카드 createdAt 표시
+ * YY.MM.DD
+ *
+ */
+
+export const formatTeamCardCreatedAt = (createdAtUtcIso: string): string => {
+  return formatKstYyMmDd(createdAtUtcIso);
+};
