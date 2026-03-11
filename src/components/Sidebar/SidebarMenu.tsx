@@ -30,10 +30,10 @@ const SIDEBAR_MENUS = [
   },
 ];
 
-const myTeams = [
-  { id: 1, name: '와글팀' },
-  { id: 2, name: '일이삼사오육칠팔구' },
-];
+// const myTeams = [
+//   { id: 1, name: '와글팀' },
+//   { id: 2, name: '일이삼사오육칠팔구' },
+// ];
 
 const SidebarMenu = ({ isFolded }: { isFolded: boolean }) => {
   return (
@@ -44,7 +44,12 @@ const SidebarMenu = ({ isFolded }: { isFolded: boolean }) => {
         isFolded ? (
           <SidebarIcon key={key} icon={icon} />
         ) : (
-          <SidebarItem key={key} icon={icon} label={label} subItems={myTeams} />
+          <SidebarItem
+            key={key}
+            icon={icon}
+            label={label}
+            // subItems={myTeams}
+          />
         ),
       )}
     </div>

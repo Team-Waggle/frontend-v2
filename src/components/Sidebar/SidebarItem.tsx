@@ -1,8 +1,12 @@
 import { useState, type ReactNode } from 'react';
-import { AnimatePresence, motion, type Variants } from 'framer-motion';
+import {
+  AnimatePresence,
+  motion,
+  // type Variants
+} from 'framer-motion';
 
 // Icons
-import ChevronDownIcon from '../../assets/icons/normal/chevron/ic_chevronDown.svg?react';
+// import ChevronDownIcon from '../../assets/icons/normal/chevron/ic_chevronDown.svg?react';
 
 interface SubItem {
   id: number | string;
@@ -21,38 +25,38 @@ const SidebarItem = ({ icon, label, onClick, subItems }: SidebarItemProps) => {
 
   const hasSubItems = subItems && subItems.length > 0;
 
-  const dropdownVariants: Variants = {
-    open: {
-      opacity: 1,
-      height: 'auto',
-      transition: {
-        height: {
-          type: 'spring',
-          mass: 1,
-          stiffness: 320,
-          damping: 40,
-        },
-        opacity: {
-          duration: 0.15,
-        },
-      },
-    },
-    closed: {
-      opacity: 0,
-      height: 0,
-      transition: {
-        height: {
-          type: 'spring',
-          mass: 1,
-          stiffness: 100,
-          damping: 20,
-        },
-        opacity: {
-          duration: 0.5,
-        },
-      },
-    },
-  };
+  // const dropdownVariants: Variants = {
+  //   open: {
+  //     opacity: 1,
+  //     height: 'auto',
+  //     transition: {
+  //       height: {
+  //         type: 'spring',
+  //         mass: 1,
+  //         stiffness: 320,
+  //         damping: 40,
+  //       },
+  //       opacity: {
+  //         duration: 0.15,
+  //       },
+  //     },
+  //   },
+  //   closed: {
+  //     opacity: 0,
+  //     height: 0,
+  //     transition: {
+  //       height: {
+  //         type: 'spring',
+  //         mass: 1,
+  //         stiffness: 100,
+  //         damping: 20,
+  //       },
+  //       opacity: {
+  //         duration: 0.5,
+  //       },
+  //     },
+  //   },
+  // };
 
   const handleClick = () => {
     if (hasSubItems) {
@@ -73,7 +77,8 @@ const SidebarItem = ({ icon, label, onClick, subItems }: SidebarItemProps) => {
             </span>
           </div>
 
-          {label === '내팀' && (
+          {/* 화살표 숨기기 */}
+          {/* {label === '내팀' && (
             <motion.div
               animate={{ rotate: isOpen ? 180 : 0 }}
               transition={{ duration: 0.2 }}
@@ -81,7 +86,7 @@ const SidebarItem = ({ icon, label, onClick, subItems }: SidebarItemProps) => {
             >
               <ChevronDownIcon className="h-[1.6rem] w-[1.6rem] text-black-40" />
             </motion.div>
-          )}
+          )} */}
         </div>
         <AnimatePresence initial={false}>
           {isOpen && hasSubItems && (
