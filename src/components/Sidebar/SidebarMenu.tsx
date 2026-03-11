@@ -44,7 +44,12 @@ const SidebarMenu = ({ isFolded }: { isFolded: boolean }) => {
         isFolded ? (
           <SidebarIcon key={key} icon={icon} />
         ) : (
-          <SidebarItem key={key} icon={icon} label={label} subItems={myTeams} />
+          <SidebarItem
+            key={key}
+            icon={icon}
+            label={label}
+            // subItems={myTeams}
+          />
         ),
       )}
     </div>

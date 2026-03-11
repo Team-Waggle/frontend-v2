@@ -73,7 +73,8 @@ const SidebarItem = ({ icon, label, onClick, subItems }: SidebarItemProps) => {
             </span>
           </div>
 
-          {label === '내팀' && (
+          {/* 화살표 숨기기 */}
+          {/* {label === '내팀' && (
             <motion.div
               animate={{ rotate: isOpen ? 180 : 0 }}
               transition={{ duration: 0.2 }}
@@ -81,7 +82,7 @@ const SidebarItem = ({ icon, label, onClick, subItems }: SidebarItemProps) => {
             >
               <ChevronDownIcon className="h-[1.6rem] w-[1.6rem] text-black-40" />
             </motion.div>
-          )}
+          )} */}
         </div>
         <AnimatePresence initial={false}>
           {isOpen && hasSubItems && (
