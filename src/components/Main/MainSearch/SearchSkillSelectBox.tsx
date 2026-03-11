@@ -1,3 +1,5 @@
+import { SKILL_MAP } from '../../../constants/skillMap';
+import { SkillIcon } from '../../../utils/SkillIcon';
 import { allSkills } from './skill-data';
 
 /**
@@ -11,10 +13,6 @@ type SearchSkillSelectBoxProps = {
   onToggleSkill: (skill: Skill) => void;
 };
 
-const formatSkillIconName = (skill: string) => {
-  return skill.replace(/\+/g, 'p').replace(/#/g, 'sharp').replace(/\s+/g, '');
-};
-
 const SearchSkillSelectBox = ({
   selectedSkills,
   onToggleSkill,
@@ -25,9 +23,8 @@ const SearchSkillSelectBox = ({
     <div className="absolute left-0 top-[calc(5rem+0.8rem)] z-[20]">
       <div className="flex flex-wrap content-start items-start gap-[0.8rem] self-stretch rounded-[0.8rem] border border-solid border-[#237BFF] bg-white p-[1.8rem] shadow-search-select-box">
         {allSkills.map((label) => {
-          const id = label;
+          const id = SKILL_MAP[label as keyof typeof SKILL_MAP];
           const isSelected = selectedSet.has(id);
-          const iconKey = formatSkillIconName(label);
 
           const baseStyle =
             'flex h-[4rem] items-center justify-center gap-[0.5rem] rounded-[9.9rem] border border-solid px-[1.2rem] hover:border-[#06F] hover:bg-[#F0F6FF] hover:text-[#0E0E0F]';
@@ -42,14 +39,7 @@ const SearchSkillSelectBox = ({
               className={`${baseStyle} ${isSelected ? selectedStyle : unSelectedStyle}`}
               aria-pressed={isSelected}
             >
-              <img
-                src={`/assets/icons/skill/small/ic_skill_${iconKey}_small.svg`}
-                alt=""
-                className="h-[1.6rem] w-[1.6rem]"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
+              <SkillIcon name={label} className="h-[1.6rem] w-[1.6rem]" />
               <span className="text-[1.4rem] font-[500]">{label}</span>
             </button>
           );

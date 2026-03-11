@@ -81,12 +81,15 @@ export type CursorResponsePostDetailResponse = {
   hasNext: boolean;
 };
 
+export type PostsSort = 'NEWEST' | 'OLDEST';
+
 export type GetPostsParams = {
   q?: string;
   positions?: string[];
   skills?: string[];
   cursor?: number;
   size?: number;
+  sort?: PostsSort;
 };
 
 export type GetPostsResponse = PageResponse<PostDetailResponse>;

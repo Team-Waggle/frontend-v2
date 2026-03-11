@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import useHorizontalScroll from '../../../hooks/useHorizontalScroll';
+import type { PostsSort } from '../../../types/api/posts';
+
+import { POSITION_CONVERTER } from '../../../utils/position';
+import { SKILL_MAP } from '../../../constants/skillMap';
 
 import IcBusinessBag from '../../../../src/assets/icons/normal/ic_businessBag.svg?react';
 import IcFolder from '../../../../src/assets/icons/normal/ic_folder.svg?react';
@@ -24,11 +28,6 @@ import IconWrapper from '../../common/IconWrapper';
  * MainSearch
  * : 홈 화면의 Search 컴포넌트
  *
- * 수정해야할 사항
- * 1. 직무를 선택하고, 스킬을 선택했을 때 중간의 회색 공백이 있음. 그 부분을 아직 해결하지 X.
- * 2. 스킬을 선택하고, 직무를 선택했을 때 중간의 회색 공백. 위와 똑같은 문제점.
- * 3. w 1440px일 때의 반응형 화면
- *
  */
 
 type OpenMenu = 'job' | 'skill' | 'keyword' | null;
@@ -44,9 +43,24 @@ type SearchTagItem = {
   title: string;
 };
 
-const MainSearch = () => {
-  const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
+type AppliedSearchFilters = {
+  q: string;
+  positions: string[];
+  skills: string[];
+};
 
+type MainSearchProps = {
+  sort: PostsSort;
+  onChangeSort: (sort: PostsSort) => void;
+  onApplyFilters: (filters: AppliedSearchFilters) => void;
+};
+
+const MainSearch = ({
+  sort,
+  onChangeSort,
+  onApplyFilters,
+}: MainSearchProps) => {
+  const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
   const [selectedJobs, setSelectedJobs] = useState<Job[]>([]);
   const [selectedSkills, setSelectedSkills] = useState<Skill[]>([]);
   const [keyword, setKeyword] = useState('');
@@ -67,6 +81,7 @@ const MainSearch = () => {
     };
 
     document.addEventListener('pointerdown', onPointerDown);
+
     return () => {
       document.removeEventListener('pointerdown', onPointerDown);
     };
@@ -127,18 +142,49 @@ const MainSearch = () => {
     });
   };
 
+  const toApiPositions = (jobs: Job[]): string[] => {
+    return Array.from(
+      new Set(
+        jobs
+          .map((job) => POSITION_CONVERTER[job.label] || job.id)
+          .map((value) => value?.trim())
+          .filter(Boolean),
+      ),
+    );
+  };
+
+  const toApiSkills = (skills: Skill[]): string[] => {
+    return Array.from(
+      new Set(
+        skills
+          .map((skill) => SKILL_MAP[skill.label as keyof typeof SKILL_MAP])
+          .map((value) => value?.trim())
+          .filter(Boolean),
+      ),
+    );
+  };
+
+  const applyFilters = () => {
+    onApplyFilters({
+      q: keyword.trim(),
+      positions: toApiPositions(selectedJobs),
+      skills: toApiSkills(selectedSkills),
+    });
+
+    setOpenMenu(null);
+  };
+
   const onReset = () => {
     setSelectedJobs([]);
     setSelectedSkills([]);
     setKeyword('');
     setOpenMenu(null);
-  };
+    onChangeSort('NEWEST');
 
-  const onSearch = () => {
-    console.log({
-      jobs: selectedJobs,
-      skills: selectedSkills,
-      keyword,
+    onApplyFilters({
+      q: '',
+      positions: [],
+      skills: [],
     });
   };
 
@@ -214,7 +260,7 @@ const MainSearch = () => {
               <SearchKeywordOverlay
                 value={keyword}
                 onChange={setKeyword}
-                onSearch={onSearch}
+                onSearch={applyFilters}
               />
             )}
 
@@ -235,13 +281,15 @@ const MainSearch = () => {
 
           <button
             type="button"
-            className="flex w-[16rem] items-center justify-center gap-[1rem] self-stretch rounded-r-[0.8rem] bg-[#06F] px-[2rem]"
+            onClick={applyFilters}
+            className="flex w-[16rem] items-center justify-center gap-[1rem] self-stretch rounded-r-[0.8rem] bg-blue-80 px-[2rem] hover:bg-hover-80"
           >
             <span className="text-[1.6rem] font-[700] text-white">확인</span>
           </button>
         </div>
 
         <button
+          type="button"
           onClick={(e) => {
             onReset();
 
@@ -311,7 +359,7 @@ const MainSearch = () => {
           </div>
         </div>
 
-        <MainSearchSelectText />
+        <MainSearchSelectText sort={sort} onChangeSort={onChangeSort} />
       </div>
     </div>
   );

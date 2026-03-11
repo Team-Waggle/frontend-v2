@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import MainCard from '../components/common/Cards/MainCard/MainCard';
 import { usePostsInfinite } from '../hooks/usePost';
+import type { PostsSort } from '../types/api/posts';
 import { useGetIsUserProfileComplete } from '../hooks/useUser';
 
 import MainSearch from '../components/Main/MainSearch/MainSearch';
@@ -18,7 +20,22 @@ import type { PostDetailResponse } from '../types/api/posts';
  *
  */
 
+type AppliedSearchFilters = {
+  q: string;
+  positions: string[];
+  skills: string[];
+};
+
 const MainPage = () => {
+  const navigate = useNavigate();
+
+  const [sort, setSort] = useState<PostsSort>('NEWEST');
+  const [appliedFilters, setAppliedFilters] = useState<AppliedSearchFilters>({
+    q: '',
+    positions: [],
+    skills: [],
+  });
+
   const {
     data: postsData,
     fetchNextPage,
@@ -26,7 +43,12 @@ const MainPage = () => {
     isFetchingNextPage,
     isLoading,
     isError,
-  } = usePostsInfinite();
+  } = usePostsInfinite({
+    q: appliedFilters.q,
+    positions: appliedFilters.positions,
+    skills: appliedFilters.skills,
+    sort,
+  });
 
   const posts = useMemo<PostDetailResponse[]>(() => {
     const pages = postsData?.pages ?? [];
@@ -66,19 +88,19 @@ const MainPage = () => {
   const isOnboardingModalOpen = data?.isComplete === false;
 
   const nowMs = Date.now();
-  
+
   return (
     <>
-      {/** Main */}
       <div className="flex w-full justify-center">
-        {/** Page Container */}
         <div className="flex w-full max-w-[152.6rem] flex-col gap-[5.6rem] px-[4.8rem]">
-          {/** Frame 01 */}
           <div className="flex w-full flex-col items-start gap-[2rem]">
-            <MainSearch />
+            <MainSearch
+              sort={sort}
+              onChangeSort={setSort}
+              onApplyFilters={setAppliedFilters}
+            />
           </div>
 
-          {/** Frame 02 */}
           <div className="inline-grid w-full max-w-[152.6rem] auto-rows-max grid-cols-[repeat(auto-fill,minmax(33.6rem,1fr))] gap-x-[1.8rem] gap-y-[1.8rem] max-1440:max-w-full">
             {posts.map((post: PostDetailResponse) => {
               const positionList: string[] = Array.from(
@@ -106,6 +128,7 @@ const MainPage = () => {
                   mainCardPositions={positionList}
                   mainCardSkills={skillsList}
                   mainCardCreatedAt={createdAtText}
+                  onClick={() => navigate(`/post/${post.postId}`)}
                 />
               );
             })}
