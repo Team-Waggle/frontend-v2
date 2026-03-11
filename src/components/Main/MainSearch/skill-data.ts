@@ -7,7 +7,7 @@
 
 export const skillData = {
   기획: ['Figma', 'GA4', 'Jira', 'Notion', 'SQL'],
-  디자인: ['After Effects', 'Figma', 'Illustrator', 'Photoshop', 'ProtoPie'],
+  디자인: ['After Effects', 'XD', 'Figma', 'Illustrator', 'Photoshop', 'ProtoPie'],
   프론트엔드: [
     'C#',
     'Javascript',
@@ -18,6 +18,7 @@ export const skillData = {
     'UE',
     'Unity',
     'Vue.js',
+    'Flutter'
   ],
   백엔드: [
     'AWS',
@@ -66,6 +67,7 @@ export const skillData = {
     'Unity',
     'Vue.js',
     '콘텐츠제작',
+    // 'Unreal Engine'
   ],
 } as const;
 

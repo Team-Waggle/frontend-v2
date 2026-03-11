@@ -1,7 +1,7 @@
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 
 import { getPostDetail, getPosts } from '../api/post';
-import type { CursorResponsePostDetailResponse } from '../types/api/posts';
+import type { CursorResponsePostDetailResponse, PostsSort } from '../types/api/posts';
 
 // 모집글 상세조회
 export const useGetPostDetail = (postId: number) => {
@@ -19,6 +19,7 @@ type UsePostsFilters = {
   q?: string;
   positions?: string[];
   skills?: string[];
+  sort?: PostsSort;
 };
 
 const trimKeyword = (value: string): string => value.trim();
@@ -36,13 +37,15 @@ export const usePostsInfinite = (filters: UsePostsFilters = {}) => {
   const keyword = trimKeyword(filters.q ?? '');
   const positionValues = cleanFilterValues(filters.positions ?? []);
   const skillValues = cleanFilterValues(filters.skills ?? []);
+  const sort = filters.sort ?? 'NEWEST';
 
   const keywordKey = keyword;
   const positionsKey = positionValues.join(',');
   const skillsKey = skillValues.join(',');
+  const sortKey = sort;
 
   return useInfiniteQuery<CursorResponsePostDetailResponse>({
-    queryKey: ['posts', keywordKey, positionsKey, skillsKey],
+    queryKey: ['posts', keywordKey, positionsKey, skillsKey, sortKey],
     initialPageParam: undefined as number | undefined,
     queryFn: ({ pageParam }) => {
       const cursor = typeof pageParam === 'number' ? pageParam : undefined;
@@ -52,11 +55,14 @@ export const usePostsInfinite = (filters: UsePostsFilters = {}) => {
         positions: positionValues.length ? positionValues : undefined,
         skills: skillValues.length ? skillValues : undefined,
         cursor,
+        sort,
         size: pageSize,
       });
     },
     getNextPageParam: (lastPage) => {
-      if (!lastPage?.hasNext) return undefined;
+      if (!lastPage?.hasNext) {
+        return undefined;
+      }
 
       const next = lastPage.nextCursor;
       return typeof next === 'number' ? next : undefined;

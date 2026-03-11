@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+
+import type { PostsSort } from '../../../types/api/posts';
+
 import IcChevronDown from '../../../assets/icons/normal/chevron/ic_chevronDown.svg?react';
 import IcChevronUp from '../../../assets/icons/normal/chevron/ic_chevronUp.svg?react';
 
@@ -6,29 +9,39 @@ import IcChevronUp from '../../../assets/icons/normal/chevron/ic_chevronUp.svg?r
  * MainSearch: 오래된순, 최신순 Select Box
  */
 
-type SearchSelectTextValue = 'latest' | 'oldest';
+type MainSearchSelectTextProps = {
+  sort: PostsSort;
+  onChangeSort: (sort: PostsSort) => void;
+};
 
-const MainSearchSelectText = () => {
+const MainSearchSelectText = ({
+  sort,
+  onChangeSort,
+}: MainSearchSelectTextProps) => {
   const [open, setOpen] = useState(false);
-  const [sort, setSort] = useState<SearchSelectTextValue>('latest');
 
   const wrapRef = useRef<HTMLDivElement | null>(null);
 
-  const label = sort === 'latest' ? '최신순' : '오래된순';
-  const optionLabel = sort === 'latest' ? '오래된순' : '최신순';
-  const nextSort: SearchSelectTextValue =
-    sort === 'latest' ? 'oldest' : 'latest';
+  const label = sort === 'NEWEST' ? '최신순' : '오래된순';
+  const optionLabel = sort === 'NEWEST' ? '오래된순' : '최신순';
+  const nextSort: PostsSort = sort === 'NEWEST' ? 'OLDEST' : 'NEWEST';
 
   useEffect(() => {
     const onMouseDown = (e: MouseEvent) => {
-      if (!wrapRef.current) return;
+      if (!wrapRef.current) {
+        return;
+      }
+
       if (!wrapRef.current.contains(e.target as Node)) {
         setOpen(false);
       }
     };
 
     document.addEventListener('mousedown', onMouseDown);
-    return () => document.removeEventListener('mousedown', onMouseDown);
+
+    return () => {
+      document.removeEventListener('mousedown', onMouseDown);
+    };
   }, []);
 
   return (
@@ -48,7 +61,7 @@ const MainSearchSelectText = () => {
       {open && (
         <div
           onClick={() => {
-            setSort(nextSort);
+            onChangeSort(nextSort);
             setOpen(false);
           }}
           className="absolute flex w-[9.4rem] cursor-pointer flex-col items-start justify-center rounded-[0.6rem] bg-white py-[0.6rem] shadow-search-select-box"
