@@ -1,6 +1,6 @@
-import { useGetUserMe } from '../../hooks/useUser';
 import { usePostLogout } from '../../hooks/useAuth';
 import { POSITION_CONVERTER } from '../../utils/position';
+import type { UserMeResponse } from '../../types/api/user';
 
 // Icons
 import BaicProfileIcon from '../../assets/icons/ic_profile_basic.svg?react';
@@ -8,15 +8,15 @@ import LogoutIcon from '../../assets/icons/normal/ic_logout.svg?react';
 import CharacterGrayIcon from '../../assets/icons/ic_character_gray.svg?react';
 
 const SidebarProfile = ({
+  data,
   isFolded,
   isLoggedIn,
 }: {
+  data: UserMeResponse;
   isFolded: boolean;
   isLoggedIn: boolean;
 }) => {
   const { mutate: logout } = usePostLogout();
-
-  const { data } = useGetUserMe();
 
   if (isFolded) return <BaicProfileIcon />;
 

@@ -6,6 +6,7 @@ import BaseButton from '../common/Button';
 import IconWrapper from '../common/IconWrapper';
 import {
   useGetIsUserProfileComplete,
+  useGetUserMe,
   useGetUserMeTeam,
 } from '../../hooks/useUser';
 
@@ -22,6 +23,7 @@ import LogoIcon from '../../assets/icons/ic_logo.svg?react';
 const Sidebar = () => {
   const navigate = useNavigate();
   const { data: isProfileCompleteData } = useGetIsUserProfileComplete();
+  const { data: myData } = useGetUserMe();
   const { data: myteamData } = useGetUserMeTeam();
 
   const [isFolded, setIsFolded] = useState(false);
@@ -54,6 +56,7 @@ const Sidebar = () => {
             } `}
           >
             <SidebarProfile
+              data={myData}
               isFolded={isFolded}
               isLoggedIn={isProfileComplete}
             />
@@ -83,7 +86,11 @@ const Sidebar = () => {
             )}
           </div>
 
-          <SidebarMenu isFolded={isFolded} />
+          <SidebarMenu
+            isFolded={isFolded}
+            teamId={myteamData?.[0]?.teamId}
+            userId={myData?.userId}
+          />
         </div>
 
         {/* 고객지원 문의 */}
