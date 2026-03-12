@@ -13,7 +13,7 @@ const BaseChip = memo(
     (
       {
         variant = 'outline',
-        isSelected = false,
+        isSelected = false, // chip의 선택 여부
         status = 'normal', // variant가 card일 때만 적용
         mainIcon,
         subIcon,
@@ -24,9 +24,6 @@ const BaseChip = memo(
       },
       ref,
     ) => {
-      const iconColorClass =
-        variant === 'card' && isSelected ? CHIP_ICON_COLOR[status] : '';
-
       const chipStyles = useMemo(() => {
         const selected = isSelected ? 'selected' : 'unselected';
 
@@ -35,13 +32,15 @@ const BaseChip = memo(
         if (variant === 'card') {
           selectedStyle = CHIP_SELECTED_STYLES.card[status][selected];
         } else {
-          // 타입 캐스팅으로 접근 (상위 interface에 card 외의 나머지들이 있음을 TS에 알림)
-          const styles = CHIP_SELECTED_STYLES[variant];
-          selectedStyle = styles[selected];
+          selectedStyle = CHIP_SELECTED_STYLES[variant][selected];
         }
 
         return `${BASE_CHIP_STYLES} ${CHIP_VARIANT_STYLES[variant]} ${selectedStyle} ${className || ''}`;
       }, [variant, status, isSelected, className]);
+
+      const iconColorClass =
+        variant === 'card' && isSelected ? CHIP_ICON_COLOR[status] : '';
+
       return (
         <button
           type="button"
@@ -54,7 +53,11 @@ const BaseChip = memo(
             <span
               className={`${CHIP_ICON_SIZE[variant]} ${iconColorClass} empty:hidden`}
             >
-              {mainIcon}
+              {typeof mainIcon === 'string' ? (
+                <img src={mainIcon} className="rounded-[0.6rem]" />
+              ) : (
+                mainIcon
+              )}
             </span>
           )}
           {children}
