@@ -11,6 +11,7 @@ import OnboardingModal from '../components/Modal/OnboardingModal';
 
 import { formatPostListCreatedAt } from '../utils/kst-time';
 import type { PostDetailResponse } from '../types/api/posts';
+import { useAuthStore } from '../stores/authStore';
 
 /**
  *
@@ -50,6 +51,10 @@ const MainPage = () => {
     sort,
   });
 
+  const { data, isSuccess } = useGetIsUserProfileComplete();
+  const { setProfileComplete } = useAuthStore();
+  const isOnboardingModalOpen = data?.isComplete === false;
+
   const posts = useMemo<PostDetailResponse[]>(() => {
     const pages = postsData?.pages ?? [];
     return pages.flatMap((p) => p?.data ?? []);
@@ -84,8 +89,11 @@ const MainPage = () => {
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  const { data } = useGetIsUserProfileComplete();
-  const isOnboardingModalOpen = data?.isComplete === false;
+  useEffect(() => {
+    if (isSuccess && data !== undefined) {
+      setProfileComplete(data?.isComplete);
+    }
+  }, [data, isSuccess, setProfileComplete]);
 
   const nowMs = Date.now();
 

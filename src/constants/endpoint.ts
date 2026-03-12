@@ -30,7 +30,7 @@ export const USERS_ME_TEAMS_URL = '/users/me/teams'; //본인 참여 팀 목록 
 export const LOGOUT_URL = '/auth/logout'; // 로그아웃
 export const REFRESH_TOKEN_URL = '/auth/refresh'; // 액세스 토큰 재발급
 
-// 프로젝트 API
+// 팀 API
 export const TEAMS_URL = '/teams'; // 팀 생성
 export const TEAMS_DETAIL_URL = (teamId: number) => `/teams/${teamId}`; // 팀 상세 조회, 수정, 삭제
 export const TEAMS_APPLICATION_URL = (teamId: number) =>
@@ -42,6 +42,8 @@ export const TEAMS_PRESIGNED_URL = '/teams/profile-image/presigned-url'; // 팀 
 
 // 팀 멤버 API
 export const MEMBER_URL = (memberId: number) => `/members/${memberId}`; // 멤버 추방, 멤버 역할 변경
+export const MEMBER_REVIEW_URL = (memberId: number) =>
+  `/members/${memberId}/reviews`;
 
 // 팀 지원 API
 export const APPLICATION_DELETE_URL = (applicationId: number) =>

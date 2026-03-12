@@ -37,7 +37,7 @@ export const CHIP_SELECTED_STYLES: ChipSelectedStyles = {
         'border-black-30 bg-black-5 text-black-80 hover:border-blue-70 hover:text-black-100',
     },
     unliked: {
-      selected: 'border-error bg-[#FFEEEA] text-black-100',
+      selected: 'border-error bg-error-2 text-black-100',
       unselected:
         'border-black-30 bg-black-5 text-black-80 hover:border-error hover:text-black-100',
     },
