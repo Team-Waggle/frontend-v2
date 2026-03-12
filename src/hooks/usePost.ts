@@ -1,7 +1,7 @@
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 
 import { getPostDetail, getPosts } from '../api/post';
-import type { GetPostsResponse } from '../types/api/posts';
+import type { CursorResponsePostDetailResponse, PostsSort } from '../types/api/posts';
 
 // 모집글 상세조회
 export const useGetPostDetail = (postId: number) => {
@@ -15,38 +15,58 @@ export const useGetPostDetail = (postId: number) => {
   });
 };
 
-// 모집글 목록 무한 스크롤 조회
-export const usePostsInfinite = (q?: string) => {
+type UsePostsFilters = {
+  q?: string;
+  positions?: string[];
+  skills?: string[];
+  sort?: PostsSort;
+};
+
+const trimKeyword = (value: string): string => value.trim();
+
+const cleanFilterValues = (values: string[]): string[] => {
+  return Array.from(
+    new Set(values.map((value) => value.trim()).filter(Boolean)),
+  ).sort();
+};
+
+// 모집글 목록 무한 스크롤 조회 (cursor 기반)
+export const usePostsInfinite = (filters: UsePostsFilters = {}) => {
   const pageSize = 10;
 
-  return useInfiniteQuery<GetPostsResponse>({
-    queryKey: ['posts', q || ''],
-    initialPageParam: 0,
+  const keyword = trimKeyword(filters.q ?? '');
+  const positionValues = cleanFilterValues(filters.positions ?? []);
+  const skillValues = cleanFilterValues(filters.skills ?? []);
+  const sort = filters.sort ?? 'NEWEST';
+
+  const keywordKey = keyword;
+  const positionsKey = positionValues.join(',');
+  const skillsKey = skillValues.join(',');
+  const sortKey = sort;
+
+  return useInfiniteQuery<CursorResponsePostDetailResponse>({
+    queryKey: ['posts', keywordKey, positionsKey, skillsKey, sortKey],
+    initialPageParam: undefined as number | undefined,
     queryFn: ({ pageParam }) => {
-      const page = typeof pageParam === 'number' ? pageParam : 0;
+      const cursor = typeof pageParam === 'number' ? pageParam : undefined;
 
       return getPosts({
-        page,
+        q: keyword || undefined,
+        positions: positionValues.length ? positionValues : undefined,
+        skills: skillValues.length ? skillValues : undefined,
+        cursor,
+        sort,
         size: pageSize,
-        q,
       });
     },
     getNextPageParam: (lastPage) => {
-      const pageNumber = Number(lastPage.number ?? 0);
-      const totalPages = Number(lastPage.totalPages ?? 0);
-
-      if (totalPages > 0) {
-        if (pageNumber + 1 >= totalPages) return undefined;
-        return pageNumber + 1;
+      if (!lastPage?.hasNext) {
+        return undefined;
       }
 
-      const contentLength = Array.isArray(lastPage.content)
-        ? lastPage.content.length
-        : 0;
-
-      if (contentLength < pageSize) return undefined;
-
-      return pageNumber + 1;
+      const next = lastPage.nextCursor;
+      return typeof next === 'number' ? next : undefined;
     },
+    refetchOnWindowFocus: false,
   });
 };

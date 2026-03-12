@@ -5,6 +5,9 @@ import { REFRESH_TOKEN_URL } from '../constants/endpoint';
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
   withCredentials: true,
+  paramsSerializer: {
+    indexes: null,
+},
 });
 
 axiosInstance.interceptors.request.use((config) => {

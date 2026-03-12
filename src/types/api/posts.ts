@@ -1,3 +1,5 @@
+import type { TeamResponse } from './team';
+
 export type SortObject = {
   empty: boolean;
   sorted: boolean;
@@ -43,6 +45,7 @@ export type PostUser = {
   email: string;
   profileImageUrl: string;
   position: PositionType;
+  skills: string[];
   createdAt?: string;
   updatedAt?: string;
 };
@@ -63,6 +66,7 @@ export type PostDetailResponse = {
   postId: number;
   title: string;
   content: string;
+  team: TeamResponse;
   user: PostUser;
   isRecruiting: boolean;
   recruitments: RecruitmentResponse[];
@@ -71,13 +75,25 @@ export type PostDetailResponse = {
   updatedAt?: string;
 };
 
+export type CursorResponsePostDetailResponse = {
+  data: PostDetailResponse[];
+  nextCursor: number | null;
+  hasNext: boolean;
+};
+
+export type PostsSort = 'NEWEST' | 'OLDEST';
+
 export type GetPostsParams = {
-  page: number;
-  size: number;
-  sort?: string[];
   q?: string;
+  positions?: string[];
+  skills?: string[];
+  cursor?: number;
+  size?: number;
+  sort?: PostsSort;
 };
 
 export type GetPostsResponse = PageResponse<PostDetailResponse>;
 
 export type GetPostDetailResponse = PostDetailResponse;
+
+export type GetTeamPostsResponse = PostDetailResponse[];

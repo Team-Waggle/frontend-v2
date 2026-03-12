@@ -177,7 +177,7 @@ const TeamHomePage = () => {
                     key={post.id}
                     variant="team"
                     mainCardTitle={post.title}
-                    isActvie={activeCard === post.id}
+                    isActive={activeCard === post.id}
                     onClick={() => {
                       setActiveCard(post.id);
                     }}
@@ -202,11 +202,11 @@ const TeamHomePage = () => {
                   key={member.id}
                   variant="team"
                   title={member.title}
-                  job={member.job}
-                  isActvie={activeTeamMember === member.id}
-                  onClick={() => {
-                    setActiveTeamMember(member.id);
-                  }}
+                  position={member.job}
+                  isActive={activeTeamMember === member.id}
+                  // onClick={() => {
+                  //   setActiveTeamMember(member.id);
+                  // }}
                 />
               ))}
             </div>

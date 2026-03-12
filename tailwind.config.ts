@@ -39,12 +39,14 @@ export default {
           10: '#E6E7E8',
           80: '#0057D9',
         },
-        error: { DEFAULT: '#F5552D' },
+        orange: { DEFAULT: '#FE991D' },
+        error: { DEFAULT: '#F5552D', 2: '#FFEEEA' },
       },
       boxShadow: {
         'main-card': '0 0 36px 0 rgba(0, 0, 0, 0.15)',
         'search-select-box':
           '0 2px 16.6px 0 rgba(0, 0, 0, 0.15), 0 1px 4px 0 rgba(0, 0, 0, 0.08)',
+        'profile-img': 'inset 0 0 0 1px rgba(14, 14, 15, 0.10)',
       },
       backgroundImage: {
         'team-home-left-slide-background':
