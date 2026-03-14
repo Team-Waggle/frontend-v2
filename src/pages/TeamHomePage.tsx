@@ -1,8 +1,15 @@
 import { useState, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import useHorizontalScroll from '../hooks/useHorizontalScroll';
-import { useGetTeamDetail } from '../hooks/useTeam';
+import {
+  useGetTeamApplications,
+  useGetTeamDetail,
+  useGetTeamMembers,
+  useDeleteTeamMember,
+  usePatchTeamMemberRole,
+} from '../hooks/useTeam';
+import { useGetUserMe } from '../hooks/useUser';
 
 import TeamDefaultImg from '../assets/icons/image/ic_character_circle_primary_60.svg?react';
 
@@ -17,9 +24,14 @@ import TeamNav from '../components/Team/TeamNav';
 import MainCard from '../components/common/Cards/MainCard/MainCard';
 import SideTeamCard from '../components/common/Cards/SideTeamCard';
 import IconWrapper from '../components/common/IconWrapper';
+import {
+  formatPostListCreatedAt,
+  formatTeamCardCreatedAt,
+} from '../utils/kst-time';
 
 const TeamHomePage = () => {
   const { teamId } = useParams<{ teamId: string }>();
+  const navigate = useNavigate();
 
   const parsedTeamId = useMemo(() => {
     if (!teamId) return 0;
@@ -30,69 +42,127 @@ const TeamHomePage = () => {
     return n;
   }, [teamId]);
 
-  const {
-    data: teamDetail
-  } = useGetTeamDetail(parsedTeamId);
+  const { data: teamDetail } = useGetTeamDetail(parsedTeamId);
+  const { data: teamMembers } = useGetTeamMembers(parsedTeamId);
+  const { data: teamApplications } = useGetTeamApplications(parsedTeamId);
+  const { data: me } = useGetUserMe();
+
+  const patchTeamMemberRoleMutation = usePatchTeamMemberRole(parsedTeamId);
+  const deleteTeamMemberMutation = useDeleteTeamMember(parsedTeamId);
 
   const [activeCard, setActiveCard] = useState<number | null>(null);
   const [activeTeamMember, setActiveTeamMember] = useState<number | null>(null);
 
-  const posts = [
-    {
-      id: 1,
-      title:
-        '와글팀모집글조회입니다.와글팀모집글조회입니다.와글팀모집글조회입니다.와글팀모집글조회입니다.',
-    },
-    {
-      id: 2,
-      title:
-        '와글팀모집글조회입니다.와글팀모집글조회입니다.와글팀모집글조회입니다.와글팀모집글조회입니다.',
-    },
-    {
-      id: 3,
-      title:
-        '와글팀모집글조회입니다.와글팀모집글조회입니다.와글팀모집글조회입니다.와글팀모집글조회입니다.',
-    },
-    {
-      id: 4,
-      title:
-        '와글팀모집글조회입니다.와글팀모집글조회입니다.와글팀모집글조회입니다.와글팀모집글조회입니다.',
-    },
-  ];
+  const applications = teamApplications ?? [];
 
-  const members = [
-    { id: 1, title: 'title1', job: '프론트엔드' },
-    { id: 2, title: 'title2', job: '프론트엔드' },
-    { id: 3, title: 'title3', job: '프론트엔드' },
-    { id: 4, title: 'title4', job: '프론트엔드' },
-    { id: 5, title: 'title5', job: '프론트엔드' },
-  ];
+  const members = teamMembers ?? [];
+
+  const myMember = members.find((member) => member.userId === me?.userId);
+  const isLeaderOrManager =
+    !myMember?.deletedAt &&
+    (myMember?.role === 'LEADER' || myMember?.role === 'MANAGER');
+
+  const sortedMembers = useMemo(() => {
+    const visibleMembers = myMember
+      ? members
+      : members.filter((m) => !m.deletedAt);
+
+    if (!me?.userId) {
+      return visibleMembers;
+    }
+
+    return [...visibleMembers].sort((a, b) => {
+      const aIsMe = a.userId === me.userId ? 1 : 0;
+      const bIsMe = b.userId === me.userId ? 1 : 0;
+      if (bIsMe !== aIsMe) return bIsMe - aIsMe;
+
+      const aIsDeleted = a.deletedAt ? 1 : 0;
+      const bIsDeleted = b.deletedAt ? 1 : 0;
+      return aIsDeleted - bIsDeleted;
+    });
+  }, [members, me?.userId, myMember]);
+
+  const handleAssignManager = (memberId: number) => {
+    patchTeamMemberRoleMutation.mutate({
+      memberId,
+      role: 'MANAGER',
+    });
+  };
+
+  const activeMemberCount = members.filter((m) => !m.deletedAt).length;
+
+  const handleKickMember = (memberId: number) => {
+    const isSelf = memberId === myMember?.memberId;
+
+    if (isSelf) {
+      if (activeMemberCount === 1) {
+        // TODO: "팀에 혼자 남아 있을 때는 이탈할 수 없습니다." 알림 추가
+        return;
+      }
+      if (myMember?.role === 'LEADER') {
+        // TODO: "리더는 다른 팀원에게 리더를 위임한 후 이탈할 수 있습니다." 알림 추가
+        return;
+      }
+    }
+
+    deleteTeamMemberMutation.mutate(memberId);
+  };
+  const nowMs = useMemo(() => Date.now(), [applications.length]);
+
+  const toWorkModeLabel = (workMode?: string): string => {
+    if (workMode === 'ONLINE') {
+      return '온라인';
+    }
+
+    if (workMode === 'OFFLINE') {
+      return '오프라인';
+    }
+
+    return workMode ?? '온라인';
+  };
 
   const { trackRef, canScrollLeft, canScrollRight, scrollByItem } =
     useHorizontalScroll({
       itemSelector: '[data-main-card="true"]',
       gapPx: 18,
-      deps: [posts.length],
+      deps: [applications.length],
     });
 
   return (
-    <div className="flex flex-1 flex-col items-center gap-[6rem] self-stretch pt-[9.2rem]">
-      <TeamNav />
-
+    <div
+      className={[
+        'flex flex-1 flex-col items-center gap-[6rem] self-stretch',
+        isLeaderOrManager ? 'pt-[5.4rem]' : 'pt-[9.2rem]',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
+      {/** pt-[9.2rem] pt-[5.4rem] */}
+      {isLeaderOrManager && <TeamNav />}
       <div className="flex w-full max-w-[clamp(98.2rem,70vw,130rem)] flex-col items-start gap-[4rem]">
         {/** 팀 설명 */}
         <div className="flex items-start gap-[4rem] self-stretch">
           {/** 팀 이미지: default 값 */}
-          <div className="flex aspect-[40/21] w-full max-w-[37.3333rem] flex-col items-center justify-center gap-[1rem] self-stretch rounded-[1rem] bg-blue-5 py-[1.9rem] max-1440:w-[42.4762rem]">
-            <TeamDefaultImg className="h-[15.8rem] w-[15.8rem]" />
-          </div>
+          {teamDetail?.profileImageUrl ? (
+            <div className="flex aspect-[1/1] h-[22.3rem] w-[22.3rem] flex-col items-center justify-center gap-[1rem] rounded-[1em] bg-black-10">
+              <img
+                alt={'프로필 이미지'}
+                src={teamDetail?.profileImageUrl}
+                className="h-[22.3rem] w-[22.3rem] rounded-[1rem] object-cover"
+              />
+            </div>
+          ) : (
+            <div className="flex aspect-[1/1] w-full max-w-[22.3rem] flex-col items-center justify-center gap-[1rem] self-stretch rounded-[1rem] bg-blue-5 py-[1.9rem]">
+              <TeamDefaultImg className="h-[18.5rem] w-[18.5rem]" />
+            </div>
+          )}
           {/** 팀 상세 내용 */}
           <div className="flex flex-1 flex-col items-start gap-[2.4rem]">
             <div className="flex flex-col items-start justify-center gap-[1.9rem]">
               {/** 팀명 */}
               <div>
                 <span className="text-[3.8rem] font-[600] leading-[1.5] tracking-[-0.076rem] text-black">
-                  {teamDetail?.name ?? "WAGGLE"}
+                  {teamDetail?.name ?? 'WAGGLE'}
                 </span>
               </div>
               {/** 팀원 수, 오프라인/온라인, 날짜 */}
@@ -100,26 +170,28 @@ const TeamHomePage = () => {
                 <div className="flex h-[4.2rem] min-w-[4.8rem] items-center justify-center gap-[0.2rem] rounded-[9.9rem] bg-black-10 px-[1.4rem]">
                   <IcPersons className="h-[1.2rem] w-[1.2rem]" />
                   <span className="flex-1 text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black-100">
-                    100
+                    {activeMemberCount}
                   </span>
                 </div>
                 <div className="flex h-[4.2rem] min-w-[4.8rem] items-center justify-center gap-[0.2rem] rounded-[9.9rem] bg-black-10 px-[1.4rem]">
                   <IcDesktop className="h-[1.2rem] w-[1.2rem]" />
                   <span className="flex-1 text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black-100">
-                    {teamDetail?.workMode ?? "온라인"}
+                    {toWorkModeLabel(teamDetail?.workMode)}
                   </span>
                 </div>
                 <div className="flex h-[4.2rem] min-w-[4.8rem] items-center justify-center gap-[0.2rem] rounded-[9.9rem] bg-black-10 px-[1.4rem]">
                   <IcCompany className="h-[1.2rem] w-[1.2rem]" />
                   <span className="flex-1 text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black-100">
-                    00.00.00
+                    {teamDetail?.createdAt
+                      ? formatTeamCardCreatedAt(teamDetail.createdAt)
+                      : ''}
                   </span>
                 </div>
               </div>
             </div>
             <div>
               <span className="text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black">
-                {teamDetail?.description ?? "팀 소개가 들어가는 자리입니다."}
+                {teamDetail?.description ?? '팀 소개가 들어가는 자리입니다.'}
               </span>
             </div>
           </div>
@@ -172,17 +244,46 @@ const TeamHomePage = () => {
                 ref={trackRef}
                 className="flex items-center gap-[1.8rem] overflow-x-auto scroll-smooth scrollbar-hide"
               >
-                {posts.map((post) => (
-                  <MainCard
-                    key={post.id}
-                    variant="team"
-                    mainCardTitle={post.title}
-                    isActive={activeCard === post.id}
-                    onClick={() => {
-                      setActiveCard(post.id);
-                    }}
-                  />
-                ))}
+                {applications.map((application) => {
+                  const positionList: string[] = Array.from(
+                    new Set(
+                      application.recruitments
+                        .map((r) => r.position)
+                        .filter(Boolean),
+                    ),
+                  );
+
+                  const skillsList: string[] = Array.from(
+                    new Set(
+                      application.recruitments.flatMap((r) =>
+                        (r.skills ?? []).map((s) => s.trim()).filter(Boolean),
+                      ),
+                    ),
+                  );
+                  return (
+                    <MainCard
+                      className="!w-[36.8rem]"
+                      key={application.postId}
+                      variant="team"
+                      mainCardTitle={application.title}
+                      mainCardPositions={positionList}
+                      mainCardSkills={skillsList}
+                      mainCardCreatedAt={
+                        application.createdAt
+                          ? formatPostListCreatedAt(
+                              application.createdAt,
+                              nowMs,
+                            )
+                          : ''
+                      }
+                      isActive={activeCard === application.postId}
+                      onClick={() => {
+                        setActiveCard(application.postId);
+                        navigate(`/post/${application.postId}`);
+                      }}
+                    />
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -196,17 +297,28 @@ const TeamHomePage = () => {
               </p>
             </div>
             {/** 팀원 명단 카드 */}
-            <div className="grid w-full gap-x-[1.8rem] gap-y-[2.4rem] self-stretch [grid-template-columns:repeat(auto-fit,minmax(23.4rem,1fr))]">
-              {members.map((member) => (
+            <div className="grid w-full gap-x-[1.8rem] gap-y-[2.4rem] self-stretch [grid-template-columns:repeat(auto-fit,23.4rem)]">
+              {sortedMembers.map((member) => (
                 <SideTeamCard
-                  key={member.id}
+                  key={member.memberId}
                   variant="team"
-                  title={member.title}
-                  position={member.job}
-                  isActive={activeTeamMember === member.id}
-                  // onClick={() => {
-                  //   setActiveTeamMember(member.id);
-                  // }}
+                  memberId={member.memberId}
+                  title={member.username}
+                  status={teamDetail?.status}
+                  profileImageUrl={member.profileImageUrl}
+                  position={member.position}
+                  skills={member.skills}
+                  isMe={member.userId === me?.userId}
+                  isLeader={member.role === 'LEADER'}
+                  isManager={member.role === 'MANAGER'}
+                  canManage={isLeaderOrManager && !member.deletedAt}
+                  disabled={!!member.deletedAt}
+                  isActive={activeTeamMember === member.memberId}
+                  onClick={() => {
+                    setActiveTeamMember(member.memberId);
+                  }}
+                  onAssignManager={handleAssignManager}
+                  onKickMember={handleKickMember}
                 />
               ))}
             </div>
