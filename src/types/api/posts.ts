@@ -55,7 +55,7 @@ export type RecruitmentStatusType = 'RECRUITING' | 'CLOSED';
 export type RecruitmentResponse = {
   recruitmentId: number;
   position: PositionType;
-  recruitingCount: number;
+  count: number;
   status: RecruitmentStatusType;
   skills?: string[];
   createdAt?: string;

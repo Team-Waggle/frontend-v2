@@ -29,6 +29,15 @@ type RecruitmentCountKey =
   | 'marketing'
   | 'etc';
 
+const getRecruitmentCountKey = (position?: string): RecruitmentCountKey => {
+  if (position === 'PLANNER') return 'plan';
+  if (position === 'DESIGNER') return 'design';
+  if (position === 'FRONTEND') return 'frontend';
+  if (position === 'BACKEND') return 'backend';
+  if (position === 'MARKETER') return 'marketing';
+  return 'etc';
+};
+
 const POSITION_ITEMS: Array<{
   key: RecruitmentCountKey;
   label: string;
@@ -78,30 +87,6 @@ const PostDetailPage = () => {
   const isMyPost =
     Boolean(myUserId) && Boolean(postUserId) && myUserId === postUserId;
 
-  const getRecruitmentCountKey = (position?: string): RecruitmentCountKey => {
-    if (position === 'PLANNER') {
-      return 'plan';
-    }
-
-    if (position === 'DESIGNER') {
-      return 'design';
-    }
-
-    if (position === 'FRONTEND') {
-      return 'frontend';
-    }
-
-    if (position === 'BACKEND') {
-      return 'backend';
-    }
-
-    if (position === 'MARKETER') {
-      return 'marketing';
-    }
-
-    return 'etc';
-  };
-
   const apiCounts = useMemo<Record<RecruitmentCountKey, number>>(() => {
     const counts: Record<RecruitmentCountKey, number> = {
       plan: 0,
@@ -112,16 +97,13 @@ const PostDetailPage = () => {
       etc: 0,
     };
 
-    const recruitments = postDetail?.recruitments ?? [];
-
-    for (const recruitment of recruitments) {
+    for (const recruitment of postDetail?.recruitments ?? []) {
       const positionKey = getRecruitmentCountKey(recruitment.position);
-
-      counts[positionKey] += recruitment.recruitingCount ?? 0;
+      counts[positionKey] += recruitment.count;
     }
 
     return counts;
-  }, [postDetail?.recruitments]);
+  }, [postDetail]);
 
   const postSkills = useMemo(() => {
     const recruitments = postDetail?.recruitments ?? [];
@@ -188,7 +170,6 @@ const PostDetailPage = () => {
                   </span>
                 </div>
                 <div className="inline-grid h-[6.2rem] gap-x-[48px] gap-y-[2rem] px-[1rem] [grid-template-columns:repeat(3,fit-content(100%))] [grid-template-rows:repeat(2,fit-content(100%))]">
-                  {/** 모집인원 임시 데이터 */}
                   {POSITION_ITEMS.map((position) => {
                     const count = apiCounts[position.key] ?? 0;
 
@@ -255,7 +236,7 @@ const PostDetailPage = () => {
             }}
           />
           <div className="w-[68.8rem]">
-            <p className="text-[1.6rem] font-[600] leading-[1.5] tracking-[-0.032rem] text-black-100">
+            <p className="text-[1.6rem] font-[600] leading-[1.5] tracking-[-0.032rem] text-black-100 break-words">
               {postDetail?.content}
             </p>
           </div>
@@ -274,6 +255,7 @@ const PostDetailPage = () => {
       <div className="flex self-start pt-[17.8rem]">
         <div ref={sideWrapRef} className="self-start will-change-transform">
           <SideTeamCard
+            memberId={Number(postDetail?.user?.userId ?? 0)}
             title={postDetail?.user?.username}
             position={postDetail?.user?.position}
             profileImageUrl={postDetail?.user?.profileImageUrl}

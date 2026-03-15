@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from 'react';
+
 import BaseButton from '../Button/index';
 
 import IcCrown from '../../../assets/icons/tag/ic_crown.svg?react';
@@ -6,18 +8,67 @@ import IcMe from '../../../assets/icons/tag/ic_me.svg?react';
 import IcVertical from '../../../assets/icons/normal/ic_moreVertical_tight.svg?react';
 import IcCharacter from '../../../assets/icons/image/ic_character_circle_gray_40.svg?react';
 
+import IcSelectBoxShield from '../../../assets/icons/normal/ic_shield.svg?react';
+import IcSelectBoxTrash from '../../../assets/icons/normal/ic_trash.svg?react';
+
 import { SkillIcon } from '../../../utils/SkillIcon';
 import { toSkillLabel } from '../../../utils/skill';
 
 interface SideTeamCardProps {
+  memberId: number;
   title?: string;
   position?: string;
   profileImageUrl?: string;
   skills?: string[];
+  status?: string;
   variant?: 'team' | 'post';
+  isMe?: boolean;
+  isLeader?: boolean;
+  isManager?: boolean;
+  canManage?: boolean;
   isActive?: boolean;
   disabled?: boolean;
+  onClick?: () => void;
+  onAssignManager?: (memberId: number) => void;
+  onKickMember?: (memberId: number) => void;
 }
+
+type SelectBoxProps = {
+  onAssignManager?: () => void;
+  onKickMember?: () => void;
+};
+
+// 따로 컴포넌트 제작해야함. 임시.
+const SelectBox = ({ onAssignManager, onKickMember }: SelectBoxProps) => {
+  return (
+    <div className="flex cursor-pointer flex-col items-end rounded-[0.8rem] bg-black-5 shadow-search-select-box">
+      <div
+        className="flex h-[4.4rem] items-center gap-[0.4rem] rounded-[0.8rem] bg-black-5 px-[1.2rem] hover:bg-hover-5 hover:text-black-80"
+        onClick={(e) => {
+          e.stopPropagation();
+          onAssignManager?.();
+        }}
+      >
+        <IcSelectBoxShield className="h-[1.6rem] w-[1.6rem] text-black-60" />
+        <span className="text-[1.4rem] font-[500] leading-[1.5] tracking-[-0.028rem] text-black-60">
+          관리자 지정
+        </span>
+      </div>
+      <div
+        className="flex h-[4.4rem] items-center gap-[0.4rem] self-stretch rounded-[0.8rem] bg-black-5 px-[1.2rem] hover:bg-hover-5 hover:text-black-80"
+        onClick={(e) => {
+          e.stopPropagation();
+          onKickMember?.();
+        }}
+      >
+        <IcSelectBoxTrash className="h-[1.6rem] w-[1.6rem] text-error" />
+        <span className="text-[1.4rem] font-[500] leading-[1.5] tracking-[-0.028rem] text-error">
+          내보내기
+        </span>
+      </div>
+    </div>
+  );
+};
 
 const toPositionLabel = (position?: string): string => {
   if (position === 'PLANNER') {
@@ -44,13 +95,22 @@ const toPositionLabel = (position?: string): string => {
 };
 
 const SideTeamCard = ({
+  memberId,
   title = 'title',
   position = 'position',
   profileImageUrl,
   skills = [],
   variant = 'team',
+  isMe = false,
+  isLeader = false,
+  isManager = false,
+  canManage = false,
   isActive = false,
   disabled = false,
+  status = "ACTIVE",
+  onClick,
+  onAssignManager,
+  onKickMember,
 }: SideTeamCardProps) => {
   const skillsIcon = Array.from(
     new Set(
@@ -61,6 +121,33 @@ const SideTeamCard = ({
   );
 
   const positionLabel = toPositionLabel(position);
+  const [isSelectBoxOpen, setIsSelectBoxOpen] = useState(false);
+
+  const selectBoxRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!isSelectBoxOpen) {
+      return;
+    }
+
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target;
+
+      if (!(target instanceof Node)) {
+        return;
+      }
+
+      if (selectBoxRef.current && !selectBoxRef.current.contains(target)) {
+        setIsSelectBoxOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isSelectBoxOpen]);
 
   const baseStyle =
     'relative flex min-h-[27.2rem] w-[23.4rem] flex-col items-center gap-[2.4rem] rounded-[1.2rem] border border-solid border-black-30 bg-black-5 p-[2.8rem]';
@@ -86,15 +173,45 @@ const SideTeamCard = ({
           {variant === 'post' && <IcCrown />}
           {variant === 'team' && (
             <>
-              <IcCrown />
-              {/* <IcShield /> */}
-              {/* <IcMe /> */}
+              {isLeader ? <IcCrown /> : isManager ? <IcShield /> : null}
+              {isMe && <IcMe />}
             </>
           )}
         </div>
-        <div className="flex aspect-square h-[2.4rem] w-[2.4rem] flex-shrink-0 flex-col items-end justify-center gap-[1rem]">
-          {variant === 'team' && (
-            <IcVertical className="h-[2.4rem] text-black-50" />
+        <div ref={selectBoxRef} 
+        className="flex aspect-square h-[2.4rem] w-[2.4rem] flex-shrink-0 flex-col items-end justify-center gap-[1rem]">
+          {variant === 'team' && canManage && (
+            <>
+              <div
+                className="cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsSelectBoxOpen((prev) => !prev);
+                }}
+              >
+                <IcVertical className="h-[2.4rem] text-black-50" />
+              </div>
+
+              {isSelectBoxOpen && (
+                <div
+                  className="absolute right-0 top-0 z-[20]"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  <SelectBox
+                    onAssignManager={() => {
+                      onAssignManager?.(memberId);
+                      setIsSelectBoxOpen(false);
+                    }}
+                    onKickMember={() => {
+                      onKickMember?.(memberId);
+                      setIsSelectBoxOpen(false);
+                    }}
+                  />
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -140,8 +257,8 @@ const SideTeamCard = ({
         <BaseButton size="md" color="secondary" children="문의하기" />
       )}
 
-      {variant === 'team' && (
-        <BaseButton size="md" color="tertiary" children="리뷰 쓰기" />
+      {variant === 'team' && status === "COMPLETED" && (
+        <BaseButton size="md" color="tertiary" disabled={isMe} children="리뷰 쓰기" />
       )}
     </div>
   );

@@ -24,6 +24,7 @@ interface MainCardProps {
   mainCardSkills?: string[];
   mainCardCreatedAt?: string;
   variant?: 'main' | 'team';
+  className?: string;
   isActive?: boolean;
   onClick?: () => void;
 }
@@ -35,6 +36,7 @@ const MainCard = ({
   variant = 'main',
   isActive = false,
   mainCardCreatedAt,
+  className,
   onClick,
 }: MainCardProps) => {
   const baseStyle =
@@ -55,14 +57,14 @@ const MainCard = ({
     <button
       type="button"
       data-main-card="true"
-      className={`${baseStyle} ${hoverStyle} ${activeStyle}`}
+      className={`${baseStyle} ${hoverStyle} ${activeStyle} ${className}`}
       onClick={onClick}
     >
       {/** Frame 01 */}
       <div className="flex h-[9rem] min-w-[28rem] flex-col items-start gap-[1.6rem] self-stretch">
         {/** MainCard Title */}
         <div className="flex h-[4.6rem] max-h-[4.6rem] flex-shrink-0 items-start gap-[1.2rem] self-stretch overflow-hidden overflow-ellipsis">
-          <span className="line-clamp-2 overflow-hidden text-ellipsis text-[1.6rem] font-[600] text-[#0E0E0E]">
+          <span className="line-clamp-2 overflow-hidden text-left text-ellipsis text-[1.6rem] font-[600] text-[#0E0E0E]">
             {mainCardTitle}
           </span>
         </div>
