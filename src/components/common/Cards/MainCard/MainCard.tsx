@@ -24,6 +24,7 @@ interface MainCardProps {
   mainCardSkills?: string[];
   mainCardCreatedAt?: string;
   variant?: 'main' | 'team';
+  className?: string;
   isActive?: boolean;
   onClick?: () => void;
 }
@@ -35,6 +36,7 @@ const MainCard = ({
   variant = 'main',
   isActive = false,
   mainCardCreatedAt,
+  className,
   onClick,
 }: MainCardProps) => {
   const baseStyle =
@@ -55,7 +57,7 @@ const MainCard = ({
     <button
       type="button"
       data-main-card="true"
-      className={`${baseStyle} ${hoverStyle} ${activeStyle}`}
+      className={`${baseStyle} ${hoverStyle} ${activeStyle} ${className}`}
       onClick={onClick}
     >
       {/** Frame 01 */}

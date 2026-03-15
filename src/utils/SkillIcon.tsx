@@ -65,5 +65,5 @@ export const SkillIconLarge = ({ name, className }: SkillIconProps) => {
 
   if (!IconComponent) return null;
 
-  return <IconComponent className={className} />;
+  return <IconComponent className={`h-[2.8rem] w-[2.8rem] ${className}`.trim()} />;
 };
