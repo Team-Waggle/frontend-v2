@@ -60,7 +60,7 @@ const TeamCard = ({
         )}
       </div>
       {/** 팀 설명 */}
-      <div className="flex flex-1 flex-col items-start gap-[2.4rem] self-stretch py-[0.8rem] pr-[2rem]">
+      <div className="flex min-w-0 flex-1 flex-col items-start gap-[2.4rem] self-stretch py-[0.8rem] pr-[2rem]">
         <div className="flex h-[6rem] flex-col items-start gap-[0.8rem]">
           <h2 className="text-[2.4rem] font-[600] leading-[1.5] tracking-[-0.048rem] text-black">
             {title}
@@ -87,7 +87,7 @@ const TeamCard = ({
           </div>
         </div>
         <div className="self-stretch overflow-hidden">
-          <p className="line-clamp-3 block h-[5.4rem] overflow-hidden text-ellipsis text-[1.2rem] font-[500] leading-[1.5] tracking-[-0.024rem] text-black">
+          <p className="line-clamp-3 block h-[5.4rem] break-words overflow-hidden text-ellipsis text-[1.2rem] font-[500] leading-[1.5] tracking-[-0.024rem] text-black">
             {description}
           </p>
         </div>
