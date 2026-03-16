@@ -53,23 +53,36 @@ const SIDEBAR_MENUS: SidebarMenu[] = [
 // ];
 
 const SidebarMenu = ({
+  isLoggedIn,
+  setIsLoginModalOpen,
   isFolded,
   teamId,
   userId,
 }: {
+  isLoggedIn: boolean;
+  setIsLoginModalOpen: () => void;
   isFolded: boolean;
   teamId?: number;
   userId?: string;
 }) => {
   const navigate = useNavigate();
+
+  const visibleMenus = isLoggedIn
+    ? SIDEBAR_MENUS
+    : SIDEBAR_MENUS.filter((menu) => menu.key === 'team');
+
   return (
     <div
       className={`flex flex-col gap-[0.4rem] ${isFolded ? 'w-[4.8rem]' : 'w-[25.8rem]'}`}
     >
-      {SIDEBAR_MENUS.map(({ key, icon, label, getPath }) => {
+      {visibleMenus.map(({ key, icon, label, getPath }) => {
         const path = getPath({ teamId, userId });
 
         const handleClick = () => {
+          if (!isLoggedIn && key === 'team') {
+            setIsLoginModalOpen();
+            return;
+          }
           if (!path) return;
           navigate(path);
         };
