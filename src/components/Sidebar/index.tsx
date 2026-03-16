@@ -103,7 +103,13 @@ const Sidebar = () => {
                 </span>
               </div>
               <div className="flex flex-col gap-[0.2rem] text-[1.4rem] font-medium text-black-60">
-                <span>고객지원/문의</span>
+                <a
+                  href="https://satin-mint-d68.notion.site/a5520f189e0d4386ab7288f9425d53e6"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  고객지원/문의
+                </a>
                 <span>서비스 이용약관</span>
                 <span>개인정보 취급 방침</span>
               </div>
