@@ -16,11 +16,18 @@ interface SubItem {
 interface SidebarItemProps {
   icon: ReactNode;
   label: string;
+  isActive: boolean;
   onClick?: () => void;
   subItems?: SubItem[];
 }
 
-const SidebarItem = ({ icon, label, onClick, subItems }: SidebarItemProps) => {
+const SidebarItem = ({
+  icon,
+  label,
+  isActive,
+  onClick,
+  subItems,
+}: SidebarItemProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const hasSubItems = subItems && subItems.length > 0;
@@ -69,10 +76,18 @@ const SidebarItem = ({ icon, label, onClick, subItems }: SidebarItemProps) => {
   return (
     <>
       <button onClick={handleClick}>
-        <div className="flex h-[4.4rem] items-center rounded-[0.8rem] bg-black-5 px-[1.2rem] hover:bg-black-10">
-          <div className="flex w-[21.8rem] gap-[0.8rem]">
+        <div
+          className={`flex h-[4.4rem] items-center rounded-[0.8rem] px-[1.2rem] ${
+            isActive ? 'bg-blue-5' : 'bg-black-5 hover:bg-black-10'
+          }`}
+        >
+          <div
+            className={`flex w-[21.8rem] gap-[0.8rem] ${isActive ? 'text-blue-100' : 'text-black-50'}`}
+          >
             {icon}
-            <span className="text-[1.6rem] font-bold text-black-40">
+            <span
+              className={`text-[1.6rem] font-bold ${isActive ? 'text-blue-100' : 'text-black-60'}`}
+            >
               {label}
             </span>
           </div>
