@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import SidebarIcon from './SidebarIcon';
 import SidebarItem from './SidebarItem';
 
@@ -24,25 +24,25 @@ const SIDEBAR_MENUS: SidebarMenu[] = [
   {
     key: 'team',
     label: '내팀',
-    icon: <FaceSmileIcon className="text-black-40" />,
+    icon: <FaceSmileIcon />,
     getPath: ({ teamId }) => `/team/${teamId}`,
   },
   {
     key: 'notification',
     label: '알림',
-    icon: <BellIcon className="text-black-40" />,
+    icon: <BellIcon />,
     getPath: () => '/notification',
   },
   {
     key: 'message',
     label: '메시지',
-    icon: <MessageIcon className="text-black-40" />,
+    icon: <MessageIcon />,
     getPath: () => '/message',
   },
   {
-    key: 'mypage',
+    key: 'profile',
     label: '마이페이지',
-    icon: <PersonIcon className="text-black-40" />,
+    icon: <PersonIcon />,
     getPath: ({ userId }) => `/profile/${userId}`,
   },
 ];
@@ -53,34 +53,58 @@ const SIDEBAR_MENUS: SidebarMenu[] = [
 // ];
 
 const SidebarMenu = ({
+  isLoggedIn,
+  setIsLoginModalOpen,
   isFolded,
   teamId,
   userId,
 }: {
+  isLoggedIn: boolean;
+  setIsLoginModalOpen: () => void;
   isFolded: boolean;
   teamId?: number;
   userId?: string;
 }) => {
+  const { pathname } = useLocation();
   const navigate = useNavigate();
+
+  const visibleMenus = isLoggedIn
+    ? SIDEBAR_MENUS
+    : SIDEBAR_MENUS.filter((menu) => menu.key === 'team');
+
   return (
     <div
       className={`flex flex-col gap-[0.4rem] ${isFolded ? 'w-[4.8rem]' : 'w-[25.8rem]'}`}
     >
-      {SIDEBAR_MENUS.map(({ key, icon, label, getPath }) => {
+      {visibleMenus.map(({ key, icon, label, getPath }) => {
         const path = getPath({ teamId, userId });
 
+        const isActive =
+          pathname.includes(key) &&
+          !(key === 'team' && pathname === '/team/new');
+
         const handleClick = () => {
+          if (!isLoggedIn && key === 'team') {
+            setIsLoginModalOpen();
+            return;
+          }
           if (!path) return;
           navigate(path);
         };
 
         return isFolded ? (
-          <SidebarIcon key={key} icon={icon} onClick={handleClick} />
+          <SidebarIcon
+            key={key}
+            icon={icon}
+            isActive={isActive}
+            onClick={handleClick}
+          />
         ) : (
           <SidebarItem
             key={key}
             icon={icon}
             label={label}
+            isActive={isActive}
             onClick={handleClick}
           />
         );

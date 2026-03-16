@@ -27,7 +27,7 @@ const Sidebar = () => {
   const { data: myteamData } = useGetUserMeTeam();
 
   const [isFolded, setIsFolded] = useState(false);
-  const [isLogInModalOpen, setIsLogInModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const accessToken = useAuthStore((state) => state.accessToken);
   const isLoggedIn = !!accessToken;
@@ -50,11 +50,7 @@ const Sidebar = () => {
         {/* middle content */}
         <div className="flex flex-1 flex-col gap-[1.2rem] px-[2rem]">
           {/* 프로필 및 모집글 작성 버튼 */}
-          <div
-            className={`flex flex-col ${
-              isLoggedIn ? 'gap-[1.8rem] py-[2rem]' : 'gap-[1rem] py-[2rem]'
-            } `}
-          >
+          <div className="flex flex-col gap-[1.8rem] py-[2rem]">
             <SidebarProfile
               data={myData}
               isFolded={isFolded}
@@ -64,7 +60,7 @@ const Sidebar = () => {
             {isFolded ? (
               <IconWrapper
                 onClick={() => {
-                  if (!isLoggedIn) setIsLogInModalOpen(true);
+                  if (!isLoggedIn) setIsLoginModalOpen(true);
                 }}
               >
                 {isLoggedIn ? <PencilIcon /> : <LogInIcon />}
@@ -80,13 +76,15 @@ const Sidebar = () => {
                 </BaseButton>
               )
             ) : (
-              <BaseButton onClick={() => setIsLogInModalOpen(true)}>
+              <BaseButton onClick={() => setIsLoginModalOpen(true)}>
                 로그인
               </BaseButton>
             )}
           </div>
 
           <SidebarMenu
+            isLoggedIn={isProfileComplete}
+            setIsLoginModalOpen={() => setIsLoginModalOpen(true)}
             isFolded={isFolded}
             teamId={myteamData?.[0]?.teamId}
             userId={myData?.userId}
@@ -114,8 +112,8 @@ const Sidebar = () => {
         )}
       </aside>
       <LoginModal
-        isOpen={isLogInModalOpen}
-        onClose={() => setIsLogInModalOpen(false)}
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
       />
     </>
   );

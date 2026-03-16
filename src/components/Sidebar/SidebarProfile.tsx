@@ -5,7 +5,6 @@ import type { UserMeResponse } from '../../types/api/user';
 // Icons
 import BaicProfileIcon from '../../assets/icons/ic_profile_basic.svg?react';
 import LogoutIcon from '../../assets/icons/normal/ic_logout.svg?react';
-import CharacterGrayIcon from '../../assets/icons/ic_character_gray.svg?react';
 
 const SidebarProfile = ({
   data,
@@ -21,29 +20,27 @@ const SidebarProfile = ({
   if (isFolded) return <BaicProfileIcon />;
 
   return (
-    <div
-      className={`flex w-[25.8rem] items-center justify-center gap-[1rem] ${!isLoggedIn && 'pt-[0.2rem]'}`}
-    >
-      {isLoggedIn ? (
-        <>
-          <BaicProfileIcon />
-          <div className="flex w-[14.8rem] flex-col justify-center">
-            <span className="text-[1.6rem] font-semibold text-black-100">
-              {data?.username || '닉네임'}
-            </span>
-            <span className="h-[2rem] text-[1.3rem] font-medium text-black-60">
-              {POSITION_CONVERTER[data?.position] || '포지션'}
-            </span>
-          </div>
-          <button
-            onClick={() => logout()}
-            className="h-[3.2rem] w-[3.2rem] rounded-full px-[0.8rem] py-[0.8rem] hover:bg-black-10"
-          >
-            <LogoutIcon className="h-[1.6rem] w-[1.6rem] text-black-40" />
-          </button>
-        </>
-      ) : (
-        <CharacterGrayIcon />
+    <div className="flex w-[25.8rem] items-center gap-[1rem] pr-[1rem]">
+      <BaicProfileIcon />
+      <div className="flex w-[15.2rem] flex-col justify-center">
+        <span className="text-[1.6rem] font-semibold text-black-100">
+          {isLoggedIn ? data?.username || '게스트' : '게스트'}
+        </span>
+        <span
+          className={`h-[2rem] text-[1.3rem] font-medium ${isLoggedIn ? 'text-black-60' : 'text-blue-60'}`}
+        >
+          {isLoggedIn && data?.position
+            ? POSITION_CONVERTER[data?.position] || '로그인해주세요'
+            : '로그인해주세요'}
+        </span>
+      </div>
+      {isLoggedIn && (
+        <button
+          onClick={() => logout()}
+          className="h-[3.2rem] w-[3.2rem] rounded-full px-[0.8rem] py-[0.8rem] hover:bg-black-10"
+        >
+          <LogoutIcon className="h-[1.6rem] w-[1.6rem] text-black-40" />
+        </button>
       )}
     </div>
   );
