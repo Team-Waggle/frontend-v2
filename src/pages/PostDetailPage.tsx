@@ -204,7 +204,7 @@ const PostDetailPage = () => {
                 </div>
                 <div className="inline-grid gap-x-[20px] gap-y-[2rem] self-stretch px-[1rem] [grid-template-columns:repeat(5,minmax(0,1fr))] [grid-template-rows:repeat(2,fit-content(100%))]">
                   {postSkills.map((skill) => (
-                    <SkillIconLarge key={skill} name={skill} />
+                    <SkillIconLarge key={skill} name={skill} className="!w-[2.4rem] !h-[2.4rem]" />
                   ))}
                 </div>
               </div>
