@@ -300,7 +300,11 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
       },
     },
     onUpdate: ({ editor }) => {
-      const markdown = editor.getMarkdown();
+      if (editor.isEmpty) {
+        onChange('');
+        return;
+      }
+      const markdown = editor.getMarkdown().replace(/&nbsp;/g, ' ');
       onChange(markdown);
     },
     immediatelyRender: false,
