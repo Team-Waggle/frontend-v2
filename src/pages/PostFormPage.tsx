@@ -1,8 +1,11 @@
 import { Controller, useForm } from 'react-hook-form';
 import BaseButton from '../components/common/Button';
 import FieldMaster from '../components/Field/FieldMaster';
-import type { PositionValue } from '../components/Field/FieldBody';
+import type { RecruitmentsValue } from '../components/Field/FieldBody';
 import { useGetUserMeTeam } from '../hooks/useUser';
+import { useCreatePosts } from '../hooks/usePost';
+import { POSITION_CONVERTER, type PositionKey } from '../utils/position';
+import { toSkillEnum } from '../utils/skill';
 
 // Icons
 import NewTeamIcon from '../assets/icons/ic_character_new_post.svg?react';
@@ -10,7 +13,7 @@ import NewTeamIcon from '../assets/icons/ic_character_new_post.svg?react';
 interface FormValues {
   teamId: number;
   title: string;
-  recruitments: PositionValue[];
+  recruitments: RecruitmentsValue[];
   skills: string[];
   content: string;
 }
@@ -23,16 +26,23 @@ const PostFormPage = () => {
     formState: { errors, isValid },
   } = useForm<FormValues>({
     mode: 'onChange',
-    defaultValues: {
-      recruitments: [{ position: null, recruitingCount: 1 }],
-      skills: [],
-    },
   });
 
   const { data: myTeamData } = useGetUserMeTeam();
+  const { mutate: createPosts } = useCreatePosts();
 
   const onSubmit = (data: FormValues) => {
-    console.log(data);
+    const formattedData = {
+      ...data,
+      recruitments: data.recruitments.map((item) => ({
+        ...item,
+        position:
+          POSITION_CONVERTER[item.position as PositionKey] || item.position,
+        skills: item.skills?.map((skill) => toSkillEnum(skill)),
+      })),
+    };
+
+    createPosts(formattedData);
   };
 
   return (
@@ -49,6 +59,7 @@ const PostFormPage = () => {
           <Controller
             name="teamId"
             control={control}
+            rules={{ required: true }}
             render={({ field }) => (
               <FieldMaster
                 title="팀 선택"
@@ -69,14 +80,10 @@ const PostFormPage = () => {
             isRequired
             errorMessage={errors.title?.message}
             inputProps={{
-              placeholder: '최대 10자 제한 / 특수문자 불가',
+              placeholder: '최대 30자 제한',
               ...register('title', {
                 required: '제목을 입력해주세요.',
-                maxLength: { value: 10, message: '최대 10자까지 가능합니다.' },
-                pattern: {
-                  value: /^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ]*$/,
-                  message: '특수문자는 사용 불가합니다.',
-                },
+                maxLength: { value: 30, message: '최대 30자까지 가능합니다.' },
               }),
             }}
           />
@@ -84,29 +91,16 @@ const PostFormPage = () => {
           <Controller
             name="recruitments"
             control={control}
+            rules={{ required: true }}
             render={({ field }) => (
               <FieldMaster
-                title="모집 직무"
-                variant="multiPosition"
+                title="모집 직무 및 사용 스킬"
+                variant="positionSkill"
                 isRequired
-                multiPositionProps={{
+                positionSkillProps={{
                   value: field.value,
                   onChange: field.onChange,
-                  hasButton: true,
                 }}
-              />
-            )}
-          />
-
-          <Controller
-            name="skills"
-            control={control}
-            render={({ field }) => (
-              <FieldMaster
-                title="사용 스킬"
-                variant="skill"
-                isRequired
-                skillProps={{ value: field.value, onChange: field.onChange }}
               />
             )}
           />

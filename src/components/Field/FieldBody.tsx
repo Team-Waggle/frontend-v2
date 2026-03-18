@@ -2,8 +2,10 @@ import React, { forwardRef, memo, useEffect, useRef, useState } from 'react';
 import type { DropzoneInputProps, DropzoneRootProps } from 'react-dropzone';
 import BaseChip from '../common/Chip/BaseChip';
 import BaseButton from '../common/Button';
+import BaseTag from '../common/Tag';
 import IconWrapper from '../common/IconWrapper';
 import { SkillIcon } from '../../utils/SkillIcon';
+import { positionSkillData } from '../../constants/positionSkill';
 
 // @tiptap
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -28,6 +30,10 @@ import Heading2Icon from '../../assets/icons/normal/ic_heading2.svg?react';
 import Heading3Icon from '../../assets/icons/normal/ic_heading3.svg?react';
 import Heading4Icon from '../../assets/icons/normal/ic_heading4.svg?react';
 import ProfileBasicIcon from '../../assets/icons/ic_profile_basic.svg?react';
+import ChevronDownIcon from '../../assets/icons/normal/chevron/ic_chevronDown.svg?react';
+import CloseIcon from '../../assets/icons/normal/ic_close.svg?react';
+import CloseSmallIcon from '../../assets/icons/normal/ic_close_small.svg?react';
+import type { PositionKey } from '../../utils/position';
 
 interface FieldInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
@@ -47,7 +53,7 @@ interface FieldThumbnailProps extends React.ButtonHTMLAttributes<HTMLButtonEleme
   preview?: string;
 }
 
-type WorkmodeType = 'ONLINE' | 'OFFLINE' | 'BOTH';
+type WorkmodeType = 'ONLINE' | 'OFFLINE' | 'HYBRID';
 
 interface FieldWorkmodeProps {
   value?: WorkmodeType;
@@ -83,31 +89,27 @@ export type PositionType =
   | 'etc'
   | '';
 
-export type PositionValue = {
-  position: PositionType | null;
-  recruitingCount: number;
+export type RecruitmentsValue = {
+  position: PositionKey | null;
+  count: number;
+  skills: string[];
 };
 
-interface FieldSinglePositionProps {
+interface FieldPositionProps {
   value?: PositionType | null;
   onChange?: (value: PositionType) => void;
 }
 
-interface FieldMultiPositionProps {
-  value?: PositionValue[];
-  onChange?: (value: PositionValue[]) => void;
-  hasButton?: boolean;
-}
-
-interface FieldSkillProps {
-  value?: string[];
-  onChange?: (value: string[]) => void;
+interface FieldPositionSkillProps {
+  value?: RecruitmentsValue[];
+  onChange?: (value: RecruitmentsValue[]) => void;
 }
 
 interface FieldTabProps {
   value?: string[];
   onChange?: (value: string[]) => void;
   options?: string[];
+  reviewType?: 'LIKE' | 'DISLIKE';
 }
 
 export const FieldInput = memo(
@@ -133,9 +135,26 @@ export const FieldInput = memo(
 export const FieldTextarea = memo(
   forwardRef<HTMLTextAreaElement, FieldTextareaProps>(
     ({ id, error, maxLength = 500, className, ...props }, ref) => {
+      const [text, setText] = useState('');
+
+      const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        // Enter 키인지 확인 (Shift + Enter도 막으려면 e.shiftKey 조건 제외)
+        if (e.key === 'Enter') {
+          e.preventDefault(); // 줄바꿈 방지
+        }
+      };
+
+      const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        // 복사 붙여넣기로 들어오는 줄바꿈도 제거하고 싶다면:
+        const formattedValue = e.target.value.replace(/\n/g, '');
+        setText(formattedValue);
+      };
       return (
         <div className="flex flex-col items-end gap-[0.4rem]">
           <textarea
+            value={text}
+            onKeyDown={handleKeyDown}
+            onChange={handleChange}
             ref={ref}
             id={id}
             maxLength={maxLength}
@@ -168,11 +187,13 @@ export const FieldThumbnail = memo(
         >
           <input {...inputProps} />
           {preview ? (
-            <img
-              src={preview}
-              alt="미리보기"
-              className="absolute inset-0 h-full w-full object-contain"
-            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <img
+                src={preview}
+                alt="미리보기"
+                className="aspect-square h-full object-cover"
+              />
+            </div>
           ) : (
             <>
               <ImageIcon className="h-[3.2rem] w-[3.2rem] text-black-40" />
@@ -181,7 +202,7 @@ export const FieldThumbnail = memo(
                   클릭하거나 파일을 드래그하여 업로드하세요
                 </span>
                 <span className="text-[1.6rem] font-medium text-black-60">
-                  권장 사이즈: 1200x630 (PNG, JPG)
+                  권장 사이즈: 1080x1080 (PNG, JPG)
                 </span>
               </div>
             </>
@@ -219,9 +240,9 @@ export const FieldWorkmode = ({
       <BaseChip
         variant="card"
         mainIcon={<GlobeIcon />}
-        isSelected={value === 'BOTH'}
+        isSelected={value === 'HYBRID'}
         className="h-[13.6rem] w-[29.4rem]"
-        onClick={() => onChange?.('BOTH')}
+        onClick={() => onChange?.('HYBRID')}
       >
         온라인 + 오프라인
       </BaseChip>
@@ -269,8 +290,7 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
         },
       }),
       Placeholder.configure({
-        placeholder:
-          '팀 목표, 기술 스택 상세 정보, 지향하는 팀 문화 등을 자유롭게 작성해주세요.',
+        placeholder: '내용을 입력하세요.',
       }),
     ],
     content: value,
@@ -280,7 +300,8 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
       },
     },
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      const markdown = editor.getMarkdown();
+      onChange(markdown);
     },
     immediatelyRender: false,
   });
@@ -475,10 +496,7 @@ export const FieldTeamName = ({
   );
 };
 
-export const FieldSinglePosition = ({
-  value,
-  onChange,
-}: FieldSinglePositionProps) => {
+export const FieldPosition = ({ value, onChange }: FieldPositionProps) => {
   const handleChange = (newValue: PositionType) => {
     onChange?.(newValue);
   };
@@ -531,199 +549,346 @@ export const FieldSinglePosition = ({
   );
 };
 
-export const FieldPosition = ({
-  value = [{ position: null, recruitingCount: 1 }],
+export const FieldPositionSkill = ({
+  value,
   onChange,
-  hasButton = false,
-}: FieldMultiPositionProps) => {
-  const positions = value;
+}: FieldPositionSkillProps) => {
+  const [selectedPosition, setSelectedPosition] = useState<PositionKey | null>(
+    null,
+  );
+  const [selectedSkill, setSelectedSkill] = useState<string[]>([]);
+  const [positionDropdownOpen, setPositionDropdownOpen] = useState(false);
+  const [skillDropdownOpen, setSkillDropdownOpen] = useState(false);
+  const [selectedCount, setSelectedCount] = useState(1);
 
-  const handleChange = (index: number, newValue: PositionType) => {
-    const updated = positions.map((item, i) =>
-      i === index ? { ...item, position: newValue } : item,
-    );
-    onChange?.(updated);
+  const items = value ?? [];
+
+  const positionRef = useRef<HTMLDivElement>(null);
+  const skillRef = useRef<HTMLDivElement>(null);
+
+  const handlePositionSelect = (e: React.MouseEvent, pos: PositionKey) => {
+    e.stopPropagation();
+    setSelectedPosition(pos);
+    setSelectedSkill([]);
+    setPositionDropdownOpen(false);
   };
 
-  const handleCountChange = (index: number, delta: number) => {
-    const updated = positions.map((item, i) => {
-      if (i === index) {
-        const newCount = Math.max(1, item.recruitingCount + delta);
-        return { ...item, recruitingCount: newCount };
-      }
-      return item;
-    });
-    onChange?.(updated);
+  const handleSkillSelect = (e: React.MouseEvent, skill: string) => {
+    e.stopPropagation();
+    setSelectedSkill((prev) =>
+      prev.includes(skill) ? prev.filter((s) => s !== skill) : [...prev, skill],
+    );
+  };
+
+  const handleSkillRemove = (itemIndex: number, skillName: string) => {
+    const newItems = [...items];
+
+    newItems[itemIndex] = {
+      ...newItems[itemIndex],
+      skills: newItems[itemIndex].skills.filter((s) => s !== skillName),
+    };
+
+    onChange?.(newItems);
   };
 
   const handleAdd = () => {
-    onChange?.([...positions, { position: null, recruitingCount: 1 }]);
+    if (!selectedPosition) return;
+
+    onChange?.([
+      ...items,
+      {
+        position: selectedPosition,
+        count: selectedCount,
+        skills: selectedSkill,
+      },
+    ]);
+    setSelectedPosition(null);
+    setSelectedSkill([]);
+    setSelectedCount(1);
   };
 
   const handleRemove = (index: number) => {
-    if (positions.length === 1) return; // 최소 1개 유지
-    onChange?.(positions.filter((_, i) => i !== index));
+    onChange?.(items.filter((_, i) => i !== index));
   };
 
+  const handleCountIncrease = (index: number) => {
+    const newItems = [...items];
+
+    newItems[index] = {
+      ...newItems[index],
+      count: newItems[index].count + 1,
+    };
+
+    onChange?.(newItems);
+  };
+
+  const handleCountDecrease = (index: number) => {
+    const newItems = [...items];
+
+    if (newItems[index].count <= 1) return;
+
+    newItems[index] = {
+      ...newItems[index],
+      count: newItems[index].count - 1,
+    };
+
+    onChange?.(newItems);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        positionRef.current &&
+        !positionRef.current.contains(event.target as Node)
+      ) {
+        setPositionDropdownOpen(false);
+      }
+      if (
+        skillRef.current &&
+        !skillRef.current.contains(event.target as Node)
+      ) {
+        setSkillDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className="flex flex-col gap-[0.8rem]">
-      {positions.map((selevtedValue, index) => (
-        <div key={index} className="flex items-center gap-[0.8rem]">
-          <div className="grid grid-cols-6 gap-[0.6rem]">
-            <BaseChip
-              isSelected={selevtedValue.position === 'PM'}
-              onClick={() => handleChange(index, 'PM')}
-              className="w-[9.2rem]"
-            >
-              기획
-            </BaseChip>
-            <BaseChip
-              isSelected={selevtedValue.position === 'Design'}
-              onClick={() => handleChange(index, 'Design')}
-              className="w-[9.2rem]"
-            >
-              디자인
-            </BaseChip>
-            <BaseChip
-              isSelected={selevtedValue.position === 'Frontend'}
-              onClick={() => handleChange(index, 'Frontend')}
-              className="w-[9.2rem]"
-            >
-              프론트엔드
-            </BaseChip>
-            <BaseChip
-              isSelected={selevtedValue.position === 'Backend'}
-              onClick={() => handleChange(index, 'Backend')}
-              className="w-[9.2rem]"
-            >
-              백엔드
-            </BaseChip>
-            <BaseChip
-              isSelected={selevtedValue.position === 'Marketing'}
-              onClick={() => handleChange(index, 'Marketing')}
-              className="w-[9.2rem]"
-            >
-              마케팅
-            </BaseChip>
-            <BaseChip
-              isSelected={selevtedValue.position === 'etc'}
-              onClick={() => handleChange(index, 'etc')}
-              className="w-[9.2rem]"
-            >
-              기타
-            </BaseChip>
+    <>
+      <div className="relative flex gap-[1.2rem]">
+        <div
+          ref={positionRef}
+          onClick={() => setPositionDropdownOpen((prev) => !prev)}
+          className={`relative flex h-[6rem] w-[31.8rem] cursor-pointer items-center gap-[1rem] rounded-[0.8rem] border px-[1.8rem] ${
+            selectedPosition ? 'border-blue-70' : 'border-black-30'
+          }`}
+        >
+          <div
+            className={`h-[2.6rem] w-[24.8rem] text-[1.6rem] font-medium ${selectedPosition ? 'text-blue-100' : 'text-black-60'}`}
+          >
+            {selectedPosition || '모집 직무'}
           </div>
-          {hasButton && (
-            <div className="flex items-center gap-[3.6rem]">
-              <div className="flex items-center gap-[0.8rem] py-[0.8rem]">
-                <button
-                  type="button"
-                  onClick={() => handleCountChange(index, -1)}
-                  className="flex h-[3.2rem] w-[3.2rem] items-center justify-center rounded-full border border-solid border-black-30 bg-black-5"
+          <ChevronDownIcon
+            className={`text-black-60 transition-transform ${positionDropdownOpen ? 'rotate-180' : ''}`}
+          />
+
+          {positionDropdownOpen && (
+            <div className="absolute top-[7rem] grid h-[6rem] w-[61.8rem] grid-cols-6 items-center gap-[0.6rem] rounded-[0.8rem] border border-black-30 bg-black-5 px-[1.8rem]">
+              <div onClick={(e) => handlePositionSelect(e, '기획')}>
+                <BaseChip
+                  isSelected={selectedPosition === '기획'}
+                  className="w-full"
                 >
-                  <MinusIcon className="h-[1.745rem] w-[1.745rem]" />
-                </button>
-                <div className="flex h-[4rem] w-[4rem] items-center justify-center px-[0.8rem] text-[2rem] font-semibold text-blue-80">
-                  {selevtedValue.recruitingCount}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleCountChange(index, 1)}
-                  className="flex h-[3.2rem] w-[3.2rem] items-center justify-center rounded-full border border-solid border-black-30 bg-black-5"
-                >
-                  <PlusIcon className="h-[1.745rem] w-[1.745rem]" />
-                </button>
+                  기획
+                </BaseChip>
               </div>
-              <div className="flex gap-[0.8rem]">
-                {positions.length > 1 && (
-                  <BaseButton
-                    size="sm"
-                    color="secondary"
-                    onClick={() => handleRemove(index)}
-                    className="w-[6.8rem]"
-                  >
-                    삭제
-                  </BaseButton>
-                )}
-                {index === positions.length - 1 && (
-                  <BaseButton
-                    size="sm"
-                    className="w-[6.8rem]"
-                    onClick={handleAdd}
-                  >
-                    추가
-                  </BaseButton>
+              <div onClick={(e) => handlePositionSelect(e, '디자인')}>
+                <BaseChip
+                  isSelected={selectedPosition === '디자인'}
+                  className="w-full"
+                >
+                  디자인
+                </BaseChip>
+              </div>
+              <div onClick={(e) => handlePositionSelect(e, '프론트엔드')}>
+                <BaseChip
+                  isSelected={selectedPosition === '프론트엔드'}
+                  className="w-full"
+                >
+                  프론트엔드
+                </BaseChip>
+              </div>
+              <div onClick={(e) => handlePositionSelect(e, '백엔드')}>
+                <BaseChip
+                  isSelected={selectedPosition === '백엔드'}
+                  className="w-full"
+                >
+                  백엔드
+                </BaseChip>
+              </div>
+              <div onClick={(e) => handlePositionSelect(e, '마케팅')}>
+                <BaseChip
+                  isSelected={selectedPosition === '마케팅'}
+                  className="w-full"
+                >
+                  마케팅
+                </BaseChip>
+              </div>
+              <div onClick={(e) => handlePositionSelect(e, '기타')}>
+                <BaseChip
+                  isSelected={selectedPosition === '기타'}
+                  className="w-full"
+                >
+                  기타
+                </BaseChip>
+              </div>
+            </div>
+          )}
+        </div>
+        <div
+          ref={skillRef}
+          onClick={() => setSkillDropdownOpen((prev) => !prev)}
+          className={`flex h-[6rem] w-[31.8rem] items-center gap-[1rem] rounded-[0.8rem] border px-[1.8rem] ${
+            selectedSkill.length !== 0 ? 'border-blue-70' : 'border-black-30'
+          } ${selectedPosition && 'cursor-pointer'}`}
+        >
+          <div
+            className={`h-[2.6rem] w-[24.8rem] truncate text-[1.6rem] font-medium ${selectedSkill.length !== 0 ? 'text-blue-100' : 'text-black-60'}`}
+          >
+            {selectedSkill.length
+              ? `사용 스킬(${selectedSkill.length}) ${selectedSkill.join(', ')}`
+              : '사용 스킬'}
+          </div>
+          <ChevronDownIcon
+            className={`text-black-60 transition-transform ${skillDropdownOpen && selectedPosition && 'rotate-180'}`}
+          />
+
+          {skillDropdownOpen && selectedPosition && (
+            <div className="absolute left-[9.5rem] top-[7rem] z-10 rounded-[0.8rem] border border-black-30 bg-black-5 p-[1.8rem]">
+              <div className="flex flex-wrap gap-x-[0.6rem] gap-y-[1rem] overflow-y-auto pl-[0.1rem] pr-[2rem] pt-[0.1rem]">
+                {positionSkillData[selectedPosition as PositionKey]?.map(
+                  (skill) => {
+                    const isSelected = selectedSkill.includes(skill);
+                    return (
+                      <div
+                        key={`${selectedPosition} - ${skill}`}
+                        onClick={(e) => handleSkillSelect(e, skill)}
+                      >
+                        <BaseChip
+                          isSelected={isSelected}
+                          mainIcon={<SkillIcon name={skill} />}
+                        >
+                          {skill}
+                        </BaseChip>
+                      </div>
+                    );
+                  },
                 )}
               </div>
             </div>
           )}
         </div>
-      ))}
-    </div>
+
+        <div className="flex items-center gap-[3.6rem]">
+          <div className="flex items-center gap-[0.8rem] py-[0.8rem]">
+            <IconWrapper
+              color="outline"
+              shape="circle"
+              className="h-[4rem] w-[4rem]"
+              onClick={() => {
+                if (selectedCount > 1) setSelectedCount(selectedCount - 1);
+              }}
+            >
+              <MinusIcon className="h-[2.182rem] w-[2.182rem]" />
+            </IconWrapper>
+            <div className="flex h-[4rem] w-[4rem] items-center justify-center px-[0.8rem] text-[2rem] font-semibold text-blue-80">
+              {selectedCount}
+            </div>
+            <IconWrapper
+              color="outline"
+              shape="circle"
+              className="h-[4rem] w-[4rem]"
+              onClick={() => {
+                setSelectedCount(selectedCount + 1);
+              }}
+            >
+              <PlusIcon className="h-[2.182rem] w-[2.182rem]" />
+            </IconWrapper>
+          </div>
+          <div className="flex gap-[0.8rem]">
+            <BaseButton size="sm" className="w-[6.8rem]" onClick={handleAdd}>
+              추가
+            </BaseButton>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-[1rem] flex flex-col gap-[0.4rem] border-t border-black-40 py-[1.3rem]">
+        {items.map((item, itemIdx) => (
+          <div
+            key={`item-${itemIdx}`}
+            className="flex gap-[1rem] py-[1.6rem] pl-[1.6rem]"
+          >
+            <div className="flex w-[63.4rem] gap-[1rem]">
+              <BaseTag
+                size="lg"
+                shape="circle"
+                color="black80"
+                className="w-[8.4rem]"
+              >
+                {item.position}
+              </BaseTag>
+              <div className="flex flex-wrap gap-x-[0.8rem] gap-y-[1rem]">
+                {item.skills.map((skill: string) => (
+                  <BaseTag
+                    key={skill}
+                    size="lg"
+                    shape="circle"
+                    color="black80"
+                    isInverted
+                    leftIcon={<SkillIcon name={skill} />}
+                    rightIcon={
+                      <CloseSmallIcon
+                        width="16"
+                        height="16"
+                        className="cursor-pointer text-black-70"
+                        onClick={() => handleSkillRemove(itemIdx, skill)}
+                      />
+                    }
+                  >
+                    {skill}
+                  </BaseTag>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-[3.6rem]">
+              <div className="flex gap-[0.8rem]">
+                <IconWrapper
+                  color="outline"
+                  shape="circle"
+                  className="!h-[3.2rem] !w-[3.2rem]"
+                  onClick={() => handleCountDecrease(itemIdx)}
+                >
+                  <MinusIcon className="h-[1.745rem] w-[1.745rem]" />
+                </IconWrapper>
+                <div className="flex h-[3.2rem] w-[3.2rem] items-center justify-center px-[0.8rem] text-[2rem] font-semibold text-blue-80">
+                  {item.count}
+                </div>
+                <IconWrapper
+                  color="outline"
+                  shape="circle"
+                  className="!h-[3.2rem] !w-[3.2rem]"
+                  onClick={() => handleCountIncrease(itemIdx)}
+                >
+                  <PlusIcon className="h-[1.745rem] w-[1.745rem]" />
+                </IconWrapper>
+              </div>
+              <div className="flex w-[6.8rem] justify-center">
+                <CloseIcon
+                  className="cursor-pointer text-black-60"
+                  onClick={() => handleRemove(itemIdx)}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
   );
 };
 
-export const FieldSkill = ({ value = [], onChange }: FieldSkillProps) => {
-  const skills = [
-    'After Effects',
-    'AWS',
-    'C#',
-    'CRM',
-    'Django',
-    'express.js',
-    'FastAPI',
-    'Figma',
-    'GA4',
-    'Illustrator',
-    'Java',
-    'Javascript',
-    'Jira',
-    'Kotlin',
-    'NestJS',
-    'Next.js',
-    'Node.js',
-    'Notion',
-    'Photoshop',
-    'ProtoPie',
-    'Python',
-    'React',
-    'React Native',
-    'SEO',
-    'SNS마케팅',
-    'Spring',
-    'SQL',
-    'TypeScript',
-    'UE',
-    'Unity',
-    'Vue.js',
-    '콘텐츠제작',
-  ];
+export const FieldTab = ({
+  value = [],
+  onChange,
+  options,
+  reviewType,
+}: FieldTabProps) => {
+  const isInverted = reviewType === 'DISLIKE';
 
-  const handleToggle = (skill: string) => {
-    if (value.includes(skill)) {
-      onChange?.(value.filter((v) => v !== skill));
-    } else {
-      onChange?.([...value, skill]);
-    }
-  };
-
-  return (
-    <div className="flex flex-wrap gap-x-[0.6rem] gap-y-[1rem] pr-[2rem]">
-      {skills.map((skill, idx) => (
-        <BaseChip
-          key={idx}
-          isSelected={value.includes(skill)}
-          onClick={() => handleToggle(skill)}
-          mainIcon={<SkillIcon name={skill} />}
-        >
-          {skill}
-        </BaseChip>
-      ))}
-    </div>
-  );
-};
-
-export const FieldTab = ({ value = [], onChange, options }: FieldTabProps) => {
   const handleClick = (item: string) => {
     const isSelected = value.includes(item);
 
@@ -750,6 +915,7 @@ export const FieldTab = ({ value = [], onChange, options }: FieldTabProps) => {
             isSelected={isSelected}
             disabled={isDisabled}
             onClick={() => handleClick(item)}
+            className={`${isSelected && isInverted ? 'border-error bg-error-2' : ''}`}
           >
             {item}
           </BaseChip>

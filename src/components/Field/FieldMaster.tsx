@@ -8,12 +8,11 @@ import {
   FieldEditor,
   FieldWorkmode,
   FieldTeamName,
-  FieldPosition,
-  FieldSkill,
-  type PositionValue,
+  FieldPositionSkill,
+  type RecruitmentsValue,
   FieldTab,
   type PositionType,
-  FieldSinglePosition,
+  FieldPosition,
 } from './FieldBody';
 import type { DropzoneInputProps, DropzoneRootProps } from 'react-dropzone';
 
@@ -47,12 +46,12 @@ interface FiledMasterProps {
     | 'workmode'
     | 'detail'
     | 'teamname'
-    | 'singlePosition'
-    | 'multiPosition'
-    | 'skill'
+    | 'position'
+    | 'positionSkill'
     | 'tab';
   isRequired?: boolean;
   errorMessage?: string;
+  warningMessage?: string;
   maxLength?: number;
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
   textareaProps?: React.TextareaHTMLAttributes<HTMLTextAreaElement>;
@@ -61,8 +60,8 @@ interface FiledMasterProps {
     preview?: string;
   };
   workmodeProps?: {
-    value?: 'ONLINE' | 'OFFLINE' | 'BOTH';
-    onChange?: (value: 'ONLINE' | 'OFFLINE' | 'BOTH') => void;
+    value?: 'ONLINE' | 'OFFLINE' | 'HYBRID';
+    onChange?: (value: 'ONLINE' | 'OFFLINE' | 'HYBRID') => void;
   };
   detailProps?: {
     value: string;
@@ -73,23 +72,19 @@ interface FiledMasterProps {
     value: number;
     onChange: (teamId: number) => void;
   };
-  singlePositionProps?: {
+  positionProps?: {
     value?: PositionType | null;
     onChange?: (value: PositionType) => void;
   };
-  multiPositionProps?: {
-    value?: PositionValue[];
-    onChange?: (value: PositionValue[]) => void;
-    hasButton?: boolean;
-  };
-  skillProps?: {
-    value?: string[];
-    onChange?: (value: string[]) => void;
+  positionSkillProps?: {
+    value?: RecruitmentsValue[];
+    onChange?: (value: RecruitmentsValue[]) => void;
   };
   tabProps?: {
     value?: string[];
     onChange?: (value: string[]) => void;
     options: string[];
+    reviewType?: 'LIKE' | 'DISLIKE';
   };
 }
 
@@ -99,6 +94,7 @@ const FieldMaster = ({
   variant,
   isRequired = false,
   errorMessage,
+  warningMessage,
   maxLength,
   inputProps,
   textareaProps,
@@ -106,9 +102,8 @@ const FieldMaster = ({
   workmodeProps,
   detailProps,
   teamnameProps,
-  singlePositionProps,
-  multiPositionProps,
-  skillProps,
+  positionProps,
+  positionSkillProps,
   tabProps,
 }: FiledMasterProps) => {
   const renderBody = {
@@ -127,10 +122,9 @@ const FieldMaster = ({
     workmode: () => <FieldWorkmode {...workmodeProps} />,
     detail: () => detailProps && <FieldEditor {...detailProps} />,
     teamname: () => teamnameProps && <FieldTeamName {...teamnameProps} />,
-    singlePosition: () => <FieldSinglePosition {...singlePositionProps} />,
-    multiPosition: () =>
-      multiPositionProps && <FieldPosition {...multiPositionProps} />,
-    skill: () => skillProps && <FieldSkill {...skillProps} />,
+    position: () => <FieldPosition {...positionProps} />,
+    positionSkill: () =>
+      positionSkillProps && <FieldPositionSkill {...positionSkillProps} />,
     tab: () => tabProps && <FieldTab {...tabProps} />,
   };
 
@@ -144,13 +138,18 @@ const FieldMaster = ({
           >
             {title}
           </label>
-          <div className="flex h-[1.8rem] w-[1.2rem] items-center">
+          <div className="flex h-[1.8rem] w-[1.2rem] items-center empty:hidden">
             {isRequired && <RequireIcon />}
           </div>
         </div>
         {errorMessage && (
           <span className="text-[1.2rem] font-medium text-error">
             {errorMessage}
+          </span>
+        )}
+        {warningMessage && (
+          <span className="text-[1.2rem] font-medium text-error">
+            {warningMessage}
           </span>
         )}
       </div>
