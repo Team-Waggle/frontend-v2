@@ -39,8 +39,21 @@ export default {
           10: '#E6E7E8',
           80: '#0057D9',
         },
-        orange: { DEFAULT: '#FE991D' },
+        orange: { DEFAULT: '#FE991D', 2: '#FFF5E9' },
         error: { DEFAULT: '#F5552D', 2: '#FFEEEA' },
+        temperatureBg: {
+          coral: '#F5552D',
+          coral2: '#FFEEEA',
+          gray: '#9FA2AB',
+          gray2: '#E7E8EA',
+          orange: '#FE991D',
+          orange2: '#FFF5E9',
+        },
+        temperatureFont: {
+          gray: '#0E0E0F',
+          orange: '#FE991D',
+          coral: '#F5552D',
+        },
       },
       boxShadow: {
         'main-card': '0 0 36px 0 rgba(0, 0, 0, 0.15)',
