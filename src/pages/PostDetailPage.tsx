@@ -16,8 +16,8 @@ import IcFolder from '../assets/icons/normal/ic_folder.svg?react';
 
 import TeamCard from '../components/PostDetail/TeamCard';
 import SideTeamCard from '../components/common/Cards/SideTeamCard';
-
 import BaseButton from '../components/common/Button/index';
+import { FieldViewer } from '../components/FieldViewer';
 
 import ButtonBlur from '../assets/blur/RecruitmentDetail_Button_Blur.svg?react';
 
@@ -204,7 +204,11 @@ const PostDetailPage = () => {
                 </div>
                 <div className="inline-grid gap-x-[20px] gap-y-[2rem] self-stretch px-[1rem] [grid-template-columns:repeat(5,minmax(0,1fr))] [grid-template-rows:repeat(2,fit-content(100%))]">
                   {postSkills.map((skill) => (
-                    <SkillIconLarge key={skill} name={skill} className="!w-[2.4rem] !h-[2.4rem]" />
+                    <SkillIconLarge
+                      key={skill}
+                      name={skill}
+                      className="!h-[2.4rem] !w-[2.4rem]"
+                    />
                   ))}
                 </div>
               </div>
@@ -236,17 +240,19 @@ const PostDetailPage = () => {
             }}
           />
           <div className="w-[68.8rem]">
-            <p className="text-[1.6rem] font-[600] leading-[1.5] tracking-[-0.032rem] text-black-100 break-words">
-              {postDetail?.content}
-            </p>
+            <FieldViewer content={postDetail?.content} />
           </div>
         </div>
 
         {/** 작성자 기준 화면: 마감하기, 수정하기 버튼 */}
         {isMyPost && (
           <div className="flex w-[32rem] items-start gap-[1.2rem] pb-[6.6rem] pt-[1.2rem]">
-            <BaseButton size="lg" color="secondary" children="마감하기" />
-            <BaseButton size="lg" color="primary" children="수정하기" />
+            <BaseButton size="lg" color="secondary">
+              마감하기
+            </BaseButton>
+            <BaseButton size="lg" color="primary">
+              수정하기
+            </BaseButton>
           </div>
         )}
       </div>

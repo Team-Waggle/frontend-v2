@@ -1,6 +1,6 @@
 import axiosInstance from './axiosInstance';
 
-import { POST_DETAIL_URL } from '../constants/endpoint';
+import { POST_DETAIL_URL, POST_URL } from '../constants/endpoint';
 import type {
   GetPostsParams,
   CursorResponsePostDetailResponse,
@@ -36,4 +36,10 @@ export const getPosts = async (
   );
 
   return response.data;
+};
+
+// 모집글 작성
+export const createPosts = async (postData: object) => {
+  const { data } = await axiosInstance.post(POST_URL, postData);
+  return data;
 };
