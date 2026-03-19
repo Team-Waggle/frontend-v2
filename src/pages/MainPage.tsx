@@ -1,17 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import IcCharacterNoPost from '../assets/icons/ic_character_main_page.svg?react';
-
 import MainCard from '../components/common/Cards/MainCard/MainCard';
+import PostEmptyPage from '../components/common/empty/PostEmptyPage';
 import { usePostsInfinite } from '../hooks/usePost';
 import type { PostsSort } from '../types/api/posts';
 import { useGetIsUserProfileComplete } from '../hooks/useUser';
 
 import MainSearch from '../components/Main/MainSearch/MainSearch';
 import OnboardingModal from '../components/Modal/OnboardingModal';
-import BaseButton from '../components/common/Button';
-
 import { formatPostListCreatedAt } from '../utils/kst-time';
 import type { PostDetailResponse } from '../types/api/posts';
 import { useAuthStore } from '../stores/authStore';
@@ -113,24 +110,7 @@ const MainPage = () => {
           </div>
 
           {posts.length === 0 ? (
-            <div className="flex h-[64rem] w-full max-w-[152.6rem] items-center justify-center max-1440:h-[45.6rem] max-1440:max-w-[104.8rem]">
-              <div className="flex w-[25.8rem] flex-col items-center gap-[2.8rem]">
-                <div className="flex w-[20rem] flex-col items-center gap-[1.8rem]">
-                  <IcCharacterNoPost />
-                  <div className="flex flex-col items-center gap-[0.4rem] self-stretch">
-                    <span className="text-[2rem] font-[600] leading-[1.5] tracking-[-0.04rem] text-black-90">
-                      등록된 모집글이 없습니다.
-                    </span>
-                    <span className="text-[1.6rem] font-[500] leading-[1.5] tracking-[-0.032rem] text-black-80">
-                      새로운 팀원을 찾아보세요!
-                    </span>
-                  </div>
-                </div>
-                <BaseButton color="secondary" className="w-full">
-                  모집글 작성
-                </BaseButton>
-              </div>
-            </div>
+            <PostEmptyPage className="max-1440:h-[45.6rem] max-1440:max-w-[104.8rem]" />
           ) : (
             <div className="inline-grid w-full max-w-[152.6rem] auto-rows-max grid-cols-[repeat(auto-fill,minmax(33.6rem,1fr))] gap-x-[1.8rem] gap-y-[1.8rem] max-1440:max-w-full">
               {posts.map((post: PostDetailResponse) => {
