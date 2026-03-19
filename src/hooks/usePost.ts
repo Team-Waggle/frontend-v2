@@ -1,9 +1,15 @@
 import { useNavigate } from 'react-router';
 import { useQuery, useInfiniteQuery, useMutation } from '@tanstack/react-query';
-import { createPosts, getPostDetail, getPosts } from '../api/post';
+import {
+  createPosts,
+  getPostDetail,
+  getPosts,
+  patchPostClose,
+} from '../api/post';
 import type {
   CursorResponsePostDetailResponse,
   PostsSort,
+  RecruitmentStatusType,
 } from '../types/api/posts';
 
 // 모집글 상세조회
@@ -15,6 +21,19 @@ export const useGetPostDetail = (postId: number) => {
     queryFn: () => getPostDetail(postId),
     enabled: isValidPostId,
     refetchOnWindowFocus: false,
+  });
+};
+
+// 모집글 마감/모집 토글
+export const usePatchPostClose = () => {
+  return useMutation({
+    mutationFn: ({
+      postId,
+      status,
+    }: {
+      postId: number;
+      status: RecruitmentStatusType;
+    }) => patchPostClose(postId, status),
   });
 };
 

@@ -5,6 +5,7 @@ export const BASE_URL = import.meta.env.VITE_BASE_URL;
 export const POST_URL = '/posts'; // 모집글 목록 페이지네이션 조회, 모집글 생성
 export const POST_DETAIL_URL = (postId: number) => `/posts/${postId}`; // 모집글 상세 조회, 수정, 삭제
 export const POST_CLOSE_URL = (postId: number) => `/posts/${postId}/close`;
+export const POST_STATUS_URL = (postId: number) => `/posts/${postId}/recruitment-status`; // 모집글 상태 변경
 
 // 북마크 API
 export const BOOKMARK_URL = '/bookmarks'; // 북마크 토글(ON/OFF)
