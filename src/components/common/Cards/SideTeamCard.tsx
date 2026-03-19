@@ -15,7 +15,7 @@ import { SkillIcon } from '../../../utils/SkillIcon';
 import { toSkillLabel } from '../../../utils/skill';
 
 interface SideTeamCardProps {
-  memberId: number;
+  memberId?: number;
   title?: string;
   position?: string;
   profileImageUrl?: string;
@@ -153,7 +153,7 @@ const SideTeamCard = ({
     'relative flex min-h-[27.2rem] w-[23.4rem] flex-col items-center gap-[2.4rem] rounded-[1.2rem] border border-solid border-black-30 bg-black-5 p-[2.8rem]';
 
   // TeamHome에서만 사용하는 SideTeamCard Style (hover, active, disabled)
-  const hoverStyle = 'hover:bg-black-20';
+  // const hoverStyle = 'hover:bg-black-20';
   const activeStyle = 'border-blue-70';
   const disabledStyle = 'bg-black-20';
 
@@ -161,7 +161,7 @@ const SideTeamCard = ({
     <div
       className={[
         baseStyle,
-        variant === 'team' && !disabled && hoverStyle,
+        variant === 'team' && !disabled,
         isActive && activeStyle,
         disabled && disabledStyle,
       ]
@@ -201,11 +201,11 @@ const SideTeamCard = ({
                 >
                   <SelectBox
                     onAssignManager={() => {
-                      onAssignManager?.(memberId);
+                      onAssignManager?.(memberId!);
                       setIsSelectBoxOpen(false);
                     }}
                     onKickMember={() => {
-                      onKickMember?.(memberId);
+                      onKickMember?.(memberId!);
                       setIsSelectBoxOpen(false);
                     }}
                   />

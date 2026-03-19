@@ -1,4 +1,4 @@
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import FieldMaster from '../Field/FieldMaster';
 import BaseButton from '../common/Button';
 import BaseChip from '../common/Chip/BaseChip';
@@ -25,11 +25,11 @@ type ReviewTagType =
   | 'MOOD_MAKER';
 
 interface FormValues {
-  reviewType: 'LIKE' | 'DISLIKE' | null;
+  reviewType: 'LIKE' | 'DISLIKE';
   tags: ReviewTagType[];
 }
 
-const REVIEW_OPTIONS = [
+const LIKE_OPTIONS = [
   '#시간엄수',
   '#개발왕',
   '#소통왕',
@@ -40,6 +40,9 @@ const REVIEW_OPTIONS = [
   '#고트',
   '#레전드',
   '#꼼꼼함',
+];
+
+const DISLIKE_OPTIONS = [
   '#지각쟁이',
   '#잠수왕',
   '#예민함',
@@ -48,16 +51,32 @@ const REVIEW_OPTIONS = [
 ];
 
 const ReviewModal = ({ isOpen, onClose }: ModalProps) => {
-  const { register, handleSubmit, control } = useForm<FormValues>({
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    formState: { isValid },
+  } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
-      reviewType: null,
+      reviewType: 'LIKE',
       tags: [],
     },
   });
 
+  const watchReviewType = useWatch({ control, name: 'reviewType' });
+
   const onSubmit = (data: FormValues) => {
     console.log(data);
+  };
+
+  const handleTypeChange = (
+    type: 'LIKE' | 'DISLIKE',
+    onChange: (val: string) => void,
+  ) => {
+    onChange(type);
+    setValue('tags', []); // 타입을 바꾸면 기존에 선택한 태그들을 리셋
   };
 
   useModal({ isOpen, onClose });
@@ -97,7 +116,7 @@ const ReviewModal = ({ isOpen, onClose }: ModalProps) => {
                         status="liked"
                         mainIcon={<LikeIcon />}
                         isSelected={field.value === 'LIKE'}
-                        onClick={() => field.onChange('LIKE')}
+                        onClick={() => handleTypeChange('LIKE', field.onChange)}
                       >
                         좋아요
                       </BaseChip>
@@ -106,7 +125,9 @@ const ReviewModal = ({ isOpen, onClose }: ModalProps) => {
                         status="unliked"
                         mainIcon={<BadIcon />}
                         isSelected={field.value === 'DISLIKE'}
-                        onClick={() => field.onChange('DISLIKE')}
+                        onClick={() =>
+                          handleTypeChange('DISLIKE', field.onChange)
+                        }
                       >
                         아쉬워요
                       </BaseChip>
@@ -122,21 +143,34 @@ const ReviewModal = ({ isOpen, onClose }: ModalProps) => {
                   }}
                   render={({ field }) => (
                     <FieldMaster
-                      title="이런 점이 좋았어요"
+                      title={
+                        watchReviewType === 'LIKE'
+                          ? '일이삼사오육칠팔구십님은 어떤점이 인상적이었나요?'
+                          : '일이삼사오육칠팔구십님은 어떤점이 아쉬웠나요?'
+                      }
                       variant="tab"
                       isRequired
                       errorMessage="최대 3개 선택 가능"
                       tabProps={{
                         value: field.value,
                         onChange: field.onChange,
-                        options: REVIEW_OPTIONS,
+                        options:
+                          watchReviewType === 'LIKE'
+                            ? LIKE_OPTIONS
+                            : DISLIKE_OPTIONS,
+                        reviewType: watchReviewType,
                       }}
                     />
                   )}
                 />
               </div>
             </div>
-            <BaseButton type="submit" size="xl" className="mx-auto w-[25rem]">
+            <BaseButton
+              type="submit"
+              size="xl"
+              disabled={!isValid}
+              className="mx-auto w-[25rem]"
+            >
               평가 제출하기
             </BaseButton>
           </div>

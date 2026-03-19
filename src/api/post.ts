@@ -1,10 +1,16 @@
 import axiosInstance from './axiosInstance';
 
-import { POST_DETAIL_URL } from '../constants/endpoint';
+import {
+  POST_DETAIL_URL,
+  POST_URL,
+  POST_STATUS_URL,
+} from '../constants/endpoint';
+
 import type {
   GetPostsParams,
   CursorResponsePostDetailResponse,
   GetPostDetailResponse,
+  RecruitmentStatusType,
 } from '../types/api/posts';
 
 // 모집글 상세조회
@@ -15,6 +21,14 @@ export const getPostDetail = async (
     POST_DETAIL_URL(postId),
   );
   return data;
+};
+
+// 모집글 마감/모집 토글
+export const patchPostClose = async (
+  postId: number,
+  status: RecruitmentStatusType,
+): Promise<void> => {
+  await axiosInstance.patch(POST_STATUS_URL(postId), { status });
 };
 
 // 모집글 목록 커서 기반 조회
@@ -36,4 +50,10 @@ export const getPosts = async (
   );
 
   return response.data;
+};
+
+// 모집글 작성
+export const createPosts = async (postData: object) => {
+  const { data } = await axiosInstance.post(POST_URL, postData);
+  return data;
 };
