@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import useHorizontalScroll from '../hooks/useHorizontalScroll';
 import {
-  useGetTeamApplications,
+  useGetTeamPosts,
   useGetTeamDetail,
   useGetTeamMembers,
   useDeleteTeamMember,
@@ -24,6 +24,7 @@ import TeamNav from '../components/Team/TeamNav';
 import MainCard from '../components/common/Cards/MainCard/MainCard';
 import SideTeamCard from '../components/common/Cards/SideTeamCard';
 import IconWrapper from '../components/common/IconWrapper';
+import BaseTag from '../components/common/Tag';
 import {
   formatPostListCreatedAt,
   formatTeamCardCreatedAt,
@@ -44,7 +45,7 @@ const TeamHomePage = () => {
 
   const { data: teamDetail } = useGetTeamDetail(parsedTeamId);
   const { data: teamMembers } = useGetTeamMembers(parsedTeamId);
-  const { data: teamApplications } = useGetTeamApplications(parsedTeamId);
+  const { data: teamApplications } = useGetTeamPosts(parsedTeamId);
   const { data: me } = useGetUserMe();
 
   const patchTeamMemberRoleMutation = usePatchTeamMemberRole(parsedTeamId);
@@ -167,26 +168,33 @@ const TeamHomePage = () => {
               </div>
               {/** 팀원 수, 오프라인/온라인, 날짜 */}
               <div className="flex items-start gap-[0.8rem]">
-                <div className="flex h-[4.2rem] min-w-[4.8rem] items-center justify-center gap-[0.2rem] rounded-[9.9rem] bg-black-10 px-[1.4rem]">
-                  <IcPersons className="h-[1.2rem] w-[1.2rem]" />
-                  <span className="flex-1 text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black-100">
-                    {activeMemberCount}
-                  </span>
-                </div>
-                <div className="flex h-[4.2rem] min-w-[4.8rem] items-center justify-center gap-[0.2rem] rounded-[9.9rem] bg-black-10 px-[1.4rem]">
-                  <IcDesktop className="h-[1.2rem] w-[1.2rem]" />
-                  <span className="flex-1 text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black-100">
-                    {toWorkModeLabel(teamDetail?.workMode)}
-                  </span>
-                </div>
-                <div className="flex h-[4.2rem] min-w-[4.8rem] items-center justify-center gap-[0.2rem] rounded-[9.9rem] bg-black-10 px-[1.4rem]">
-                  <IcCompany className="h-[1.2rem] w-[1.2rem]" />
-                  <span className="flex-1 text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black-100">
-                    {teamDetail?.createdAt
+                {[
+                  {
+                    icon: <IcPersons className="h-[2rem] w-[2rem]" />,
+                    label: activeMemberCount,
+                  },
+                  {
+                    icon: <IcDesktop className="h-[2rem] w-[2rem]" />,
+                    label: toWorkModeLabel(teamDetail?.workMode),
+                  },
+                  {
+                    icon: <IcCompany className="h-[2rem] w-[2rem]" />,
+                    label: teamDetail?.createdAt
                       ? formatTeamCardCreatedAt(teamDetail.createdAt)
-                      : ''}
-                  </span>
-                </div>
+                      : '',
+                  },
+                ].map(({ icon, label }, i) => (
+                  <BaseTag
+                    key={i}
+                    size="xl"
+                    shape="circle"
+                    color="black80"
+                    isInverted
+                    leftIcon={icon}
+                  >
+                    {label}
+                  </BaseTag>
+                ))}
               </div>
             </div>
             <div>
