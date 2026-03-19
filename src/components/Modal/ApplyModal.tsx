@@ -16,15 +16,21 @@ interface FormValues {
 }
 
 const ApplyModal = ({ isOpen, onClose }: ModalProps) => {
-  const { register, handleSubmit, watch, control, setValue } =
-    useForm<FormValues>({
-      mode: 'onChange',
-      defaultValues: {
-        position: '',
-        detail: '',
-        portfolioUrls: [],
-      },
-    });
+  const {
+    register,
+    handleSubmit,
+    watch,
+    control,
+    formState: { isValid },
+    setValue,
+  } = useForm<FormValues>({
+    mode: 'onChange',
+    defaultValues: {
+      position: '',
+      detail: '',
+      portfolioUrls: [],
+    },
+  });
 
   const detailValue = watch('detail', '');
 
@@ -56,12 +62,15 @@ const ApplyModal = ({ isOpen, onClose }: ModalProps) => {
                 <Controller
                   name="position"
                   control={control}
+                  rules={{
+                    validate: (value) => value !== '',
+                  }}
                   render={({ field }) => (
                     <FieldMaster
                       title="지원 직무"
-                      variant="singlePosition"
+                      variant="position"
                       isRequired
-                      singlePositionProps={{
+                      positionProps={{
                         value: field.value,
                         onChange: field.onChange,
                       }}
@@ -72,7 +81,7 @@ const ApplyModal = ({ isOpen, onClose }: ModalProps) => {
                   title="포트폴리오"
                   id="portfolioUrls"
                   variant="input"
-                  errorMessage="URL 추가 시 권한제한/암호 없이 공유해주세요"
+                  warningMessage="URL 추가 시 권한제한/암호 없이 공유해주세요"
                   inputProps={{
                     ...register('portfolioUrls'),
                     placeholder: 'URL::',
@@ -97,7 +106,12 @@ const ApplyModal = ({ isOpen, onClose }: ModalProps) => {
                 />
               </div>
             </div>
-            <BaseButton type="submit" size="xl" className="mx-auto w-[25rem]">
+            <BaseButton
+              type="submit"
+              size="xl"
+              disabled={!isValid}
+              className="mx-auto w-[25rem]"
+            >
               지원완료
             </BaseButton>
           </div>
