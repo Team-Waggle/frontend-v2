@@ -22,7 +22,7 @@ const TeamPostManagementPage = () => {
             </span>
           </div>
         )}
-        <div className="mb-[29.1rem] flex flex-col items-start self-stretch">
+        <div className={`mb-[29.1rem] flex flex-col items-start self-stretch ${posts.length >= 6 ? 'max-h-[60rem] overflow-y-auto scrollbar-hide' : ''}`}>
           {posts.length === 0 ? (
             <PostEmptyPage />
           ) : (
