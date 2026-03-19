@@ -13,12 +13,12 @@ import NewTeamIcon from '../assets/icons/ic_character_new_team.svg?react';
 interface FormValues {
   name: string;
   description: string;
-  workMode: 'ONLINE' | 'OFFLINE' | 'BOTH';
+  workMode: 'ONLINE' | 'OFFLINE' | 'HYBRID';
   profileImageUrl: string;
 }
 
 const TeamNewPage = () => {
-  const { mutateAsync: createImage } = useCreateTeamImage();
+  const { mutate: createImage } = useCreateTeamImage();
   const { mutate: createTeam } = useCreateTeam();
   const [preview, setPreview] = useState<string | undefined>(undefined);
   const [file, setFile] = useState<File | null>(null);
@@ -28,6 +28,7 @@ const TeamNewPage = () => {
   const {
     register,
     handleSubmit,
+    watch,
     control,
     setValue,
     formState: { errors, isValid },
@@ -40,6 +41,8 @@ const TeamNewPage = () => {
       profileImageUrl: '',
     },
   });
+
+  const descriptionValue = watch('description', '');
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: { 'image/*': ['.png', '.jpg'] },
@@ -63,7 +66,7 @@ const TeamNewPage = () => {
     },
   });
 
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = (data: FormValues) => {
     if (!file || !presignedUrl) return;
 
     createTeam(data, {
@@ -89,7 +92,7 @@ const TeamNewPage = () => {
         <span className="text-[2.4rem] font-bold text-black-100">
           새로운 팀을 만들어요!
         </span>
-        <div className="flex h-[108.5rem] flex-col gap-[3.6rem]">
+        <div className="flex h-[74.7rem] flex-col gap-[3.6rem]">
           <FieldMaster
             title="팀 명"
             id="title"
@@ -141,23 +144,28 @@ const TeamNewPage = () => {
             )}
           />
 
-          <Controller
-            name="description"
-            control={control}
-            rules={{ required: '상세 내용을 입력해주세요.' }}
-            render={({ field }) => (
-              <FieldMaster
-                title="상세 소개 작성"
-                id="detail"
-                variant="detail"
-                isRequired
-                errorMessage={errors.description?.message}
-                detailProps={{
-                  value: field.value,
-                  onChange: field.onChange,
-                }}
-              />
-            )}
+          <FieldMaster
+            title="상세 소개 작성"
+            id="description"
+            variant="textarea"
+            isRequired
+            errorMessage={errors.description?.message}
+            textareaProps={{
+              placeholder:
+                '팀 목표, 기술 스택 상세 정보, 지향하는 팀 문화 등을 자유롭게 작성해주세요.',
+              value: descriptionValue,
+              ...register('description', {
+                onChange: (e) => {
+                  const value = e.target.value;
+                  if (value.length > 200) {
+                    setValue('description', value.slice(0, 200));
+                  }
+                },
+                validate: (value) =>
+                  value.length <= 200 || '200자 이내로 입력해주세요.',
+              }),
+              maxLength: 200,
+            }}
           />
         </div>
         <BaseButton
