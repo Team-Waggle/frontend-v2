@@ -1,12 +1,13 @@
-import { useLocation } from 'react-router';
+import { useLocation, useParams } from 'react-router';
 import TeamTab from '../common/Tap/TeamTab';
 
 const TeamNav = () => {
   const location = useLocation();
+  const { teamId } = useParams<{ teamId: string }>();
 
   const tabs = [
-    { label: '메인 홈', to: '/team/home' },
-    { label: '모집글 관리', to: '/' },
+    { label: '메인 홈', to: `/team/${teamId}` },
+    { label: '모집글 관리', to: `/team/${teamId}/recruitments` },
     { label: '지원자 관리', to: '/' },
     { label: '팀 상태 관리', to: '/' },
   ] as const;
