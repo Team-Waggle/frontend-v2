@@ -16,7 +16,7 @@ const NotFoundPage = () => {
               돌아가주세요!!
             </span>
             <span className="whitespace-pre-line text-center text-[2rem] font-semibold text-black-60">
-              {`불편을 드려 죄송합니다. \n이전 페이지로 돌아가 주세요.`}
+              {`존재하지 않는 페이지입니다. \n이전 페이지로 돌아가 주세요.`}
             </span>
           </div>
           <BaseButton
