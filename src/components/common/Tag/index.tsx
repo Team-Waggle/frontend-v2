@@ -18,15 +18,21 @@ const BaseTag = ({
   shape,
   color,
   isInverted = false,
+  isDisabled = false,
   leftIcon,
   rightIcon,
   className,
   children,
 }: BaseTagProps) => {
-  const inverted = isInverted ? 'inverted' : 'normal';
+  // const inverted = isInverted ? 'inverted' : 'normal';
+  const state = isDisabled ? 'disabled' : isInverted ? 'inverted' : 'normal';
+
+  // 2. 해당 색상에 그 상태(state)가 없으면 'normal'로 돌아가도록(Fallback) 처리
+  const colorStyle =
+    TAG_COLOR_STYLES[color][state] || TAG_COLOR_STYLES[color]['normal'];
   const tagStyles = useMemo(() => {
-    return `${BASE_TAG_STYLES} ${TAG_SIZE_STYLES[size]} ${TAG_SHAPE_STYLES[shape]} ${TAG_COLOR_STYLES[color][inverted]} ${className || ''}`;
-  }, [size, shape, color, inverted, className]);
+    return `${BASE_TAG_STYLES} ${TAG_SIZE_STYLES[size]} ${TAG_SHAPE_STYLES[shape]} ${colorStyle} ${className || ''}`;
+  }, [size, shape, color, isInverted, isDisabled, className]);
   return (
     <div className={tagStyles}>
       {leftIcon && <span>{leftIcon}</span>}

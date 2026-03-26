@@ -20,7 +20,10 @@ export const TAG_SHAPE_STYLES: Record<TagShape, string> = {
   circle: 'rounded-full',
 };
 
-export const TAG_COLOR_STYLES: Record<TagColor, Record<TagInverted, string>> = {
+export const TAG_COLOR_STYLES: Record<
+  TagColor,
+  Partial<Record<TagInverted, string>>
+> = {
   blue70: {
     normal: 'bg-blue-70 text-black-5 font-semibold',
     inverted: 'bg-blue-10 text-blue-70 font-medium',
@@ -28,10 +31,12 @@ export const TAG_COLOR_STYLES: Record<TagColor, Record<TagInverted, string>> = {
   black90: {
     normal: 'bg-black-90 text-black-5 font-semibold',
     inverted: 'bg-black-20 text-black-100 font-medium',
+    disabled: 'bg-black-20 text-black-60 font-medium',
   },
   black80: {
     normal: 'bg-black-80 text-black-5 font-semibold',
     inverted: 'bg-black-10 text-black-100 font-medium',
+    disabled: 'bg-black-10 text-black-60 font-medium',
   },
   blue80: {
     normal: 'bg-blue-80 text-black-5 font-semibold',
