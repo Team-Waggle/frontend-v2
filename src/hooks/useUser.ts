@@ -21,11 +21,12 @@ export const useGetUserDetail = (userId: string) => {
 
 // 본인 프로필 조회
 export const useGetUserMe = () => {
-  const isProfileComplete = useAuthStore((state) => state.isProfileComplete);
+  const { isLoggedIn, isProfileComplete } = useAuthStore();
   return useQuery({
     queryKey: ['me'],
     queryFn: () => getUserMe(),
-    enabled: !!isProfileComplete,
+    enabled: !!isLoggedIn && !!isProfileComplete,
+    refetchOnWindowFocus: false,
   });
 };
 
@@ -61,10 +62,11 @@ export const useGetIsUserProfileComplete = () => {
 
 // 본인 참여 팀 목록 조회
 export const useGetUserMeTeam = () => {
-  const isProfileComplete = useAuthStore((state) => state.isProfileComplete);
+  const { isLoggedIn, isProfileComplete } = useAuthStore();
   return useQuery({
     queryKey: ['user-me-team'],
     queryFn: () => getUserMeTeam(),
-    enabled: !!isProfileComplete,
+    enabled: !!isLoggedIn && !!isProfileComplete,
+    refetchOnWindowFocus: false,
   });
 };

@@ -8,6 +8,7 @@ import {
   PatchTeamMemberRole,
   DeleteTeamMember,
   GetTeamPosts,
+  patchTeamStatus,
 } from '../api/team';
 
 // 팀 생성
@@ -103,5 +104,13 @@ export const useDeleteTeamMember = (teamId: number) => {
         queryKey: ['team-members', teamId],
       });
     },
+  });
+};
+
+// 팀 상태 변경
+export const usePatchTeamStatus = () => {
+  return useMutation({
+    mutationFn: ({ teamId, status }: { teamId: number; status: string }) =>
+      patchTeamStatus(teamId, status),
   });
 };

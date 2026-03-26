@@ -6,6 +6,7 @@ import {
   TEAMS_RECRUITMENTS_URL,
   MEMBER_URL,
   TEAMS_APPLICATION_URL,
+  TEAMS_STATUS_URL,
 } from '../constants/endpoint';
 import type { TeamResponse, MemberResponse } from '../types/api/team';
 import type { PostDetailResponse } from '../types/api/posts';
@@ -71,5 +72,13 @@ export const PatchTeamMemberRole = async (
 // 팀 멤버 추방
 export const DeleteTeamMember = async (memberId: number) => {
   const { data } = await axiosInstance.delete(MEMBER_URL(memberId));
+  return data;
+};
+
+// 팀 상태 변경
+export const patchTeamStatus = async (teamId: number, status: string) => {
+  const { data } = await axiosInstance.patch(TEAMS_STATUS_URL(teamId), {
+    status,
+  });
   return data;
 };

@@ -15,7 +15,7 @@ import TeamPostManagementPage from './pages/TeamPostManagementPage';
 import PostDetailPage from './pages/PostDetailPage';
 import PostFormPage from './pages/PostFormPage';
 import NotFoundPage from './pages/NotFoundPage';
-// import TeamStatusPage from './pages/TeamStatusPage';
+import TeamStatusPage from './pages/TeamStatusPage';
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -28,7 +28,7 @@ export const router = createBrowserRouter(
           path="/team/:teamId/recruitments"
           element={<TeamPostManagementPage />}
         />
-        {/* <Route path="/team/:teamId/status" element={<TeamStatusPage />} /> */}
+        <Route path="/team/:teamId/status" element={<TeamStatusPage />} />
         <Route path="/post/new" element={<PostFormPage />} />
         <Route path="/post/:postId" element={<PostDetailPage />} />
       </Route>
