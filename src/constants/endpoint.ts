@@ -5,7 +5,8 @@ export const BASE_URL = import.meta.env.VITE_BASE_URL;
 export const POST_URL = '/posts'; // 모집글 목록 페이지네이션 조회, 모집글 생성
 export const POST_DETAIL_URL = (postId: number) => `/posts/${postId}`; // 모집글 상세 조회, 수정, 삭제
 export const POST_CLOSE_URL = (postId: number) => `/posts/${postId}/close`;
-export const POST_STATUS_URL = (postId: number) => `/posts/${postId}/recruitment-status`; // 모집글 상태 변경
+export const POST_STATUS_URL = (postId: number) =>
+  `/posts/${postId}/recruitment-status`; // 모집글 상태 변경
 
 // 북마크 API
 export const BOOKMARK_URL = '/bookmarks'; // 북마크 토글(ON/OFF)
@@ -36,9 +37,10 @@ export const TEAMS_URL = '/teams'; // 팀 생성
 export const TEAMS_DETAIL_URL = (teamId: number) => `/teams/${teamId}`; // 팀 상세 조회, 수정, 삭제
 export const TEAMS_APPLICATION_URL = (teamId: number) =>
   `/teams/${teamId}/applications`; // 팀 지원 목록 조회, 지원
-export const TEAMS_MEMBERS_URL = (teamId: number) => `/teams/${teamId}/members`; // 팀 이탈
+export const TEAMS_MEMBERS_URL = (teamId: number) => `/teams/${teamId}/members`; // 팀 멤버 목록 조회, 팀 이탈
 export const TEAMS_RECRUITMENTS_URL = (teamId: number) =>
   `/teams/${teamId}/posts`; // 팀 모집글 목록 조회
+export const TEAMS_STATUS_URL = (teamId: number) => `/teams/${teamId}/status`; // 팀 상태 변경
 export const TEAMS_PRESIGNED_URL = '/teams/profile-image/presigned-url'; // 팀 프로필 이미지 업로드용 Presigned URL 생성
 
 // 팀 멤버 API

@@ -9,7 +9,7 @@ const TeamNav = () => {
     { label: '메인 홈', to: `/team/${teamId}` },
     { label: '모집글 관리', to: `/team/${teamId}/recruitments` },
     { label: '지원자 관리', to: '/' },
-    { label: '팀 상태 관리', to: '/' },
+    { label: '팀 상태 관리', to: `/team/${teamId}/status` },
   ] as const;
 
   return (
