@@ -8,13 +8,14 @@ export type TagColor =
   | 'orange'
   | 'red'
   | 'black100';
-export type TagInverted = 'normal' | 'inverted';
+export type TagInverted = 'normal' | 'inverted' | 'disabled';
 
 export interface BaseTagProps {
   size: TagSize;
   shape: TagShape;
   color: TagColor;
   isInverted?: boolean;
+  isDisabled?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   className?: string;
