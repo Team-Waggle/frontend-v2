@@ -11,6 +11,7 @@ import type {
   PostsSort,
   RecruitmentStatusType,
 } from '../types/api/posts';
+import { usePatchTeamStatus } from './useTeam';
 
 // 모집글 상세조회
 export const useGetPostDetail = (postId: number) => {
@@ -95,10 +96,12 @@ export const usePostsInfinite = (filters: UsePostsFilters = {}) => {
 
 // 모집글 작성
 export const useCreatePosts = () => {
+  const { mutate } = usePatchTeamStatus();
   const navigate = useNavigate();
   return useMutation({
     mutationFn: (postData: object) => createPosts(postData),
     onSuccess: (data) => {
+      mutate({ teamId: data.team.teamId, status: 'ACTIVE' });
       navigate(`/team/${data.team.teamId}`);
     },
     onError: (err) => {
