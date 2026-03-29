@@ -25,6 +25,7 @@
     "react-dropzone": "^14.4.0",
     "react-hook-form": "^7.71.1",
     "react-router-dom": "^7.12.0",
+    "sonner": "^2.0.7",
     "tailwind-scrollbar-hide": "^4.0.0",
     "zustand": "^5.0.11"
   },
