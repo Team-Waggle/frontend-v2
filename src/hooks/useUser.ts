@@ -1,12 +1,19 @@
 import { useNavigate } from 'react-router';
 import { useAuthStore } from '../stores/authStore';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { TeamResponse } from '../types/api/team';
+import type { UserMeResponse } from '../types/api/user';
 import {
   getUserDetail,
   getUserMe,
   getIsUserProfileComplete,
   postUserProfile,
   getUserMeTeam,
+  getUserTeams,
+  patchTeamVisibility,
+  postUserPresignedUrl,
+  putUserProfileImageToS3,
+  putUserMe,
 } from '../api/user';
 
 // 사용자 조회
@@ -60,6 +67,55 @@ export const useGetIsUserProfileComplete = () => {
   });
 };
 
+// 프로필 이미지 업로드 (presigned URL → S3 PUT → 프로필 PUT)
+export const useUpdateProfileImage = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (file: File) => {
+      const me = queryClient.getQueryData<UserMeResponse>(['me']);
+      if (!me) throw new Error('사용자 정보를 불러올 수 없습니다.');
+      const { presignedUrl, objectUrl } = await postUserPresignedUrl(file.type);
+      await putUserProfileImageToS3(presignedUrl, file);
+      await putUserMe({
+        username: me.username,
+        position: me.position,
+        bio: me.bio,
+        skills: me.skills,
+        portfolioUrls: me.portfolioUrls,
+        profileImageUrl: objectUrl,
+      });
+      return objectUrl;
+    },
+    onSuccess: (_objectUrl, _file, _ctx) => {
+      queryClient.invalidateQueries({ queryKey: ['me'] });
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+    },
+  });
+};
+
+// 팀 공개 여부 변경
+export const usePatchTeamVisibility = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ teamId, isVisible }: { teamId: number; isVisible: boolean }) =>
+      patchTeamVisibility(teamId, isVisible),
+    onMutate: async ({ teamId, isVisible }) => {
+      await queryClient.cancelQueries({ queryKey: ['user-me-team'] });
+      const previous = queryClient.getQueryData<TeamResponse[]>(['user-me-team']);
+      queryClient.setQueryData<TeamResponse[]>(['user-me-team'], (old) =>
+        old?.map((team) => team.teamId === teamId ? { ...team, isVisible } : team),
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(['user-me-team'], context?.previous);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-me-team'] });
+    },
+  });
+};
+
 // 본인 참여 팀 목록 조회
 export const useGetUserMeTeam = () => {
   const { isLoggedIn, isProfileComplete } = useAuthStore();
@@ -67,6 +123,16 @@ export const useGetUserMeTeam = () => {
     queryKey: ['user-me-team'],
     queryFn: () => getUserMeTeam(),
     enabled: !!isLoggedIn && !!isProfileComplete,
+    refetchOnWindowFocus: false,
+  });
+};
+
+// 사용자 참여 팀 목록 조회
+export const useGetUserTeams = (userId: string) => {
+  return useQuery({
+    queryKey: ['user-teams', userId],
+    queryFn: () => getUserTeams(userId),
+    enabled: !!userId,
     refetchOnWindowFocus: false,
   });
 };

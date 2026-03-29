@@ -24,7 +24,7 @@ const TeamPostManagementPage = () => {
         )}
         <div className={`mb-[29.1rem] flex flex-col items-start self-stretch`}>
           {posts.length === 0 ? (
-            <PostEmptyPage />
+            <PostEmptyPage title="등록된 모집글이 없습니다." subTitle="새로운 팀원을 찾아보세요!" btnText="모집글 작성" />
           ) : (
             posts.map((post) => (
               <TeamPostItem
