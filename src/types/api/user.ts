@@ -15,3 +15,20 @@ export type UserMeResponse = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type UserReviewTag =
+  | "PUNCTUAL"
+  | "SKILLED"
+  | "GOOD_COMMUNICATOR"
+  | "RESPONSIBLE"
+  | "KIND"
+  | "PICASSO"
+  | "PROMOTER"
+  | "GOAT"
+  | "LEGEND"
+  | "METICULOUS"
+  | "LATE"
+  | "NO_SHOW"
+  | "SENSITIVE"
+  | "UNKIND"
+  | "DESERTER";
