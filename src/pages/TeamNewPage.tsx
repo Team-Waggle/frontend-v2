@@ -121,6 +121,9 @@ const TeamNewPage = () => {
             variant="thumbnail"
             isRequired
             thumbnailProps={{
+              ...register('profileImageUrl', {
+                required: '이미지를 첨부해주세요.',
+              }),
               rootProps: getRootProps(),
               inputProps: getInputProps(),
               preview,
@@ -155,6 +158,7 @@ const TeamNewPage = () => {
                 '팀 목표, 기술 스택 상세 정보, 지향하는 팀 문화 등을 자유롭게 작성해주세요.',
               value: descriptionValue,
               ...register('description', {
+                required: '상세 소개를 작성해주세요.',
                 onChange: (e) => {
                   const value = e.target.value;
                   if (value.length > 200) {
