@@ -16,6 +16,8 @@ import PostDetailPage from './pages/PostDetailPage';
 import PostFormPage from './pages/PostFormPage';
 import NotFoundPage from './pages/NotFoundPage';
 import TeamStatusPage from './pages/TeamStatusPage';
+import MyPage from './pages/MyPage';
+import ProfileRedirect from './components/Profile/ProfileRedirect';
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -25,12 +27,14 @@ export const router = createBrowserRouter(
         <Route path="/team/new" element={<TeamNewPage />} />
         <Route path="/team/:teamId" element={<TeamHomePage />} />
         <Route
-          path="/team/:teamId/recruitments"
+          path="/team/:teamId/posts"
           element={<TeamPostManagementPage />}
         />
         <Route path="/team/:teamId/status" element={<TeamStatusPage />} />
         <Route path="/post/new" element={<PostFormPage />} />
         <Route path="/post/:postId" element={<PostDetailPage />} />
+        <Route path="/profile" element={<ProfileRedirect />} />
+        <Route path="/profile/:userId" element={<MyPage />} />
       </Route>
       <Route path="/oauth/callback" element={<LoginPage />} />
       <Route path="*" element={<NotFoundPage />} />
@@ -43,4 +47,3 @@ export const router = createBrowserRouter(
 // 내팀/팀상태 관리 /team/:teamId/status
 // 알림 /notification
 // 메시지 /message
-// 유저 정보 및 마이페이지 /profile/:userId
