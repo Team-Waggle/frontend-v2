@@ -98,7 +98,7 @@ const TeamStatusPage = () => {
                 <TeamStatusCard
                   key={item.type}
                   type={item.type}
-                  currentStatus={data?.[0]?.status}
+                  currentStatus={data?.[0]?.status ?? 'PREPARING'}
                   title={item.title}
                   description={item.description}
                   ActiveIcon={item.ActiveIcon}
@@ -129,8 +129,10 @@ const TeamStatusPage = () => {
         isOpen={isOpenModal}
         onClose={() => setIsOpenModal(false)}
         handleDone={() => {
+          const teamId = data?.[0]?.teamId;
+          if (!teamId) return;
           mutate(
-            { teamId: data?.[0]?.teamId, status: 'COMPLETED' },
+            { teamId, status: 'COMPLETED' },
             {
               onSuccess: () => {
                 queryClient.invalidateQueries({ queryKey: ['user-me-team'] });

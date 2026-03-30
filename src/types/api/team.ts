@@ -2,7 +2,7 @@ export type TeamResponse = {
   teamId: number;
   name: string;
   description: string;
-  status: 'ACTIVE' | 'COMPLETED';
+  status: 'PREPARING' | 'ACTIVE' | 'COMPLETED';
   workMode: 'ONLINE' | 'OFFLINE';
   profileImageUrl: string;
   memberCount: number;
