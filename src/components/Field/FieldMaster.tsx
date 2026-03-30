@@ -1,6 +1,4 @@
-//  Icons
 import type React from 'react';
-import RequireIcon from '../../assets/icons/ic_require.svg?react';
 import {
   FieldInput,
   FieldTextarea,
@@ -15,6 +13,10 @@ import {
   FieldPosition,
 } from './FieldBody';
 import type { DropzoneInputProps, DropzoneRootProps } from 'react-dropzone';
+import type { TeamResponse } from '../../types/api/team';
+
+//  Icons
+import RequireIcon from '../../assets/icons/ic_require.svg?react';
 
 /* 
   title: 소개박스 제목
@@ -26,15 +28,6 @@ import type { DropzoneInputProps, DropzoneRootProps } from 'react-dropzone';
   inputProps: input에 쓰이는 placeholder, register
   textareaProps: textarea에 쓰이는 placeholder, register
 */
-
-interface TeamData {
-  teamId: number;
-  name: string;
-  description: string;
-  profileImageUrl: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 interface FiledMasterProps {
   title: string;
@@ -68,7 +61,7 @@ interface FiledMasterProps {
     onChange: (content: string) => void;
   };
   teamnameProps?: {
-    data: TeamData[];
+    data: TeamResponse[];
     value: number;
     onChange: (teamId: number) => void;
   };

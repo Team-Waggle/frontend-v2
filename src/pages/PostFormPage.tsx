@@ -66,7 +66,7 @@ const PostFormPage = () => {
                 variant="teamname"
                 isRequired
                 teamnameProps={{
-                  data: myTeamData,
+                  data: myTeamData ?? [],
                   value: field.value,
                   onChange: field.onChange,
                 }}
