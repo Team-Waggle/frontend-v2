@@ -11,7 +11,7 @@ interface MyPageCardProps {
   memberCount?: number;
   isLeader?: boolean;
   profileImageUrl?: string;
-  status?: 'ACTIVE' | 'COMPLETED';
+  status?: 'PREPARING' | 'ACTIVE' | 'COMPLETED';
   isMyProfile?: boolean;
   isVisible?: boolean;
   teamId?: number;
