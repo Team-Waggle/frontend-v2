@@ -3,6 +3,7 @@ import { Outlet, ScrollRestoration } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 import { usePostRefresh } from './hooks/useAuth';
 import Sidebar from './components/Sidebar';
+import FloatingMessageButton from './components/Message/FloatingMessageButton';
 
 function App() {
   const { mutateAsync: silentRefresh } = usePostRefresh();
@@ -49,6 +50,7 @@ function App() {
       <main className="mx-auto w-full min-w-0">
         <Outlet />
       </main>
+      <FloatingMessageButton />
       <ScrollRestoration />
     </div>
   );
