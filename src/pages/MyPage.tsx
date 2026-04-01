@@ -13,6 +13,7 @@ import IcCharacterNoReviews from '../assets/icons/ic_character_main_page.svg?rea
 import Tag from '../components/common/Tag/index';
 import MyPageCard from '../components/common/Cards/MyPageCard/MyPageCard';
 import PostEmptyPage from '../components/common/empty/PostEmptyPage';
+import Tooltip from '../components/common/Tooltip';
 
 import {
   useGetUserDetail,
@@ -53,6 +54,12 @@ const getTemperatureColor = (temp: number, whiteBlend = 0): string => {
   }
   return `rgb(${r}, ${g}, ${b})`;
 };
+
+const getReviewTagStyle = (isTop: boolean) => ({
+  barColor: isTop ? 'bg-blue-40' : 'bg-blue-10',
+  labelColor: isTop ? 'text-blue-100' : 'text-blue-70',
+  countColor: isTop ? 'text-blue-100' : 'text-black-60',
+});
 
 const MyPage = () => {
   const navigate = useNavigate();
@@ -198,22 +205,12 @@ const MyPage = () => {
                   <p className="text-[1.4rem] font-[600] leading-[1.5] tracking-[-0.028rem] text-black-90">
                     협업온도
                   </p>
-                  <div className="group relative">
+                  <Tooltip
+                    id="collab-temp-tooltip"
+                    content="팀 활동 및 팀원 피드백 기반으로 변동되는 지표입니다."
+                  >
                     <IcInfo className="h-[2rem] w-[2rem] text-black-60" />
-                    <div
-                      className="absolute bottom-[calc(100%+1.05rem)] left-1/2 hidden -translate-x-1/2 items-center justify-center whitespace-nowrap rounded-[0.8rem] p-[1.2rem] group-hover:flex group-hover:flex-row"
-                      style={{
-                        border: '1px solid #CFD1D5',
-                        background: '#FFF',
-                        boxShadow:
-                          '0 2px 18px 0 rgba(0,0,0,0.08), 0 1px 4px 0 rgba(0,0,0,0.08)',
-                      }}
-                    >
-                      <p className="text-[1.2rem] font-[500] text-black-80">
-                        팀 활동 및 팀원 피드백 기반으로 변동되는 지표입니다.
-                      </p>
-                    </div>
-                  </div>
+                  </Tooltip>
                 </div>
                 {/** 온도 바 */}
                 <div className="flex h-[6.4rem] flex-col items-start gap-[0.8rem] self-stretch">
@@ -245,11 +242,7 @@ const MyPage = () => {
                   const reviews = (userDetail?.topLikeTags ?? []).map(
                     ({ tag, count }, index) => ({
                       label: formatReviewTag(tag),
-                      barColor: index === 0 ? 'bg-blue-40' : 'bg-blue-10',
-                      labelColor:
-                        index === 0 ? 'text-blue-100' : 'text-blue-70',
-                      countColor:
-                        index === 0 ? 'text-blue-100' : 'text-black-60',
+                      ...getReviewTagStyle(index === 0),
                       count,
                     }),
                   );
