@@ -1,4 +1,5 @@
 import axiosInstance from './axiosInstance';
+import type { UserMeResponse } from '../types/api/user';
 import {
   USERS_CHECK_URL,
   USERS_ME_PRESIGNED_URL,
@@ -13,8 +14,10 @@ import {
 import type { TeamResponse } from '../types/api/team';
 
 // 사용자 조회
-export const getUserDetail = async (userId: string) => {
-  const { data } = await axiosInstance.get(USERS_URL(userId));
+export const getUserDetail = async (
+  userId: string,
+): Promise<UserMeResponse> => {
+  const { data } = await axiosInstance.get<UserMeResponse>(USERS_URL(userId));
   return data;
 };
 

@@ -9,7 +9,7 @@ export type UserMeResponse = {
   skills: string[];
   portfolioUrls: string[];
   topLikeTags: {
-    tag: string;
+    tag: UserReviewTag;
     count: number;
   }[];
   createdAt: string;
@@ -17,18 +17,18 @@ export type UserMeResponse = {
 };
 
 export type UserReviewTag =
-  | "PUNCTUAL"
-  | "SKILLED"
-  | "GOOD_COMMUNICATOR"
-  | "RESPONSIBLE"
-  | "KIND"
-  | "PICASSO"
-  | "PROMOTER"
-  | "GOAT"
-  | "LEGEND"
-  | "METICULOUS"
-  | "LATE"
-  | "NO_SHOW"
-  | "SENSITIVE"
-  | "UNKIND"
-  | "DESERTER";
+  | 'PUNCTUAL'
+  | 'SKILLED'
+  | 'GOOD_COMMUNICATOR'
+  | 'RESPONSIBLE'
+  | 'KIND'
+  | 'PICASSO'
+  | 'PROMOTER'
+  | 'GOAT'
+  | 'LEGEND'
+  | 'METICULOUS'
+  | 'LATE'
+  | 'NO_SHOW'
+  | 'SENSITIVE'
+  | 'UNKIND'
+  | 'DESERTER';

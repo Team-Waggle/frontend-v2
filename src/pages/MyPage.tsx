@@ -8,6 +8,7 @@ import IcPolygon from '../assets/icons/ic_polygon.svg?react';
 import IcVerticalBar from '../assets/icons/ic_mypage_vertical_bar.svg?react';
 import IcCamera from '../assets/icons/normal/ic_camera_fill.svg?react';
 import IcProfileImg from '../assets/icons/image/ic_character_circle_gray_40.svg?react';
+import IcCharacterNoReviews from '../assets/icons/ic_character_main_page.svg?react';
 
 import Tag from '../components/common/Tag/index';
 import MyPageCard from '../components/common/Cards/MyPageCard/MyPageCard';
@@ -25,6 +26,7 @@ import {
 import { POSITION_CONVERTER } from '../utils/position';
 import { SkillIcon } from '../utils/SkillIcon';
 import { toSkillLabel } from '../utils/skill';
+import { formatReviewTag } from '../utils/review-tag';
 
 const getTemperatureRGB = (temp: number): [number, number, number] => {
   if (temp <= 50) {
@@ -196,7 +198,22 @@ const MyPage = () => {
                   <p className="text-[1.4rem] font-[600] leading-[1.5] tracking-[-0.028rem] text-black-90">
                     협업온도
                   </p>
-                  <IcInfo className="h-[2rem] w-[2rem] text-black-60" />
+                  <div className="group relative">
+                    <IcInfo className="h-[2rem] w-[2rem] text-black-60" />
+                    <div
+                      className="absolute bottom-[calc(100%+1.05rem)] left-1/2 hidden -translate-x-1/2 items-center justify-center whitespace-nowrap rounded-[0.8rem] p-[1.2rem] group-hover:flex group-hover:flex-row"
+                      style={{
+                        border: '1px solid #CFD1D5',
+                        background: '#FFF',
+                        boxShadow:
+                          '0 2px 18px 0 rgba(0,0,0,0.08), 0 1px 4px 0 rgba(0,0,0,0.08)',
+                      }}
+                    >
+                      <p className="text-[1.2rem] font-[500] text-black-80">
+                        팀 활동 및 팀원 피드백 기반으로 변동되는 지표입니다.
+                      </p>
+                    </div>
+                  </div>
                 </div>
                 {/** 온도 바 */}
                 <div className="flex h-[6.4rem] flex-col items-start gap-[0.8rem] self-stretch">
@@ -225,29 +242,29 @@ const MyPage = () => {
               {/** 이런 점이 좋았어요 바 */}
               <div className="flex flex-col items-start gap-[0.8rem] self-stretch">
                 {(() => {
-                  const reviews = [
-                    {
-                      label: '꼼꼼함',
-                      barColor: 'bg-blue-40',
-                      labelColor: 'text-blue-100',
-                      countColor: 'text-blue-100',
-                      count: 380,
-                    },
-                    {
-                      label: '책임감',
-                      barColor: 'bg-blue-10',
-                      labelColor: 'text-blue-70',
-                      countColor: 'text-black-60',
-                      count: 400,
-                    },
-                    {
-                      label: '시간엄수',
-                      barColor: 'bg-blue-10',
-                      labelColor: 'text-blue-70',
-                      countColor: 'text-black-60',
-                      count: 335,
-                    },
-                  ];
+                  const reviews = (userDetail?.topLikeTags ?? []).map(
+                    ({ tag, count }, index) => ({
+                      label: formatReviewTag(tag),
+                      barColor: index === 0 ? 'bg-blue-40' : 'bg-blue-10',
+                      labelColor:
+                        index === 0 ? 'text-blue-100' : 'text-blue-70',
+                      countColor:
+                        index === 0 ? 'text-blue-100' : 'text-black-60',
+                      count,
+                    }),
+                  );
+
+                  if (reviews.length === 0) {
+                    return (
+                      <div className="flex flex-1 flex-col items-center justify-center gap-[1.2rem] self-stretch">
+                        <IcCharacterNoReviews />
+                        <p className="overflow-hidden text-ellipsis text-center text-[1.4rem] font-[600] leading-[1.5] tracking-[-0.028rem] text-black-60">
+                          아직 받은 평판이 없어요.
+                        </p>
+                      </div>
+                    );
+                  }
+
                   const maxCount = Math.max(...reviews.map((r) => r.count));
 
                   return reviews.map(
@@ -257,7 +274,7 @@ const MyPage = () => {
                         className="relative flex h-[4rem] items-center self-stretch rounded-[0.6rem] bg-black-10"
                       >
                         <div
-                          className={`${barColor} flex items-center gap-[1rem] self-stretch rounded-l-[0.6rem] px-[1rem]`}
+                          className={`${barColor} flex items-center gap-[1rem] self-stretch rounded-l-[0.6rem] px-[1rem] ${count === maxCount ? 'rounded-r-[0.6rem]' : ''}`}
                           style={{
                             width: `${Math.max((count / maxCount) * 100, 15)}%`,
                           }}
