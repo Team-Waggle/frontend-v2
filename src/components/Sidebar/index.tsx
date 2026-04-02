@@ -61,6 +61,7 @@ const Sidebar = () => {
               <IconWrapper
                 onClick={() => {
                   if (!isLoggedIn) setIsLoginModalOpen(true);
+                  navigate('/post/new');
                 }}
               >
                 {isLoggedIn ? <PencilIcon /> : <LogInIcon />}
