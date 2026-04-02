@@ -6,6 +6,8 @@ import BaseTag from '../common/Tag';
 import IconWrapper from '../common/IconWrapper';
 import { SkillIcon } from '../../utils/SkillIcon';
 import { positionSkillData } from '../../constants/positionSkill';
+import type { PositionKey } from '../../utils/position';
+import type { TeamResponse } from '../../types/api/team';
 
 // @tiptap
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -33,7 +35,6 @@ import ProfileBasicIcon from '../../assets/icons/ic_profile_basic.svg?react';
 import ChevronDownIcon from '../../assets/icons/normal/chevron/ic_chevronDown.svg?react';
 import CloseIcon from '../../assets/icons/normal/ic_close.svg?react';
 import CloseSmallIcon from '../../assets/icons/normal/ic_close_small.svg?react';
-import type { PositionKey } from '../../utils/position';
 
 interface FieldInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
@@ -65,17 +66,8 @@ interface FieldEditorProps {
   onChange: (content: string) => void;
 }
 
-interface TeamData {
-  teamId: number;
-  name: string;
-  description: string;
-  profileImageUrl: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 interface FieldTeamNameProps {
-  data: TeamData[];
+  data: TeamResponse[];
   value: number;
   onChange: (teamId: number) => void;
 }

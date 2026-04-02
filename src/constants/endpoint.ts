@@ -27,6 +27,7 @@ export const USERS_ME_PROFILE_URL = '/users/me/profile'; // 사용자 프로필 
 export const USERS_ME_PROFILE_COMPLETION_URL = '/users/me/profile-completion'; // 프로필 완성 여부 조회
 export const USERS_ME_PRESIGNED_URL = '/users/me/profile-image/presigned-url'; // 사용자 프로필 이미지 업로드용 Presigned URL 생성
 export const USERS_ME_TEAMS_URL = '/users/me/teams'; //본인 참여 팀 목록 조회
+export const USERS_ME_TEAMS_VISIBILITY_URL = (teamId: number) => `/users/me/teams/${teamId}/visibility`; // 팀 공개 여부 변경
 
 // 인증 토큰 API
 export const LOGOUT_URL = '/auth/logout'; // 로그아웃
@@ -50,8 +51,8 @@ export const MEMBER_REVIEW_URL = (memberId: number) =>
 
 // 팀 지원 API
 export const APPLICATION_DELETE_URL = (applicationId: number) =>
-  `/applications${applicationId}`; // 팀 지원 삭제
+  `/applications/${applicationId}`; // 팀 지원 삭제
 export const APPLICATION_APPROVE_URL = (applicationId: number) =>
-  `/applications${applicationId}/approve`; // 팀 지원 승인
+  `/applications/${applicationId}/approve`; // 팀 지원 승인
 export const APPLICATION_REJECT_URL = (applicationId: number) =>
-  `/applications${applicationId}/reject`; //팀 지원 거절
+  `/applications/${applicationId}/reject`; //팀 지원 거절
