@@ -17,11 +17,21 @@ const SidebarProfile = ({
 }) => {
   const { mutate: logout } = usePostLogout();
 
-  if (isFolded) return <BaicProfileIcon />;
+  const profileImage = data?.profileImageUrl ? (
+    <img
+      src={data.profileImageUrl}
+      alt=""
+      className="h-[4.4rem] w-[4.4rem] rounded-[0.6rem]"
+    />
+  ) : (
+    <BaicProfileIcon />
+  );
+
+  if (isFolded) return profileImage;
 
   return (
     <div className="flex w-[25.8rem] items-center gap-[1rem] pr-[1rem]">
-      <BaicProfileIcon />
+      {profileImage}
       <div className="flex w-[15.2rem] flex-col justify-center">
         <span className="text-[1.6rem] font-semibold text-black-100">
           {isLoggedIn ? data?.username || '게스트' : '게스트'}

@@ -1,16 +1,14 @@
 import { useState, type ReactNode } from 'react';
-import {
-  AnimatePresence,
-  motion,
-  // type Variants
-} from 'framer-motion';
+import { useNavigate, useParams } from 'react-router';
+import { AnimatePresence, motion, type Variants } from 'framer-motion';
 
 // Icons
-// import ChevronDownIcon from '../../assets/icons/normal/chevron/ic_chevronDown.svg?react';
+import ChevronDownIcon from '../../assets/icons/normal/chevron/ic_chevronDown.svg?react';
 
 interface SubItem {
-  id: number | string;
+  teamId: number | string;
   name: string;
+  profileImageUrl?: string;
 }
 
 interface SidebarItemProps {
@@ -28,45 +26,48 @@ const SidebarItem = ({
   onClick,
   subItems,
 }: SidebarItemProps) => {
+  const navigate = useNavigate();
+  const { teamId } = useParams<{ teamId: string }>();
   const [isOpen, setIsOpen] = useState(false);
 
-  const hasSubItems = subItems && subItems.length > 0;
+  const isTeamMenu = label === '내팀';
+  const hasMultipleTeams = subItems && subItems.length > 1;
 
-  // const dropdownVariants: Variants = {
-  //   open: {
-  //     opacity: 1,
-  //     height: 'auto',
-  //     transition: {
-  //       height: {
-  //         type: 'spring',
-  //         mass: 1,
-  //         stiffness: 320,
-  //         damping: 40,
-  //       },
-  //       opacity: {
-  //         duration: 0.15,
-  //       },
-  //     },
-  //   },
-  //   closed: {
-  //     opacity: 0,
-  //     height: 0,
-  //     transition: {
-  //       height: {
-  //         type: 'spring',
-  //         mass: 1,
-  //         stiffness: 100,
-  //         damping: 20,
-  //       },
-  //       opacity: {
-  //         duration: 0.5,
-  //       },
-  //     },
-  //   },
-  // };
+  const dropdownVariants: Variants = {
+    open: {
+      opacity: 1,
+      height: 'auto',
+      transition: {
+        height: {
+          type: 'spring',
+          mass: 1,
+          stiffness: 320,
+          damping: 40,
+        },
+        opacity: {
+          duration: 0.15,
+        },
+      },
+    },
+    closed: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        height: {
+          type: 'spring',
+          mass: 1,
+          stiffness: 100,
+          damping: 20,
+        },
+        opacity: {
+          duration: 0.5,
+        },
+      },
+    },
+  };
 
   const handleClick = () => {
-    if (hasSubItems) {
+    if (hasMultipleTeams) {
       setIsOpen(!isOpen);
     } else if (onClick) {
       onClick();
@@ -75,7 +76,7 @@ const SidebarItem = ({
 
   return (
     <>
-      <button onClick={handleClick}>
+      <div className="cursor-pointer" onClick={handleClick}>
         <div
           className={`flex h-[4.4rem] items-center rounded-[0.8rem] px-[1.2rem] ${
             isActive ? 'bg-blue-5' : 'bg-black-5 hover:bg-black-10'
@@ -93,7 +94,7 @@ const SidebarItem = ({
           </div>
 
           {/* 화살표 숨기기 */}
-          {/* {label === '내팀' && (
+          {isTeamMenu && hasMultipleTeams && (
             <motion.div
               animate={{ rotate: isOpen ? 180 : 0 }}
               transition={{ duration: 0.2 }}
@@ -101,13 +102,13 @@ const SidebarItem = ({
             >
               <ChevronDownIcon className="h-[1.6rem] w-[1.6rem] text-black-40" />
             </motion.div>
-          )} */}
+          )}
         </div>
         <AnimatePresence initial={false}>
-          {isOpen && hasSubItems && (
+          {isOpen && isTeamMenu && hasMultipleTeams && (
             <motion.div
               key="content"
-              // variants={dropdownVariants}
+              variants={dropdownVariants}
               initial="closed"
               animate="open"
               exit="closed"
@@ -115,16 +116,35 @@ const SidebarItem = ({
             >
               {subItems.map((team) => (
                 <button
-                  key={team.id}
-                  className="flex h-[4.4rem] w-full items-center rounded-[0.8rem] pl-[4.4rem] pr-[2.4rem] text-[1.4rem] font-medium text-black-60 hover:bg-hover-5 hover:text-black-80"
+                  key={team.teamId}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/team/${team.teamId}`);
+                  }}
+                  className="group flex h-[4.4rem] w-full items-center gap-[0.4rem] rounded-[0.8rem] px-[2.4rem] hover:bg-hover-5"
                 >
-                  {team.name}
+                  {team.profileImageUrl && (
+                    <img
+                      src={team.profileImageUrl}
+                      alt=""
+                      className="h-[2.4rem] w-[2.4rem] rounded-[0.6rem]"
+                    />
+                  )}
+                  <span
+                    className={`text-[1.4rem] ${
+                      Number(team.teamId) === Number(teamId)
+                        ? 'font-bold text-blue-100'
+                        : 'font-medium text-black-60 group-hover:text-black-80'
+                    }`}
+                  >
+                    {team.name}
+                  </span>
                 </button>
               ))}
             </motion.div>
           )}
         </AnimatePresence>
-      </button>
+      </div>
     </>
   );
 };

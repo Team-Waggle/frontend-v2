@@ -61,6 +61,7 @@ const Sidebar = () => {
               <IconWrapper
                 onClick={() => {
                   if (!isLoggedIn) setIsLoginModalOpen(true);
+                  navigate('/post/new');
                 }}
               >
                 {isLoggedIn ? <PencilIcon /> : <LogInIcon />}
@@ -68,8 +69,24 @@ const Sidebar = () => {
             ) : isProfileComplete ? (
               myteamData?.length === 0 ? (
                 <BaseButton onClick={() => navigate('/team/new')}>
-                  팀 만들기
+                  새 팀 만들기
                 </BaseButton>
+              ) : myteamData && myteamData?.length >= 1 ? (
+                <div className="flex gap-[1.2rem]">
+                  <BaseButton
+                    color="secondary"
+                    onClick={() => navigate('/team/new')}
+                    className="w-[12.3rem] whitespace-nowrap"
+                  >
+                    새 팀 만들기
+                  </BaseButton>
+                  <BaseButton
+                    onClick={() => navigate('/post/new')}
+                    className="w-[12.3rem] whitespace-nowrap"
+                  >
+                    모집글 작성
+                  </BaseButton>
+                </div>
               ) : (
                 <BaseButton onClick={() => navigate('/post/new')}>
                   모집글 작성
@@ -86,7 +103,7 @@ const Sidebar = () => {
             isLoggedIn={isProfileComplete}
             setIsLoginModalOpen={() => setIsLoginModalOpen(true)}
             isFolded={isFolded}
-            teamId={myteamData?.[0]?.teamId}
+            teamData={isProfileComplete ? (myteamData ?? []) : []}
             userId={myData?.userId}
           />
         </div>

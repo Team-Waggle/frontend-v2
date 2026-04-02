@@ -1,16 +1,18 @@
 import { useNavigate } from 'react-router';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { postLogout, postRefresh } from '../api/auth';
 import { useAuthStore } from '../stores/authStore';
 
 // 로그아웃
 export const usePostLogout = () => {
   const logout = useAuthStore((state) => state.logout);
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   return useMutation({
     mutationFn: postLogout,
     onSuccess: () => {
       logout();
+      queryClient.clear();
       navigate('/');
     },
     onError: (error) => {
