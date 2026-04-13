@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { useGetPostDetail } from '../hooks/usePost';
 import { useGetUserMe } from '../hooks/useUser';
+import { useBreakpoint } from '../hooks/useBreakpoint';
 import usePostDetailApplyButtonPosition from '../hooks/usePostDetailApplyButtonPosition';
 import usePostDetailFloatingSideCard from '../hooks/usePostDetailFloatingSideCard';
 
@@ -73,13 +74,18 @@ const PostDetailPage = () => {
 
   const { data: postDetail } = useGetPostDetail(parsedPostId);
   const { data: me } = useGetUserMe();
+  const breakpoint = useBreakpoint();
+  const isDesktop = breakpoint === 'desktop';
 
   const leftColRef = useRef<HTMLDivElement | null>(null);
   const sideWrapRef = useRef<HTMLDivElement | null>(null);
 
   const applyButtonPx = usePostDetailApplyButtonPosition(leftColRef);
 
-  usePostDetailFloatingSideCard(leftColRef, sideWrapRef);
+  usePostDetailFloatingSideCard(
+    isDesktop ? leftColRef : { current: null },
+    isDesktop ? sideWrapRef : { current: null },
+  );
 
   const myUserId = me?.userId;
   const postUserId = postDetail?.user?.userId;
@@ -120,11 +126,11 @@ const PostDetailPage = () => {
   }, [postDetail?.recruitments]);
 
   return (
-    <div className="flex flex-1 items-start justify-center gap-[7.2rem] self-stretch pt-[11.2rem]">
+    <div className="flex flex-1 flex-col items-center gap-[4rem] self-stretch px-[1.6rem] pt-[3.2rem] sm:px-[2.4rem] sm:pt-[5.6rem] lg:flex-row lg:items-start lg:justify-center lg:gap-[7.2rem] lg:px-0 lg:pt-[11.2rem]">
       {/** 모집글 상세조회 구간 */}
       <div
         ref={leftColRef}
-        className="flex w-[68.8rem] flex-col items-center gap-[6rem]"
+        className="flex w-full flex-col items-center gap-[4rem] sm:gap-[6rem] lg:w-[68.8rem]"
       >
         {/** 모집글 상세조회 제목 및 핈수 정보 */}
         <div className="flex flex-col items-start gap-[1rem] self-stretch">
@@ -160,9 +166,9 @@ const PostDetailPage = () => {
                 </span>
               </div>
             </div>
-            <div className="flex items-center justify-between self-stretch">
+            <div className="flex flex-col items-stretch gap-[1.2rem] self-stretch sm:flex-row sm:items-center sm:justify-between sm:gap-0">
               {/** 왼쪽: 모집인원 */}
-              <div className="flex w-[39.5rem] flex-col items-start gap-[1.6rem] rounded-[0.8rem] border border-solid border-black-30 px-[2.2rem] pb-[2.8rem] pt-[2rem]">
+              <div className="flex w-full flex-col items-start gap-[1.6rem] rounded-[0.8rem] border border-solid border-black-30 px-[2.2rem] pb-[2.8rem] pt-[2rem] sm:w-[39.5rem]">
                 <div className="flex items-center gap-[0.4rem]">
                   <IcPersons className="h-[1.6rem] w-[1.6rem] rounded-[0.4rem]" />
                   <span className="text-[1.3rem] font-[600] leading-[1.5] text-black-100">
@@ -195,7 +201,7 @@ const PostDetailPage = () => {
               </div>
 
               {/** 오른쪽: 사용스킬 */}
-              <div className="flex h-[14.9rem] w-[27.9rem] flex-col items-start gap-[1.6rem] rounded-[0.8rem] border border-solid border-black-30 px-[2.2rem] pb-[2.8rem] pt-[2rem]">
+              <div className="flex w-full flex-col items-start gap-[1.6rem] rounded-[0.8rem] border border-solid border-black-30 px-[2.2rem] pb-[2.8rem] pt-[2rem] sm:h-[14.9rem] sm:w-[27.9rem]">
                 <div className="flex items-center gap-[0.4rem]">
                   <IcFolder className="h-[1.6rem] w-[1.6rem]" />
                   <span className="text-[1.3rem] font-[600] leading-[1.5] tracking-[-0.026rem] text-black-100">
@@ -239,7 +245,7 @@ const PostDetailPage = () => {
               navigate(`/team/${postDetail.team.teamId}`);
             }}
           />
-          <div className="w-[68.8rem]">
+          <div className="w-full lg:w-[68.8rem]">
             <FieldViewer content={postDetail?.content} />
           </div>
         </div>
@@ -258,8 +264,8 @@ const PostDetailPage = () => {
       </div>
 
       {/** 팀 구간 */}
-      <div className="flex self-start pt-[17.8rem]">
-        <div ref={sideWrapRef} className="self-start will-change-transform">
+      <div className="flex w-full justify-center lg:w-auto lg:self-start lg:pt-[17.8rem]">
+        <div ref={sideWrapRef} className="self-start lg:will-change-transform">
           <SideTeamCard
             memberId={Number(postDetail?.user?.userId ?? 0)}
             title={postDetail?.user?.username}
@@ -272,18 +278,22 @@ const PostDetailPage = () => {
       </div>
 
       {/** 지원자 기준 화면: 지원하기 버튼 */}
-      {!isMyPost && applyButtonPx !== null && (
+      {!isMyPost && (isDesktop ? applyButtonPx !== null : true) && (
         <div
-          className="fixed bottom-[3.6rem] z-50 -translate-x-1/2"
-          style={{ left: applyButtonPx ?? undefined }}
+          className={`fixed z-50 ${
+            isDesktop
+              ? 'bottom-[3.6rem] -translate-x-1/2'
+              : 'bottom-[6rem] left-0 right-0 px-[1.6rem]'
+          }`}
+          style={isDesktop ? { left: applyButtonPx ?? undefined } : undefined}
         >
-          <div className="relative w-[32rem]">
+          <div className={`relative ${isDesktop ? 'w-[32rem]' : 'w-full'}`}>
             <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2">
               <ButtonBlur className="h-[10rem] w-[40rem]" />
             </div>
 
             <BaseButton
-              className="relative z-10 w-[32rem]"
+              className={`relative z-10 ${isDesktop ? 'w-[32rem]' : 'w-full'}`}
               size="lg"
               color="primary"
             >
