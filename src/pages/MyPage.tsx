@@ -83,12 +83,12 @@ const MyPage = () => {
   };
 
   return (
-    <div className="mb-[16rem] flex h-full w-full justify-center">
-      <div className="mt-[9.2rem] flex w-[clamp(98.2rem,2.8rem_+_66.25vw,130rem)] flex-col items-start gap-[7.2rem]">
+    <div className="mb-[8rem] flex h-full w-full justify-center px-[1.6rem] sm:mb-[12rem] sm:px-[2.4rem] lg:mb-[16rem] lg:px-0">
+      <div className="mt-[3.2rem] flex w-full flex-col items-start gap-[4rem] sm:mt-[5.6rem] sm:gap-[5.6rem] lg:mt-[9.2rem] lg:w-[clamp(98.2rem,2.8rem_+_66.25vw,130rem)] lg:gap-[7.2rem]">
         {/** 프로필 및 온도 */}
-        <div className="relative flex items-start gap-[3rem] self-stretch rounded-[1.6rem] border border-solid border-black-30 bg-black-5 p-[3rem]">
+        <div className="relative flex flex-col items-start gap-[2.4rem] self-stretch rounded-[1.6rem] border border-solid border-black-30 bg-black-5 p-[2rem] sm:flex-row sm:gap-[3rem] sm:p-[3rem]">
           {/** 프로필 정보 */}
-          <div className="relative flex w-[clamp(27.7rem,3.97rem_+_16.48vw,36.6rem)] flex-col items-start gap-[1.2rem] pt-[1rem]">
+          <div className="relative flex w-full flex-col items-start gap-[1.2rem] pt-[1rem] sm:w-[clamp(27.7rem,3.97rem_+_16.48vw,36.6rem)]">
             {/** 프로필 아이콘 */}
             <div className="relative flex aspect-square h-[5.6rem] w-[5.6rem]">
               <div
@@ -171,7 +171,10 @@ const MyPage = () => {
             </div>
           </div>
 
-          <IcVerticalBar />
+          <div className="hidden sm:block">
+            <IcVerticalBar />
+          </div>
+          <div className="h-[0.1rem] w-full bg-black-20 sm:hidden" />
 
           {/** 온도 및 해시태그 */}
           <div className="flex flex-1 flex-col items-start gap-[4rem] pt-[1rem]">
@@ -290,7 +293,7 @@ const MyPage = () => {
             </h2>
           </div>
           {userTeams && userTeams.length > 0 ? (
-            <div className="grid grid-cols-3 flex-wrap content-start items-start gap-[1.4rem] self-stretch max-1440:grid-cols-2">
+            <div className="grid grid-cols-1 flex-wrap content-start items-start gap-[1.4rem] self-stretch sm:grid-cols-2 lg:grid-cols-3 max-1440:grid-cols-2">
               {isMyProfile
                 ? myTeams?.map((team) => (
                     <MyPageCard
