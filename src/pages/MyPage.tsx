@@ -29,30 +29,22 @@ import { SkillIcon } from '../utils/SkillIcon';
 import { toSkillLabel } from '../utils/skill';
 import { formatReviewTag } from '../utils/review-tag';
 
-const getTemperatureRGB = (temp: number): [number, number, number] => {
-  if (temp <= 50) {
-    const t = temp / 50;
-    return [
-      Math.round(0x9f + (0xfe - 0x9f) * t),
-      Math.round(0xa2 + (0x99 - 0xa2) * t),
-      Math.round(0xab + (0x1d - 0xab) * t),
-    ];
-  } else {
-    const t = (temp - 50) / 50;
-    return [
-      Math.round(0xfe + (0xf5 - 0xfe) * t),
-      Math.round(0x99 + (0x55 - 0x99) * t),
-      Math.round(0x1d + (0x2d - 0x1d) * t),
-    ];
+const getTemperatureGradient = (temp: number): string => {
+  if (temp <= 36.5) {
+    return 'linear-gradient(270deg, #9FA2AB 39.42%, #F2F3F4 100%)';
   }
-};
 
-const getTemperatureColor = (temp: number, whiteBlend = 0): string => {
-  const [r, g, b] = getTemperatureRGB(temp);
-  if (whiteBlend > 0) {
-    return `rgb(${Math.round(r + (255 - r) * whiteBlend)}, ${Math.round(g + (255 - g) * whiteBlend)}, ${Math.round(b + (255 - b) * whiteBlend)})`;
-  }
-  return `rgb(${r}, ${g}, ${b})`;
+  const t = Math.min((temp - 36.5) / (100 - 36.5), 1);
+  const hex = (n: number) => Math.round(n).toString(16).padStart(2, '0');
+
+  const r1 = 0xfe + (0xf5 - 0xfe) * t;
+  const g1 = 0x99 + (0x55 - 0x99) * t;
+  const b1 = 0x1d + (0x2d - 0x1d) * t;
+
+  const g2 = 0xf5 + (0xee - 0xf5) * t;
+  const b2 = 0xe9 + (0xea - 0xe9) * t;
+
+  return `linear-gradient(270deg, #${hex(r1)}${hex(g1)}${hex(b1)} 0%, #ff${hex(g2)}${hex(b2)} 100%)`;
 };
 
 const getReviewTagStyle = (isTop: boolean) => ({
@@ -156,7 +148,7 @@ const MyPage = () => {
               <div className="flex flex-col items-center gap-[3rem] self-stretch">
                 {/** 스킬 */}
                 <div className="flex items-start gap-[0.8rem] self-stretch">
-                  {userDetail?.skills?.map((skill: string) => (
+                  {userDetail?.skills?.slice(0, 3).map((skill: string) => (
                     <Tag
                       key={skill}
                       size="xs"
@@ -224,7 +216,7 @@ const MyPage = () => {
                       className="h-[1.4rem] rounded-l-[9.9rem]"
                       style={{
                         width: `${userDetail?.temperature ?? 36.5}%`,
-                        background: `linear-gradient(270deg, ${getTemperatureColor(userDetail?.temperature ?? 36.5)} 39.42%, #F2F3F4 100%)`,
+                        background: getTemperatureGradient(userDetail?.temperature ?? 36.5),
                       }}
                     />
                   </div>
@@ -249,8 +241,7 @@ const MyPage = () => {
 
                   if (reviews.length === 0) {
                     return (
-                      <div className="flex flex-1 flex-col items-center justify-center gap-[1.2rem] self-stretch">
-                        <IcCharacterNoReviews />
+                      <div className="flex flex-1 min-h-[12rem] flex-col items-center justify-center gap-[1.2rem] self-stretch">
                         <p className="overflow-hidden text-ellipsis text-center text-[1.4rem] font-[600] leading-[1.5] tracking-[-0.028rem] text-black-60">
                           아직 받은 평판이 없어요.
                         </p>
