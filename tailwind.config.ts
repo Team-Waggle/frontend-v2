@@ -68,6 +68,8 @@ export default {
           'linear-gradient(270deg, #FFF 0%, rgba(255, 255, 255, 0) 100%)',
       },
       screens: {
+        sm: '768px',
+        lg: '1440px',
         'max-1440': { max: '1440px' },
       },
     },
