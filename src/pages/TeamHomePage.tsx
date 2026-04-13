@@ -140,21 +140,21 @@ const TeamHomePage = () => {
     >
       {/** pt-[9.2rem] pt-[5.4rem] */}
       {isLeaderOrManager && <TeamNav />}
-      <div className="flex w-full max-w-[clamp(98.2rem,70vw,130rem)] flex-col items-start gap-[4rem]">
+      <div className="flex w-full max-w-full flex-col items-start gap-[2.4rem] px-[1.6rem] sm:gap-[3.2rem] sm:px-[2.4rem] lg:max-w-[clamp(98.2rem,70vw,130rem)] lg:gap-[4rem] lg:px-0">
         {/** 팀 설명 */}
-        <div className="flex items-start gap-[4rem] self-stretch">
+        <div className="flex flex-col items-center gap-[2.4rem] self-stretch sm:flex-row sm:items-start sm:gap-[4rem]">
           {/** 팀 이미지: default 값 */}
           {teamDetail?.profileImageUrl ? (
-            <div className="flex aspect-[1/1] h-[22.3rem] w-[22.3rem] flex-col items-center justify-center gap-[1rem] rounded-[1em] bg-black-10">
+            <div className="flex aspect-[1/1] h-[16rem] w-[16rem] flex-col items-center justify-center gap-[1rem] rounded-[1rem] bg-black-10 sm:h-[22.3rem] sm:w-[22.3rem]">
               <img
                 alt={'프로필 이미지'}
                 src={teamDetail?.profileImageUrl}
-                className="h-[22.3rem] w-[22.3rem] rounded-[1rem] object-cover"
+                className="h-[16rem] w-[16rem] rounded-[1rem] object-cover sm:h-[22.3rem] sm:w-[22.3rem]"
               />
             </div>
           ) : (
-            <div className="flex aspect-[1/1] w-full max-w-[22.3rem] flex-col items-center justify-center gap-[1rem] self-stretch rounded-[1rem] bg-blue-5 py-[1.9rem]">
-              <TeamDefaultImg className="h-[18.5rem] w-[18.5rem]" />
+            <div className="flex aspect-[1/1] w-[16rem] flex-col items-center justify-center gap-[1rem] rounded-[1rem] bg-blue-5 py-[1.9rem] sm:w-full sm:max-w-[22.3rem]">
+              <TeamDefaultImg className="h-[12rem] w-[12rem] sm:h-[18.5rem] sm:w-[18.5rem]" />
             </div>
           )}
           {/** 팀 상세 내용 */}
@@ -305,7 +305,7 @@ const TeamHomePage = () => {
               </p>
             </div>
             {/** 팀원 명단 카드 */}
-            <div className="grid w-full gap-x-[1.8rem] gap-y-[2.4rem] self-stretch [grid-template-columns:repeat(auto-fit,23.4rem)]">
+            <div className="grid w-full grid-cols-2 gap-x-[1.2rem] gap-y-[1.6rem] self-stretch sm:grid-cols-3 sm:gap-x-[1.8rem] sm:gap-y-[2.4rem] lg:[grid-template-columns:repeat(auto-fit,23.4rem)]">
               {sortedMembers.map((member) => (
                 <SideTeamCard
                   key={member.memberId}

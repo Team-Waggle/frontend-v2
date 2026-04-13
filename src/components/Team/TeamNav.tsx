@@ -13,7 +13,7 @@ const TeamNav = () => {
   ] as const;
 
   return (
-    <div className="flex w-full max-w-[clamp(98.2rem,70vw,130rem)] items-center gap-[2.4rem] border-b border-solid border-black-20">
+    <div className="flex w-full max-w-full items-center gap-[1.2rem] overflow-x-auto border-b border-solid border-black-20 px-[1.6rem] scrollbar-hide sm:gap-[2.4rem] sm:px-[2.4rem] lg:max-w-[clamp(98.2rem,70vw,130rem)] lg:px-0">
       {tabs.map((tab) => {
         const isActive = location.pathname === tab.to;
 
