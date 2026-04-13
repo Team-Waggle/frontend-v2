@@ -210,10 +210,10 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
         <ModalOverlay onClose={onClose} isOnboarding={true} />
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="relative flex h-[63.2rem] w-[73.8rem] flex-col gap-[4rem] overflow-scroll overflow-y-scroll scroll-smooth rounded-[2rem] bg-white px-[4rem] pt-[4.4rem] scrollbar-hide"
+          className="relative flex max-h-[90vh] w-[calc(100vw-3.2rem)] flex-col gap-[4rem] overflow-y-auto scroll-smooth rounded-[2rem] bg-white px-[2rem] pt-[3.2rem] scrollbar-hide sm:w-[73.8rem] sm:px-[4rem] sm:pt-[4.4rem]"
         >
           <div className="flex w-full flex-col gap-[3.4rem]">
-            <div className="flex flex-col text-[3rem] font-bold">
+            <div className="flex flex-col text-[2.4rem] font-bold sm:text-[3rem]">
               <span className="">반가워요!</span>
               <span className="">어떤 분인지 알려주세요!</span>
             </div>
@@ -249,7 +249,7 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
                   </div>
                 </div>
                 <div className="flex flex-col gap-[2rem]">
-                  <div className="flex gap-[0.6rem]">
+                  <div className="flex flex-wrap gap-[0.6rem]">
                     {positions.map((pos) => (
                       <BaseChip
                         variant="filled"
@@ -320,12 +320,12 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
               />
             </div>
           </div>
-          <div className="flex w-full justify-center pb-[3.8rem]">
+          <div className="flex w-full justify-center pb-[2.4rem] sm:pb-[3.8rem]">
             <BaseButton
               type="submit"
               size="xl"
               disabled={!isValid}
-              className="w-[25rem]"
+              className="w-full sm:w-[25rem]"
             >
               완료
             </BaseButton>
