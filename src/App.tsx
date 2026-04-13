@@ -44,7 +44,7 @@ function App() {
   }
 
   return (
-    <div className="flex min-h-screen w-full min-w-[144rem]">
+    <div className="flex min-h-screen w-full">
       <Sidebar />
       <main className="mx-auto w-full min-w-0">
         <Outlet />

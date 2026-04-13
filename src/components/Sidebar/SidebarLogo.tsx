@@ -9,9 +9,11 @@ import ChevronDoubleLeftIcon from '../../assets/icons/normal/chevron/ic_chevronD
 const SidebarLogo = ({
   isFolded,
   onToggle,
+  showToggle = true,
 }: {
   isFolded: boolean;
   onToggle: () => void;
+  showToggle?: boolean;
 }) => {
   return (
     <div
@@ -32,20 +34,22 @@ const SidebarLogo = ({
         </div>
       )}
 
-      <button
-        onClick={onToggle}
-        className={`${
-          isFolded
-            ? 'absolute left-[7.3rem] top-[0.9rem] z-10 flex h-[3rem] w-[3rem] items-center justify-center rounded-full border border-solid border-black-20 bg-black-5 hover:bg-black-20'
-            : 'h-[1.6rem] w-[1.6rem]'
-        }`}
-      >
-        {isFolded ? (
-          <ChevronDoubleRightIcon className="h-[1.6rem] w-[1.6rem] text-black-60" />
-        ) : (
-          <ChevronDoubleLeftIcon className="h-[1.6rem] w-[1.6rem] text-black-60" />
-        )}
-      </button>
+      {showToggle && (
+        <button
+          onClick={onToggle}
+          className={`${
+            isFolded
+              ? 'absolute left-[7.3rem] top-[0.9rem] z-10 flex h-[3rem] w-[3rem] items-center justify-center rounded-full border border-solid border-black-20 bg-black-5 hover:bg-black-20'
+              : 'h-[1.6rem] w-[1.6rem]'
+          }`}
+        >
+          {isFolded ? (
+            <ChevronDoubleRightIcon className="h-[1.6rem] w-[1.6rem] text-black-60" />
+          ) : (
+            <ChevronDoubleLeftIcon className="h-[1.6rem] w-[1.6rem] text-black-60" />
+          )}
+        </button>
+      )}
     </div>
   );
 };

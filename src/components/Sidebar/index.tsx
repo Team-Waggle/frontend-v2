@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../stores/authStore';
+import { useBreakpoint } from '../../hooks/useBreakpoint';
 import LoginModal from '../Modal/LoginModal';
 import BaseButton from '../common/Button';
 import IconWrapper from '../common/IconWrapper';
@@ -26,8 +27,16 @@ const Sidebar = () => {
   const { data: myData } = useGetUserMe();
   const { data: myteamData } = useGetUserMeTeam();
 
+  const breakpoint = useBreakpoint();
+  const isDesktop = breakpoint === 'desktop';
+
   const [isFolded, setIsFolded] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  // 모바일/태블릿에서는 항상 접힌 상태 유지
+  useEffect(() => {
+    if (!isDesktop) setIsFolded(true);
+  }, [isDesktop]);
 
   const accessToken = useAuthStore((state) => state.accessToken);
   const isLoggedIn = !!accessToken;
@@ -45,6 +54,7 @@ const Sidebar = () => {
         <SidebarLogo
           isFolded={isFolded}
           onToggle={() => setIsFolded(!isFolded)}
+          showToggle={isDesktop}
         />
 
         {/* middle content */}
