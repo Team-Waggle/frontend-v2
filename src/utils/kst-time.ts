@@ -80,6 +80,18 @@ export const formatKstYyMmDdHm = (utcIso: string): string => {
   return `${yy}.${mm}.${dd} ${hh}:${min}`;
 };
 
+// UTC -> KST 기준 YYYY.MM.DD 로 변환
+export const formatKstYyyyMmDd = (utcIso: string): string => {
+  const utcMs = parseUtcIsoToMs(utcIso);
+  const { year, month, day } = utcMsToKstParts(utcMs);
+
+  const yyyy = year;
+  const mm = pad2(month);
+  const dd = pad2(day);
+
+  return `${yyyy}.${mm}.${dd}`;
+};
+
 /**
  *
  * 모집글 목록 createdAt 표시 규칙
