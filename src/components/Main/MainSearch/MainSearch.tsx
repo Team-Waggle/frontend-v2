@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import useHorizontalScroll from '../../../hooks/useHorizontalScroll';
+import { useBreakpoint } from '../../../hooks/useBreakpoint';
 import type { PostsSort } from '../../../types/api/posts';
 
 import { POSITION_CONVERTER } from '../../../utils/position';
@@ -9,6 +10,8 @@ import { SKILL_MAP } from '../../../constants/skillMap';
 import IcBusinessBag from '../../../../src/assets/icons/normal/ic_businessBag.svg?react';
 import IcFolder from '../../../../src/assets/icons/normal/ic_folder.svg?react';
 import IcRefresh from '../../../../src/assets/icons/normal/ic_refresh.svg?react';
+import IcSearch from '../../../../src/assets/icons/normal/ic_normal_search.svg?react';
+import IcFilter from '../../../../src/assets/icons/normal/ic_filter.svg?react';
 import ChevronLeft from '../../../assets/icons/normal/chevron/ic_chevronLeft.svg?react';
 import ChevronRight from '../../../assets/icons/normal/chevron/ic_chevronRight.svg?react';
 
@@ -22,6 +25,7 @@ import SearchKeywordOverlay from './SearchKeywordOverlay';
 import SearchSkillSelectBox from './SearchSkillSelectBox';
 import SearchJobSelectBox from './SearchJobSelectBox';
 import IconWrapper from '../../common/IconWrapper';
+
 
 /**
  *
@@ -64,6 +68,10 @@ const MainSearch = ({
   const [selectedJobs, setSelectedJobs] = useState<Job[]>([]);
   const [selectedSkills, setSelectedSkills] = useState<Skill[]>([]);
   const [keyword, setKeyword] = useState('');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  const breakpoint = useBreakpoint();
+  const isMobile = breakpoint === 'mobile';
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -172,6 +180,7 @@ const MainSearch = ({
     });
 
     setOpenMenu(null);
+    if (isMobile) setIsFilterOpen(false);
   };
 
   const onReset = () => {
@@ -189,6 +198,7 @@ const MainSearch = ({
   };
 
   const hasKeyword = keyword.trim().length > 0;
+  const filterCount = selectedJobs.length + selectedSkills.length;
 
   const searchTags = useMemo<SearchTagItem[]>(() => {
     const jobTags = selectedJobs.map((j) => ({
@@ -222,8 +232,166 @@ const MainSearch = ({
       deps: [searchTags.length],
     });
 
+  // 모바일 레이아웃
+  if (isMobile) {
+    return (
+      <div className="flex w-full flex-col items-start gap-[1.6rem] pt-[2.4rem]">
+        {/* 검색바 한 줄: 키워드 입력 + 필터 + 리셋 */}
+        <div
+          ref={containerRef}
+          className="relative flex w-full items-center gap-[0.8rem]"
+        >
+          <div className="flex h-[4.4rem] min-w-0 flex-1 items-center gap-[0.8rem] rounded-[0.8rem] border border-solid border-black-30 bg-white px-[1.2rem]">
+            <IcSearch className="h-[2rem] w-[2rem] shrink-0 text-black-50" />
+            <input
+              type="text"
+              className={`w-full text-[1.4rem] font-semibold outline-none ${
+                hasKeyword ? 'text-blue-100' : 'text-black-50'
+              }`}
+              onChange={(e) => setKeyword(e.target.value)}
+              onFocus={() => setOpenMenu('keyword')}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') applyFilters();
+              }}
+              value={keyword}
+              placeholder="검색어를 입력해주세요."
+            />
+          </div>
+
+          {/* 필터 버튼 */}
+          <button
+            type="button"
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            className={`relative flex h-[4.4rem] w-[4.4rem] shrink-0 items-center justify-center rounded-[0.8rem] border border-solid ${
+              isFilterOpen || filterCount > 0
+                ? 'border-blue-80 bg-blue-5'
+                : 'border-black-30 bg-white'
+            }`}
+          >
+            <IcFilter
+              className={`h-[2rem] w-[2rem] ${
+                isFilterOpen || filterCount > 0
+                  ? 'text-blue-80'
+                  : 'text-black-50'
+              }`}
+            />
+            {filterCount > 0 && (
+              <span className="absolute -right-[0.4rem] -top-[0.4rem] flex h-[1.6rem] w-[1.6rem] items-center justify-center rounded-full bg-blue-80 text-[1rem] font-bold text-white">
+                {filterCount}
+              </span>
+            )}
+          </button>
+
+          {/* 리셋 */}
+          <button
+            type="button"
+            onClick={(e) => {
+              onReset();
+              setIsFilterOpen(false);
+              const icon = e.currentTarget.querySelector('svg');
+              if (!icon) return;
+              icon.classList.remove('spin-once');
+              void icon.getBoundingClientRect();
+              icon.classList.add('spin-once');
+            }}
+            className="flex h-[4.4rem] w-[4.4rem] shrink-0 items-center justify-center rounded-[0.8rem] border border-solid border-black-30 bg-white"
+          >
+            <IcRefresh className="text-black-50 transition-none" />
+          </button>
+
+          {openMenu === 'keyword' && (
+            <SearchKeywordOverlay
+              value={keyword}
+              onChange={setKeyword}
+              onSearch={applyFilters}
+            />
+          )}
+        </div>
+
+        {/* 필터 패널 (접이식) */}
+        {isFilterOpen && (
+          <div
+            ref={containerRef}
+            className="relative flex w-full flex-col gap-[0.8rem]"
+          >
+            <div className="relative flex">
+              <MainSearchSelectField
+                variant="job"
+                isSelected={selectedJobs.length > 0}
+                icon={<IcBusinessBag />}
+                valueLabel={jobLabel}
+                isOpen={openMenu === 'job'}
+                onToggle={() => toggleMenu('job')}
+                suppressRightBorder={false}
+                hasKeyword={hasKeyword}
+                className="!h-[4.4rem] !rounded-[0.8rem] !border"
+              />
+              {openMenu === 'job' && (
+                <SearchJobSelectBox
+                  values={selectedJobs.map((j) => j.label)}
+                  onToggle={onToggleJob}
+                />
+              )}
+            </div>
+
+            <div className="relative flex">
+              <MainSearchSelectField
+                variant="skill"
+                isSelected={selectedSkills.length > 0}
+                icon={<IcFolder />}
+                valueLabel={skillLabel}
+                isOpen={openMenu === 'skill'}
+                onToggle={() => toggleMenu('skill')}
+                hasKeyword={hasKeyword}
+                className="!h-[4.4rem] !rounded-[0.8rem] !border"
+              />
+              {openMenu === 'skill' && (
+                <SearchSkillSelectBox
+                  selectedSkills={selectedSkills}
+                  onToggleSkill={onToggleSkill}
+                />
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={applyFilters}
+              className="flex h-[4.4rem] w-full items-center justify-center rounded-[0.8rem] bg-blue-80 hover:bg-hover-80"
+            >
+              <span className="text-[1.4rem] font-bold text-white">
+                필터 적용
+              </span>
+            </button>
+          </div>
+        )}
+
+        {/* 태그 + 정렬 */}
+        <div className="flex items-center justify-between self-stretch">
+          <div className="relative min-w-0 flex-1 self-stretch overflow-hidden">
+            <div
+              ref={trackRef}
+              className="flex h-full min-w-0 items-center gap-[0.8rem] overflow-x-auto scroll-smooth scrollbar-hide"
+            >
+              {searchTags.map((t) => (
+                <div key={`${t.type}-${t.id}`} data-search-tag="true">
+                  <MainSearchTag
+                    TagTitle={t.title}
+                    onRemove={() => removeSearchTag(t)}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <MainSearchSelectText sort={sort} onChangeSort={onChangeSort} />
+        </div>
+      </div>
+    );
+  }
+
+  // 태블릿 + 데스크톱 레이아웃 (기존)
   return (
-    <div className="flex w-full max-w-[152.6rem] flex-col items-start gap-[2rem] pt-[5.4rem]">
+    <div className="flex w-full max-w-[152.6rem] flex-col items-start gap-[2rem] pt-[3.6rem] lg:pt-[5.4rem]">
       <div className="flex h-[5rem] items-center gap-[2.4rem] self-stretch max-1440:w-full">
         <div className="flex min-w-0 flex-1 items-center self-stretch">
           <div ref={containerRef} className="relative min-w-0 flex-1">

@@ -100,7 +100,7 @@ const MainPage = () => {
   return (
     <>
       <div className="flex w-full justify-center">
-        <div className="flex w-full max-w-[152.6rem] flex-col gap-[5.6rem] px-[4.8rem]">
+        <div className="flex w-full max-w-[152.6rem] flex-col gap-[3.2rem] px-[1.6rem] sm:gap-[4rem] sm:px-[2.4rem] lg:gap-[5.6rem] lg:px-[4.8rem]">
           <div className="flex w-full flex-col items-start gap-[2rem]">
             <MainSearch
               sort={sort}
@@ -112,7 +112,7 @@ const MainPage = () => {
           {posts.length === 0 ? (
             <PostEmptyPage className="max-1440:h-[45.6rem] max-1440:max-w-[104.8rem]" title="등록된 모집글이 없습니다." subTitle="새로운 팀원을 찾아보세요!" btnText="모집글 작성" onBtnClick={() => navigate('/post/new')} />
           ) : (
-            <div className="inline-grid w-full max-w-[152.6rem] auto-rows-max grid-cols-[repeat(auto-fill,minmax(33.6rem,1fr))] gap-x-[1.8rem] gap-y-[1.8rem] max-1440:max-w-full">
+            <div className="inline-grid w-full max-w-[152.6rem] auto-rows-max grid-cols-1 gap-x-[1.8rem] gap-y-[1.8rem] sm:grid-cols-[repeat(auto-fill,minmax(28rem,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(33.6rem,1fr))] max-1440:max-w-full">
               {posts.map((post: PostDetailResponse) => {
                 const positionList: string[] = Array.from(
                   new Set(

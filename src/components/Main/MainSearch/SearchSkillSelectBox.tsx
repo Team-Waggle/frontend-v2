@@ -20,7 +20,7 @@ const SearchSkillSelectBox = ({
   const selectedSet = new Set(selectedSkills.map((s) => s.id));
 
   return (
-    <div className="absolute left-0 top-[calc(5rem+0.8rem)] z-[20]">
+    <div className="absolute left-0 right-0 top-[calc(4.4rem+0.4rem)] z-[20] sm:right-auto sm:top-[calc(5rem+0.8rem)]">
       <div className="flex flex-wrap content-start items-start gap-[0.8rem] self-stretch rounded-[0.8rem] border border-solid border-[#237BFF] bg-white p-[1.8rem] shadow-search-select-box">
         {allSkills.map((label) => {
           const id = SKILL_MAP[label as keyof typeof SKILL_MAP];

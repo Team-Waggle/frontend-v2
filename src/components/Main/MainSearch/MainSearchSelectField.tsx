@@ -16,6 +16,7 @@ type MainSearchSelectFieldProps = {
   suppressRightBorder?: boolean;
   disabled?: boolean;
   hasKeyword?: boolean;
+  className?: string;
 };
 
 const MainSearchSelectField = ({
@@ -28,6 +29,7 @@ const MainSearchSelectField = ({
   suppressRightBorder = false,
   disabled = false,
   hasKeyword = false,
+  className,
 }: MainSearchSelectFieldProps) => {
   const baseCommon =
     'flex-1 flex min-w-0 h-[5rem] px-[2rem] items-center gap-[1rem] border-solid bg-white';
@@ -73,7 +75,7 @@ const MainSearchSelectField = ({
       disabled={disabled}
       className={`${baseCommon} ${baseVariant} ${
         isOpen ? openClass : `${borderColorClass} ${textColorClass}`
-      } ${suppressRightBorder ? 'border-r-0' : ''}`}
+      } ${suppressRightBorder ? 'border-r-0' : ''} ${className ?? ''}`}
     >
       <div className="flex h-[2rem] w-[2rem] items-center justify-center">
         {icon}
