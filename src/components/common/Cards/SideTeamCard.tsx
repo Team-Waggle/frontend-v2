@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import BaseButton from '../Button/index';
 
@@ -15,7 +16,7 @@ import { SkillIcon } from '../../../utils/SkillIcon';
 import { toSkillLabel } from '../../../utils/skill';
 
 interface SideTeamCardProps {
-  memberId?: number;
+  memberId?: number | string;
   title?: string;
   position?: string;
   profileImageUrl?: string;
@@ -112,6 +113,8 @@ const SideTeamCard = ({
   onAssignManager,
   onKickMember,
 }: SideTeamCardProps) => {
+  const navigate = useNavigate();
+
   const skillsIcon = Array.from(
     new Set(
       skills
@@ -201,11 +204,11 @@ const SideTeamCard = ({
                 >
                   <SelectBox
                     onAssignManager={() => {
-                      onAssignManager?.(memberId!);
+                      onAssignManager?.(Number(memberId!));
                       setIsSelectBoxOpen(false);
                     }}
                     onKickMember={() => {
-                      onKickMember?.(memberId!);
+                      onKickMember?.(Number(memberId!));
                       setIsSelectBoxOpen(false);
                     }}
                   />
@@ -254,7 +257,13 @@ const SideTeamCard = ({
         </div>
       </div>
       {variant === 'post' && (
-        <BaseButton size="md" color="secondary" children="문의하기" />
+        <BaseButton
+          size="md"
+          color="secondary"
+          onClick={() => navigate(`/message/${memberId}`)}
+        >
+          문의하기
+        </BaseButton>
       )}
 
       {variant === 'team' && status === "COMPLETED" && (

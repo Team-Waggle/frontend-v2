@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { useGetPostDetail } from '../hooks/usePost';
+import { useGetPostDetail, usePatchPostClose } from '../hooks/usePost';
 import { useGetUserMe } from '../hooks/useUser';
 import usePostDetailApplyButtonPosition from '../hooks/usePostDetailApplyButtonPosition';
 import usePostDetailFloatingSideCard from '../hooks/usePostDetailFloatingSideCard';
@@ -73,6 +73,8 @@ const PostDetailPage = () => {
 
   const { data: postDetail } = useGetPostDetail(parsedPostId);
   const { data: me } = useGetUserMe();
+  const { mutate: patchPostClose, isPending: isClosing } =
+    usePatchPostClose();
 
   const leftColRef = useRef<HTMLDivElement | null>(null);
   const sideWrapRef = useRef<HTMLDivElement | null>(null);
@@ -247,10 +249,22 @@ const PostDetailPage = () => {
         {/** 작성자 기준 화면: 마감하기, 수정하기 버튼 */}
         {isMyPost && (
           <div className="flex w-[32rem] items-start gap-[1.2rem] pb-[6.6rem] pt-[1.2rem]">
-            <BaseButton size="lg" color="secondary">
+            <BaseButton
+              size="lg"
+              color="secondary"
+              disabled={!postDetail?.isRecruiting || isClosing}
+              onClick={() =>
+                patchPostClose({ postId: parsedPostId, status: 'CLOSED' })
+              }
+            >
               마감하기
             </BaseButton>
-            <BaseButton size="lg" color="primary">
+            <BaseButton
+              size="lg"
+              color="primary"
+              disabled={!postDetail?.isRecruiting}
+              onClick={() => navigate(`/post/${parsedPostId}/edit`)}
+            >
               수정하기
             </BaseButton>
           </div>
@@ -261,7 +275,7 @@ const PostDetailPage = () => {
       <div className="flex self-start pt-[17.8rem]">
         <div ref={sideWrapRef} className="self-start will-change-transform">
           <SideTeamCard
-            memberId={Number(postDetail?.user?.userId ?? 0)}
+            memberId={postDetail?.user?.userId}
             title={postDetail?.user?.username}
             position={postDetail?.user?.position}
             profileImageUrl={postDetail?.user?.profileImageUrl}
