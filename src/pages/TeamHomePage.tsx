@@ -66,7 +66,9 @@ const TeamHomePage = () => {
 
   const sortedMembers = useMemo(() => {
     const visibleMembers = myMember
-      ? members
+      ? myMember.deletedAt
+        ? members.filter((m) => !m.deletedAt || m.userId === me?.userId)
+        : members
       : members.filter((m) => !m.deletedAt);
 
     if (!me?.userId) {
