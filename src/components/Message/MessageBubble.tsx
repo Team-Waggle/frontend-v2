@@ -1,17 +1,40 @@
 import IcProfileImg from '../../assets/icons/image/ic_character_circle_gray_60.svg?react';
+import type { OptimisticMessage } from '../../types/api/message';
 
-interface MessageBubbleProps {
-  isMine: boolean;
+type MessageBubbleProps =
+  | {
+      isMine: true;
+      messages: string[];
+      time: string;
+      profileImageUrl?: string | null;
+      variant?: 'default' | 'modal';
+      optimistic?: OptimisticMessage;
+    }
+  | {
+      isMine: false;
+      messages: string[];
+      time: string;
+      profileImageUrl?: string | null;
+      variant?: 'default' | 'modal';
+      optimistic?: never;
+    };
+
+const MyBubble = ({
+  messages,
+  time,
+  variant = 'default',
+  optimistic,
+}: {
   messages: string[];
   time: string;
-  profileImage?: string;
   variant?: 'default' | 'modal';
-}
-
-const MyBubble = ({ messages, time, variant = 'default' }: { messages: string[]; time: string; variant?: 'default' | 'modal' }) => {
+  optimistic?: OptimisticMessage;
+}) => {
   const isConsecutive = messages.length > 1;
   const maxW = variant === 'modal' ? 'max-w-[23.6rem]' : 'max-w-[36rem]';
   const textSize = variant === 'modal' ? 'text-[1.4rem]' : 'text-[1.6rem]';
+  const isFailed = optimistic?.status === 'failed';
+  const isSending = optimistic?.status === 'sending';
 
   return (
     <div className="flex flex-col items-end justify-center gap-[1rem] self-stretch py-[0.8rem]">
@@ -28,12 +51,23 @@ const MyBubble = ({ messages, time, variant = 'default' }: { messages: string[];
               >
                 <div className="flex items-end gap-[1rem]">
                   {isLast && (
-                    <span className="text-[1.2rem] font-[500] leading-[1.5] tracking-[-0.024rem] text-black-50">
-                      {time}
-                    </span>
+                    <div className="flex flex-col items-end gap-[0.2rem]">
+                      {isFailed && (
+                        <span className="text-[1rem] font-[500] text-red-500">전송 실패</span>
+                      )}
+                      <span
+                        className={`text-[1.2rem] font-[500] leading-[1.5] tracking-[-0.024rem] ${isSending ? 'text-black-30' : 'text-black-50'}`}
+                      >
+                        {isSending ? '전송 중...' : time}
+                      </span>
+                    </div>
                   )}
-                  <div className={`flex ${maxW} items-center gap-[1rem] rounded-[1rem] bg-blue-10 p-[1rem]`}>
-                    <span className={`${textSize} font-[500] leading-[1.5] tracking-[-0.032rem] text-black-100`}>
+                  <div
+                    className={`flex ${maxW} items-center gap-[1rem] rounded-[1rem] p-[1rem] ${isFailed ? 'bg-red-50' : 'bg-blue-10'}`}
+                  >
+                    <span
+                      className={`${textSize} font-[500] leading-[1.5] tracking-[-0.032rem] text-black-100`}
+                    >
                       {message}
                     </span>
                   </div>
@@ -50,11 +84,12 @@ const MyBubble = ({ messages, time, variant = 'default' }: { messages: string[];
 const OpponentBubble = ({
   messages,
   time,
+  profileImageUrl,
   variant = 'default',
 }: {
   messages: string[];
   time: string;
-  profileImage?: string;
+  profileImageUrl?: string | null;
   variant?: 'default' | 'modal';
 }) => {
   const isConsecutive = messages.length > 1;
@@ -65,7 +100,15 @@ const OpponentBubble = ({
   return (
     <div className="flex flex-col items-start gap-[1rem] self-stretch">
       <div className="inline-flex items-end gap-[0.8rem] px-[1.2rem] py-[0.8rem]">
-        <IcProfileImg className={profileSize} />
+        {profileImageUrl ? (
+          <img
+            src={profileImageUrl}
+            alt="프로필"
+            className={`${profileSize} flex-shrink-0 rounded-full object-cover`}
+          />
+        ) : (
+          <IcProfileImg className={`${profileSize} rounded-full flex-shrink-0`} />
+        )}
         <div
           className={`flex flex-col items-start justify-center ${isConsecutive ? 'gap-[0.2rem]' : 'gap-[1rem] py-[0.4rem]'}`}
         >
@@ -77,8 +120,12 @@ const OpponentBubble = ({
                 className="flex flex-col items-start justify-center gap-[1rem] py-[0.4rem]"
               >
                 <div className={`flex items-end gap-[1rem] ${isLast ? 'self-stretch' : ''}`}>
-                  <div className={`flex ${maxW} items-center gap-[1rem] rounded-[1rem] bg-black-10 p-[1rem]`}>
-                    <span className={`${textSize} font-[500] leading-[1.5] tracking-[-0.032rem] text-black-100`}>
+                  <div
+                    className={`flex ${maxW} items-center gap-[1rem] rounded-[1rem] bg-black-10 p-[1rem]`}
+                  >
+                    <span
+                      className={`${textSize} font-[500] leading-[1.5] tracking-[-0.032rem] text-black-100`}
+                    >
                       {message}
                     </span>
                   </div>
@@ -97,11 +144,24 @@ const OpponentBubble = ({
   );
 };
 
-const MessageBubble = ({ isMine, messages, time, profileImage, variant }: MessageBubbleProps) => {
-  return isMine ? (
-    <MyBubble messages={messages} time={time} variant={variant} />
-  ) : (
-    <OpponentBubble messages={messages} time={time} profileImage={profileImage} variant={variant} />
+const MessageBubble = (props: MessageBubbleProps) => {
+  if (props.isMine) {
+    return (
+      <MyBubble
+        messages={props.messages}
+        time={props.time}
+        variant={props.variant}
+        optimistic={props.optimistic}
+      />
+    );
+  }
+  return (
+    <OpponentBubble
+      messages={props.messages}
+      time={props.time}
+      profileImageUrl={props.profileImageUrl}
+      variant={props.variant}
+    />
   );
 };
 
