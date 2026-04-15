@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Outlet, ScrollRestoration } from 'react-router-dom';
+import { Outlet, ScrollRestoration, useMatch } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 import { usePostRefresh } from './hooks/useAuth';
+import { useStompClient } from './hooks/useStompClient';
 import Sidebar from './components/Sidebar';
 import FloatingMessageButton from './components/Message/FloatingMessageButton';
 
 function App() {
   const { mutateAsync: silentRefresh } = usePostRefresh();
+  const messageMatch = useMatch('/message/:partnerId');
+  useStompClient(messageMatch?.params?.partnerId);
 
   const { accessToken, isProfileComplete } = useAuthStore();
   const [isInitializing, setIsInitializing] = useState(true);
@@ -45,9 +48,9 @@ function App() {
   }
 
   return (
-    <div className="flex min-h-screen w-full min-w-[144rem]">
+    <div className="flex h-screen min-h-screen w-full min-w-[144rem]">
       <Sidebar />
-      <main className="mx-auto w-full min-w-0">
+      <main className="mx-auto flex h-full w-full min-w-0 flex-col">
         <Outlet />
       </main>
       <FloatingMessageButton />
