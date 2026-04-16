@@ -37,12 +37,14 @@ export type PositionType =
   | 'ANDROID'
   | 'DEVOPS'
   | 'PLANNER'
-  | 'MARKETER';
+  | 'MARKETER'
+  | 'OTHER';
 
 export type PostUser = {
   userId: string;
   username: string;
   email: string;
+  temperature: number;
   profileImageUrl: string;
   position: PositionType;
   skills: string[];
@@ -90,6 +92,13 @@ export type GetPostsParams = {
   cursor?: number;
   size?: number;
   sort?: PostsSort;
+};
+
+export type ApplyRequest = {
+  postId: number;
+  position: string;
+  detail: string;
+  portfolioUrls: string[];
 };
 
 export type GetPostsResponse = PageResponse<PostDetailResponse>;

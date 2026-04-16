@@ -1,5 +1,6 @@
-import { useNavigate } from 'react-router';
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
+import Notifications from '../Notifications';
 import { useAuthStore } from '../../stores/authStore';
 import LoginModal from '../Modal/LoginModal';
 import BaseButton from '../common/Button';
@@ -9,6 +10,7 @@ import {
   useGetUserMe,
   useGetUserMeTeam,
 } from '../../hooks/useUser';
+import { useModal } from '../../hooks/useModal';
 
 // Sidebar Components
 import SidebarLogo from './SidebarLogo';
@@ -28,16 +30,22 @@ const Sidebar = () => {
 
   const [isFolded, setIsFolded] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   const accessToken = useAuthStore((state) => state.accessToken);
   const isLoggedIn = !!accessToken;
 
   const isProfileComplete = isLoggedIn && isProfileCompleteData?.isComplete;
 
+  useModal({
+    isOpen: isNotificationOpen,
+    onClose: () => setIsNotificationOpen(false),
+  });
+
   return (
     <>
       <aside
-        className={`flex flex-col gap-[1.6rem] border-r border-black-20 bg-black-5 pt-[2.8rem] ${
+        className={`z-50 flex flex-col gap-[1.6rem] border-r border-black-20 bg-black-5 pt-[2.8rem] ${
           isFolded ? 'w-[8.8rem]' : 'w-[29.8rem]'
         }`}
       >
@@ -61,7 +69,12 @@ const Sidebar = () => {
               <IconWrapper
                 onClick={() => {
                   if (!isLoggedIn) setIsLoginModalOpen(true);
-                  navigate('/post/new');
+                  if (myteamData?.length === 0) {
+                    navigate('/team/new');
+                  }
+                  if (myteamData && myteamData?.length >= 1) {
+                    navigate('/post/new');
+                  }
                 }}
               >
                 {isLoggedIn ? <PencilIcon /> : <LogInIcon />}
@@ -105,6 +118,8 @@ const Sidebar = () => {
             isFolded={isFolded}
             teamData={isProfileComplete ? (myteamData ?? []) : []}
             userId={myData?.userId}
+            isNotificationOpen={isNotificationOpen}
+            setIsNotificationOpen={setIsNotificationOpen}
           />
         </div>
 
@@ -134,6 +149,12 @@ const Sidebar = () => {
           </div>
         )}
       </aside>
+      {isNotificationOpen && (
+        <Notifications
+          isFolded={isFolded}
+          onClose={() => setIsNotificationOpen(false)}
+        />
+      )}
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
