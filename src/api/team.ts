@@ -7,9 +7,16 @@ import {
   MEMBER_URL,
   TEAMS_APPLICATION_URL,
   TEAMS_STATUS_URL,
+  APPLICATION_READ_URL,
+  APPLICATION_STATUS_URL,
 } from '../constants/endpoint';
-import type { TeamResponse, MemberResponse } from '../types/api/team';
-import type { PostDetailResponse } from '../types/api/posts';
+import type {
+  TeamResponse,
+  MemberResponse,
+  CursorResponseApplicantResponse,
+  GetApplicationsParams,
+} from '../types/api/team';
+import type { ApplyRequest, PostDetailResponse } from '../types/api/posts';
 import axiosInstance from './axiosInstance';
 
 // 팀 생성
@@ -35,9 +42,35 @@ export const GetTeamDetail = async (teamId: number) => {
 };
 
 // 팀 지원 목록 조회
-export const GetTeamApplications = async (teamId: number) => {
-  const { data } = await axiosInstance.get<PostDetailResponse[]>(
+export const GetTeamApplications = async ({
+  teamId,
+  postId,
+  cursor,
+  size = 9,
+  direction,
+}: GetApplicationsParams) => {
+  const { data } = await axiosInstance.get<CursorResponseApplicantResponse>(
     TEAMS_APPLICATION_URL(teamId),
+    {
+      params: {
+        postId: postId ?? undefined,
+        cursor,
+        size,
+        direction,
+      },
+    },
+  );
+  return data;
+};
+
+// 팀 지원
+export const PostTeamApplications = async (
+  teamId: number,
+  postData: ApplyRequest,
+) => {
+  const { data } = await axiosInstance.post(
+    TEAMS_APPLICATION_URL(teamId),
+    postData,
   );
   return data;
 };
@@ -80,5 +113,25 @@ export const patchTeamStatus = async (teamId: number, status: string) => {
   const { data } = await axiosInstance.patch(TEAMS_STATUS_URL(teamId), {
     status,
   });
+  return data;
+};
+
+// 팀 지원 읽음 처리
+export const postTeamApplicationRead = async (applicationId: number) => {
+  const { data } = await axiosInstance.post(
+    APPLICATION_READ_URL(applicationId),
+  );
+  return data;
+};
+
+// 팀 지원 상태 변경
+export const patchTeamApplicationStatus = async (
+  applicationId: number,
+  status: string,
+) => {
+  const { data } = await axiosInstance.patch(
+    APPLICATION_STATUS_URL(applicationId),
+    { status },
+  );
   return data;
 };
