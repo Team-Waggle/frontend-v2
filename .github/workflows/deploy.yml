@@ -40,6 +40,7 @@ jobs:
         run: npm run build
         env:
           VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
+          VITE_WS_URL: ${{ secrets.VITE_WS_URL }}
 
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
