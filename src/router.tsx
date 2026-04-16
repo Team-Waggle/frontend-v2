@@ -18,6 +18,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import TeamStatusPage from './pages/TeamStatusPage';
 import MyPage from './pages/MyPage';
 import ProfileRedirect from './components/Profile/ProfileRedirect';
+import MessagePage from './pages/MessagePage';
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -35,6 +36,8 @@ export const router = createBrowserRouter(
         <Route path="/post/:postId" element={<PostDetailPage />} />
         <Route path="/profile" element={<ProfileRedirect />} />
         <Route path="/profile/:userId" element={<MyPage />} />
+        <Route path="/message" element={<MessagePage />} />
+        <Route path="/message/:partnerId" element={<MessagePage />} />
       </Route>
       <Route path="/oauth/callback" element={<LoginPage />} />
       <Route path="*" element={<NotFoundPage />} />
@@ -46,4 +49,3 @@ export const router = createBrowserRouter(
 // 내팀/지원자 관리 /team/:teamId/applicants
 // 내팀/팀상태 관리 /team/:teamId/status
 // 알림 /notification
-// 메시지 /message
