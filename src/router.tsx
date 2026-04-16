@@ -19,6 +19,7 @@ import TeamStatusPage from './pages/TeamStatusPage';
 import MyPage from './pages/MyPage';
 import ProfileRedirect from './components/Profile/ProfileRedirect';
 import MessagePage from './pages/MessagePage';
+import TeamApplicantPage from './pages/TeamApplicantPage';
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -26,12 +27,12 @@ export const router = createBrowserRouter(
       <Route element={<App />}>
         <Route path="/" element={<MainPage />} />
         <Route path="/team/new" element={<TeamNewPage />} />
-        <Route path="/team/:teamId" element={<TeamHomePage />} />
-        <Route
-          path="/team/:teamId/posts"
-          element={<TeamPostManagementPage />}
-        />
-        <Route path="/team/:teamId/status" element={<TeamStatusPage />} />
+        <Route path="/team/:teamId">
+          <Route index element={<TeamHomePage />} />
+          <Route path="posts" element={<TeamPostManagementPage />} />
+          <Route path="applicants" element={<TeamApplicantPage />} />
+          <Route path="status" element={<TeamStatusPage />} />
+        </Route>
         <Route path="/post/new" element={<PostFormPage />} />
         <Route path="/post/:postId" element={<PostDetailPage />} />
         <Route path="/profile" element={<ProfileRedirect />} />
@@ -46,6 +47,4 @@ export const router = createBrowserRouter(
 );
 
 // 내팀/모집글 관리 /team/:teamId/posts
-// 내팀/지원자 관리 /team/:teamId/applicants
-// 내팀/팀상태 관리 /team/:teamId/status
-// 알림 /notification
+// 메시지 /message

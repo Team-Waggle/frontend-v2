@@ -60,6 +60,8 @@ export default {
         'search-select-box':
           '0 2px 16.6px 0 rgba(0, 0, 0, 0.15), 0 1px 4px 0 rgba(0, 0, 0, 0.08)',
         'profile-img': 'inset 0 0 0 1px rgba(14, 14, 15, 0.10)',
+        'applicants-card':
+          '0px 1px 4px 0px rgba(0, 0, 0, 0.08), 0px 2px 18px 0px rgba(0, 0, 0, 0.08)',
       },
       backgroundImage: {
         'team-home-left-slide-background':
