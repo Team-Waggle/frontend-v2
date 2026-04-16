@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
+import BaseTag from '../common/Tag';
 
 // Icons
 import ChevronDownIcon from '../../assets/icons/normal/chevron/ic_chevronDown.svg?react';
@@ -17,6 +18,7 @@ interface SidebarItemProps {
   isActive: boolean;
   onClick?: () => void;
   subItems?: SubItem[];
+  unreadNotificationCount: number;
 }
 
 const SidebarItem = ({
@@ -25,12 +27,14 @@ const SidebarItem = ({
   isActive,
   onClick,
   subItems,
+  unreadNotificationCount,
 }: SidebarItemProps) => {
   const navigate = useNavigate();
   const { teamId } = useParams<{ teamId: string }>();
   const [isOpen, setIsOpen] = useState(false);
 
   const isTeamMenu = label === '내팀';
+  const isNotificationMenu = label === '알림';
   const hasMultipleTeams = subItems && subItems.length > 1;
 
   const dropdownVariants: Variants = {
@@ -92,6 +96,11 @@ const SidebarItem = ({
               {label}
             </span>
           </div>
+          {isNotificationMenu && unreadNotificationCount > 0 && (
+            <BaseTag size="xs" shape="circle" color="blue80">
+              {unreadNotificationCount > 100 ? '100+' : unreadNotificationCount}
+            </BaseTag>
+          )}
 
           {/* 화살표 숨기기 */}
           {isTeamMenu && hasMultipleTeams && (
