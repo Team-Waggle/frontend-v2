@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useLocation } from 'react-router';
 
 import { useGetConversations, useGetMessages, useGetMessagesAfter, useReadConversation } from './useMessage';
 import { useGetUserMe } from './useUser';
@@ -32,6 +33,12 @@ export interface GroupedMessages {
 export const useChatLogic = (partnerId: string, highlight?: string | null) => {
   const queryClient = useQueryClient();
   const { data: me } = useGetUserMe();
+  const location = useLocation();
+  const locationState = location.state as {
+    username?: string;
+    position?: string;
+    profileImageUrl?: string;
+  } | null;
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const prevScrollHeightRef = useRef(0);
@@ -118,12 +125,21 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
       .flatMap((p) => p.data)
       .find((c) => c.partner.userId === partnerId)?.partner;
     if (fromConversations) return fromConversations;
-    return (
+    const fromMessages =
       allMessages.find((m) => m.sender.userId === partnerId)?.sender ??
       allMessages.find((m) => m.receiver.userId === partnerId)?.receiver ??
-      null
-    );
-  }, [conversationsData, allMessages, partnerId]);
+      null;
+    if (fromMessages) return fromMessages;
+    if (locationState?.username) {
+      return {
+        userId: partnerId,
+        username: locationState.username,
+        position: locationState.position ?? null,
+        profileImageUrl: locationState.profileImageUrl ?? null,
+      };
+    }
+    return null;
+  }, [conversationsData, allMessages, partnerId, locationState]);
 
   // 날짜별 그룹핑 / 같은 발신자, 같은 시각 연속 메시지를 하나의 버블로 묶기
   const groupedMessages: GroupedMessages[] = useMemo(() => {

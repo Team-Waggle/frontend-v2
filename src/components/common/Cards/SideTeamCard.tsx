@@ -260,7 +260,11 @@ const SideTeamCard = ({
         <BaseButton
           size="md"
           color="secondary"
-          onClick={() => navigate(`/message/${memberId}`)}
+          onClick={() =>
+            navigate(`/message/${memberId}`, {
+              state: { username: title, position, profileImageUrl },
+            })
+          }
         >
           문의하기
         </BaseButton>
