@@ -2,6 +2,10 @@ import axiosInstance from './axiosInstance';
 import type { UserMeResponse } from '../types/api/user';
 import {
   USERS_CHECK_URL,
+  USERS_ME_NOTIFICATIONS_COUNT_URL,
+  USERS_ME_NOTIFICATIONS_READ_ALL_URL,
+  USERS_ME_NOTIFICATIONS_READ_URL,
+  USERS_ME_NOTIFICATIONS_URL,
   USERS_ME_PRESIGNED_URL,
   USERS_ME_PROFILE_COMPLETION_URL,
   USERS_ME_PROFILE_URL,
@@ -11,7 +15,10 @@ import {
   USERS_TEAMS_URL,
   USERS_URL,
 } from '../constants/endpoint';
-import type { TeamResponse } from '../types/api/team';
+import type {
+  CursorNotificationResponse,
+  TeamResponse,
+} from '../types/api/team';
 
 // 사용자 조회
 export const getUserDetail = async (
@@ -32,6 +39,12 @@ export const getUserCheck = async (username: string) => {
 // 본인 프로필 조회
 export const getUserMe = async () => {
   const { data } = await axiosInstance.get(USERS_ME_URL);
+  return data;
+};
+
+// 회원 탈퇴
+export const deleteUserMe = async () => {
+  const { data } = await axiosInstance.delete(USERS_ME_URL);
   return data;
 };
 
@@ -99,6 +112,36 @@ export const getUserMeTeam = async (): Promise<TeamResponse[]> => {
 export const getUserTeams = async (userId: string): Promise<TeamResponse[]> => {
   const { data } = await axiosInstance.get<TeamResponse[]>(
     USERS_TEAMS_URL(userId),
+  );
+  return data;
+};
+
+// 본인 알림 목록 조회
+export const getNotifications = async () => {
+  const { data } = await axiosInstance.get<CursorNotificationResponse>(
+    USERS_ME_NOTIFICATIONS_URL,
+  );
+  return data;
+};
+
+// 본인 알림 개수 조회
+export const getNotificationsCount = async () => {
+  const { data } = await axiosInstance.get(USERS_ME_NOTIFICATIONS_COUNT_URL);
+  return data;
+};
+
+// 알림 읽음 처리
+export const patchNotificationsRead = async (notificationIds: number[]) => {
+  const { data } = await axiosInstance.patch(USERS_ME_NOTIFICATIONS_READ_URL, {
+    notificationIds,
+  });
+  return data;
+};
+
+// 본인 알림 전체 읽음 처리
+export const patchNotificationsReadAll = async () => {
+  const { data } = await axiosInstance.patch(
+    USERS_ME_NOTIFICATIONS_READ_ALL_URL,
   );
   return data;
 };

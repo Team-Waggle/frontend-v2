@@ -14,6 +14,11 @@ import {
   postUserPresignedUrl,
   putUserProfileImageToS3,
   putUserMe,
+  deleteUserMe,
+  patchNotificationsReadAll,
+  getNotifications,
+  getNotificationsCount,
+  patchNotificationsRead,
 } from '../api/user';
 
 // 사용자 조회
@@ -34,6 +39,13 @@ export const useGetUserMe = () => {
     queryFn: () => getUserMe(),
     enabled: !!isLoggedIn && !!isProfileComplete,
     refetchOnWindowFocus: false,
+  });
+};
+
+// 회원 탈퇴
+export const useDeleteUserMe = () => {
+  return useMutation({
+    mutationFn: deleteUserMe,
   });
 };
 
@@ -97,13 +109,22 @@ export const useUpdateProfileImage = () => {
 export const usePatchTeamVisibility = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ teamId, isVisible }: { teamId: number; isVisible: boolean }) =>
-      patchTeamVisibility(teamId, isVisible),
+    mutationFn: ({
+      teamId,
+      isVisible,
+    }: {
+      teamId: number;
+      isVisible: boolean;
+    }) => patchTeamVisibility(teamId, isVisible),
     onMutate: async ({ teamId, isVisible }) => {
       await queryClient.cancelQueries({ queryKey: ['user-me-team'] });
-      const previous = queryClient.getQueryData<TeamResponse[]>(['user-me-team']);
+      const previous = queryClient.getQueryData<TeamResponse[]>([
+        'user-me-team',
+      ]);
       queryClient.setQueryData<TeamResponse[]>(['user-me-team'], (old) =>
-        old?.map((team) => team.teamId === teamId ? { ...team, isVisible } : team),
+        old?.map((team) =>
+          team.teamId === teamId ? { ...team, isVisible } : team,
+        ),
       );
       return { previous };
     },
@@ -134,5 +155,50 @@ export const useGetUserTeams = (userId: string) => {
     queryFn: () => getUserTeams(userId),
     enabled: !!userId,
     refetchOnWindowFocus: false,
+  });
+};
+
+// 본인 알림 목록 조회
+export const useGetNotifications = () => {
+  return useQuery({
+    queryKey: ['my-notifications'],
+    queryFn: getNotifications,
+    refetchOnWindowFocus: false,
+  });
+};
+
+// 본인 알림 개수 조회
+export const useGetNotificationsCount = () => {
+  return useQuery({
+    queryKey: ['my-notifications-count'],
+    queryFn: getNotificationsCount,
+    refetchOnWindowFocus: false,
+  });
+};
+
+// 본인 알림 읽음 처리
+export const usePatchNotificationsRead = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (notificationIds: number[]) =>
+      patchNotificationsRead(notificationIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['my-notifications', 'my-notifications-count'],
+      });
+    },
+  });
+};
+
+// 본인 알림 전체 읽음 처리
+export const usePatchNotificationsReadAll = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: patchNotificationsReadAll,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['my-notifications', 'my-notifications-count'],
+      });
+    },
   });
 };
