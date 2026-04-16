@@ -80,18 +80,6 @@ export const formatKstYyMmDdHm = (utcIso: string): string => {
   return `${yy}.${mm}.${dd} ${hh}:${min}`;
 };
 
-// UTC -> KST 기준 YYYY.MM.DD 로 변환
-export const formatKstYyyyMmDd = (utcIso: string): string => {
-  const utcMs = parseUtcIsoToMs(utcIso);
-  const { year, month, day } = utcMsToKstParts(utcMs);
-
-  const yyyy = year;
-  const mm = pad2(month);
-  const dd = pad2(day);
-
-  return `${yyyy}.${mm}.${dd}`;
-};
-
 /**
  *
  * 모집글 목록 createdAt 표시 규칙
@@ -157,4 +145,36 @@ export const formatPostDetailCreatedAt = (createdAtUtcIso: string): string => {
 
 export const formatTeamCardCreatedAt = (createdAtUtcIso: string): string => {
   return formatKstYyMmDd(createdAtUtcIso);
+};
+
+// UTC -> KST 기준 대화 목록 시간 표시 (방금 전 / N분 전 / N시간 전 / N일 전 / M/D)
+export const formatConversationTime = (utcIso: string): string => {
+  const createdAtMs = parseUtcIsoToMs(utcIso);
+  const nowMs = Date.now();
+  const diffMs = nowMs - createdAtMs;
+  const diffMin = Math.floor(diffMs / (1000 * 60));
+  const diffH = Math.floor(diffMin / 60);
+  const diffD = Math.floor(diffH / 24);
+
+  if (diffMin < 1) return '방금 전';
+  if (diffMin < 60) return `${diffMin}분 전`;
+  if (diffH < 24) return `${diffH}시간 전`;
+  if (diffD < 7) return `${diffD}일 전`;
+
+  const { month, day } = utcMsToKstParts(createdAtMs);
+  return `${month}/${day}`;
+};
+
+// UTC -> KST 기준 HH:MM 로 변환
+export const formatKstHhMm = (utcIso: string): string => {
+  const utcMs = parseUtcIsoToMs(utcIso);
+  const { hours, minutes } = utcMsToKstParts(utcMs);
+  return `${pad2(hours)}:${pad2(minutes)}`;
+};
+
+// UTC -> KST 기준 YYYY.MM.DD 로 변환
+export const formatKstYyyyMmDd = (utcIso: string): string => {
+  const utcMs = parseUtcIsoToMs(utcIso);
+  const { year, month, day } = utcMsToKstParts(utcMs);
+  return `${year}.${pad2(month)}.${pad2(day)}`;
 };
