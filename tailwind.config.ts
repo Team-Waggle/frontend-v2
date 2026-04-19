@@ -62,6 +62,8 @@ export default {
         'profile-img': 'inset 0 0 0 1px rgba(14, 14, 15, 0.10)',
         'applicants-card':
           '0px 1px 4px 0px rgba(0, 0, 0, 0.08), 0px 2px 18px 0px rgba(0, 0, 0, 0.08)',
+        'message-btn':
+          '0 6px 12px 0 rgba(0, 0, 0, 0.12), 0 4px 8px 0 rgba(0, 0, 0, 0.08), 0 0 4px 0 rgba(0, 0, 0, 0.08)',
       },
       backgroundImage: {
         'team-home-left-slide-background':
