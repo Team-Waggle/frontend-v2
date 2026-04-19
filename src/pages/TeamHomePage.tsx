@@ -198,7 +198,7 @@ const TeamHomePage = () => {
               </div>
             </div>
             <div>
-              <span className="text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black">
+              <span className="break-all text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black">
                 {teamDetail?.description ?? '팀 소개가 들어가는 자리입니다.'}
               </span>
             </div>
