@@ -118,6 +118,10 @@ const TeamHomePage = () => {
     if (workMode === 'OFFLINE') {
       return '오프라인';
     }
+    
+    if (workMode === 'HYBRID') {
+      return '혼합';
+    }
 
     return workMode ?? '온라인';
   };
