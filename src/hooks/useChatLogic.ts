@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'react-router';
 
 import { useGetConversations, useGetMessages, useGetMessagesAfter, useReadConversation } from './useMessage';
-import { useGetUserMe } from './useUser';
+import { useGetUserDetail, useGetUserMe } from './useUser';
 import { TEMP_ID_BASE, useMessageStore } from '../stores/messageStore';
 import type { MessageResponse } from '../types/api/message';
 import { formatKstHhMm, formatKstYyyyMmDd } from '../utils/kst-time';
@@ -33,6 +33,7 @@ export interface GroupedMessages {
 export const useChatLogic = (partnerId: string, highlight?: string | null) => {
   const queryClient = useQueryClient();
   const { data: me } = useGetUserMe();
+  const { data: partnerDetail } = useGetUserDetail(partnerId);
   const location = useLocation();
   const locationState = location.state as {
     username?: string;
@@ -126,8 +127,8 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
       .find((c) => c.partner.userId === partnerId)?.partner;
     if (fromConversations) return fromConversations;
     const fromMessages =
-      allMessages.find((m) => m.sender.userId === partnerId)?.sender ??
-      allMessages.find((m) => m.receiver.userId === partnerId)?.receiver ??
+      allMessages.find((m) => m.sender.userId === partnerId && m.sender.username)?.sender ??
+      allMessages.find((m) => m.receiver.userId === partnerId && m.receiver.username)?.receiver ??
       null;
     if (fromMessages) return fromMessages;
     if (locationState?.username) {
@@ -138,8 +139,16 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
         profileImageUrl: locationState.profileImageUrl ?? null,
       };
     }
+    if (partnerDetail) {
+      return {
+        userId: partnerDetail.userId,
+        username: partnerDetail.username,
+        position: partnerDetail.position ?? null,
+        profileImageUrl: partnerDetail.profileImageUrl ?? null,
+      };
+    }
     return null;
-  }, [conversationsData, allMessages, partnerId, locationState]);
+  }, [conversationsData, allMessages, partnerId, locationState, partnerDetail]);
 
   // 날짜별 그룹핑 / 같은 발신자, 같은 시각 연속 메시지를 하나의 버블로 묶기
   const groupedMessages: GroupedMessages[] = useMemo(() => {

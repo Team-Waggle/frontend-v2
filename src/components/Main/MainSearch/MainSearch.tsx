@@ -64,6 +64,7 @@ const MainSearch = ({
   const [selectedJobs, setSelectedJobs] = useState<Job[]>([]);
   const [selectedSkills, setSelectedSkills] = useState<Skill[]>([]);
   const [keyword, setKeyword] = useState('');
+  const [debouncedKeyword, setDebouncedKeyword] = useState('');
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -163,6 +164,23 @@ const MainSearch = ({
       ),
     );
   };
+
+  // debounce 적용 300ms 동안 추가 입력이 없을 시 API 요청
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedKeyword(keyword);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [keyword]);
+
+  useEffect(() => {
+    onApplyFilters({
+      q: debouncedKeyword.trim(),
+      positions: toApiPositions(selectedJobs),
+      skills: toApiSkills(selectedSkills),
+    });
+  }, [selectedJobs, selectedSkills, debouncedKeyword]);
 
   const applyFilters = () => {
     onApplyFilters({
