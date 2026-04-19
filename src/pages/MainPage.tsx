@@ -9,6 +9,7 @@ import { useGetIsUserProfileComplete } from '../hooks/useUser';
 
 import MainSearch from '../components/Main/MainSearch/MainSearch';
 import OnboardingModal from '../components/Modal/OnboardingModal';
+import LoginModal from '../components/Modal/LoginModal';
 import { formatPostListCreatedAt } from '../utils/kst-time';
 import type { PostDetailResponse } from '../types/api/posts';
 import { useAuthStore } from '../stores/authStore';
@@ -52,8 +53,10 @@ const MainPage = () => {
   });
 
   const { data, isSuccess } = useGetIsUserProfileComplete();
-  const { setProfileComplete } = useAuthStore();
+  const { setProfileComplete, isLoggedIn } = useAuthStore();
   const isOnboardingModalOpen = data?.isComplete === false;
+
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const posts = useMemo<PostDetailResponse[]>(() => {
     const pages = postsData?.pages ?? [];
@@ -110,7 +113,7 @@ const MainPage = () => {
           </div>
 
           {posts.length === 0 ? (
-            <PostEmptyPage className="max-1440:h-[45.6rem] max-1440:max-w-[104.8rem]" title="등록된 모집글이 없습니다." subTitle="새로운 팀원을 찾아보세요!" btnText="모집글 작성" onBtnClick={() => navigate('/post/new')} />
+            <PostEmptyPage className="max-1440:h-[45.6rem] max-1440:max-w-[104.8rem]" title="등록된 모집글이 없습니다." subTitle="새로운 팀원을 찾아보세요!" btnText="모집글 작성" onBtnClick={() => isLoggedIn ? navigate('/post/new') : setIsLoginModalOpen(true)} />
           ) : (
             <div className="inline-grid w-full max-w-[152.6rem] auto-rows-max grid-cols-[repeat(auto-fill,minmax(33.6rem,1fr))] gap-x-[1.8rem] gap-y-[1.8rem] max-1440:max-w-full">
               {posts.map((post: PostDetailResponse) => {
@@ -151,6 +154,7 @@ const MainPage = () => {
       </div>
 
       <OnboardingModal isOpen={isOnboardingModalOpen} onClose={() => {}} />
+      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     </>
   );
 };
