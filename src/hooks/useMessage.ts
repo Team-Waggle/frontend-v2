@@ -27,7 +27,6 @@ export const useGetMessages = (partnerId: string, initialCursor?: number) => {
     getNextPageParam: () => undefined,
     enabled: !!partnerId,
     refetchOnWindowFocus: false,
-    refetchInterval: 3000,
   });
 };
 
