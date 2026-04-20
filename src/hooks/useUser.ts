@@ -42,10 +42,21 @@ export const useGetUserMe = () => {
   });
 };
 
+// 본인 프로필 수정
+export const usePutUserMe = () => {
+  return useMutation({
+    mutationFn: (profileData: object) => putUserMe(profileData),
+  });
+};
+
 // 회원 탈퇴
 export const useDeleteUserMe = () => {
+  const navigate = useNavigate();
   return useMutation({
     mutationFn: deleteUserMe,
+    onSuccess: () => {
+      navigate('/');
+    },
   });
 };
 

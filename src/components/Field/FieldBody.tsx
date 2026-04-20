@@ -8,6 +8,7 @@ import { SkillIcon } from '../../utils/SkillIcon';
 import { positionSkillData } from '../../constants/positionSkill';
 import type { PositionKey } from '../../utils/position';
 import type { TeamResponse } from '../../types/api/team';
+import type { PositionType } from '../../types/api/posts';
 
 // @tiptap
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -72,15 +73,6 @@ interface FieldTeamNameProps {
   onChange: (teamId: number) => void;
 }
 
-export type PositionType =
-  | 'PM'
-  | 'Design'
-  | 'Frontend'
-  | 'Backend'
-  | 'Marketing'
-  | 'etc'
-  | '';
-
 export type RecruitmentsValue = {
   position: PositionKey | null;
   count: number;
@@ -106,28 +98,60 @@ interface FieldTabProps {
 
 export const FieldInput = memo(
   forwardRef<HTMLInputElement, FieldInputProps>(
-    ({ id, error, className, ...props }, ref) => {
+    ({ id, error, maxLength, className, ...props }, ref) => {
+      const isEmpty = !props.value;
+
+      const getByteLength = (str: string) => {
+        return str.split('').reduce((acc: number, char: string) => {
+          return acc + (/[가-힣]/.test(char) ? 3 : 1);
+        }, 0);
+      };
+
+      const byteLength = getByteLength(String(props.value ?? ''));
+
       return (
-        <input
-          ref={ref}
-          id={id}
-          autoComplete="off"
-          className={`h-[6rem] rounded-[0.8rem] border px-[1.8rem] py-[1.7rem] text-[1.6rem] font-medium ${
+        <div
+          className={`flex h-[6rem] items-center rounded-[0.8rem] border px-[1.8rem] py-[1.7rem] ${
             error
               ? 'border-error'
-              : 'border-black-100 placeholder-shown:border-black-30 focus:border-blue-80'
+              : isEmpty
+                ? 'border-black-30 focus-within:border-blue-80'
+                : 'border-black-100 focus-within:border-blue-80'
           } ${className || ''}`}
-          {...props}
-        />
+        >
+          <input
+            ref={ref}
+            id={id}
+            autoComplete="off"
+            className={`w-full text-[1.6rem] font-medium`}
+            {...props}
+          />
+          {maxLength && (
+            <span className="text-[1.4rem] font-medium text-black-60">
+              {byteLength}/{maxLength}
+            </span>
+          )}
+        </div>
       );
     },
   ),
 );
 
+FieldInput.displayName = 'FieldInput';
+
 export const FieldTextarea = memo(
   forwardRef<HTMLTextAreaElement, FieldTextareaProps>(
     ({ id, error, maxLength = 500, className, ...props }, ref) => {
       const [text, setText] = useState('');
+      const isEmpty = !props.value;
+
+      const getByteLength = (str: string) => {
+        return str.split('').reduce((acc: number, char: string) => {
+          return acc + (/[가-힣]/.test(char) ? 3 : 1);
+        }, 0);
+      };
+
+      const byteLength = getByteLength(String(props.value ?? ''));
 
       const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         // Enter 키인지 확인 (Shift + Enter도 막으려면 e.shiftKey 조건 제외)
@@ -141,8 +165,17 @@ export const FieldTextarea = memo(
         const formattedValue = e.target.value.replace(/\n/g, '');
         setText(formattedValue);
       };
+
       return (
-        <div className="flex flex-col items-end gap-[0.4rem]">
+        <div
+          className={`flex flex-col items-end rounded-[0.8rem] border px-[1.8rem] pb-[1rem] pt-[1.7rem] ${
+            error
+              ? 'border-error'
+              : isEmpty
+                ? 'border-black-30 focus-within:border-blue-80'
+                : 'border-black-100 focus-within:border-blue-80'
+          } ${className || ''}`}
+        >
           <textarea
             value={text}
             onKeyDown={handleKeyDown}
@@ -150,15 +183,11 @@ export const FieldTextarea = memo(
             ref={ref}
             id={id}
             maxLength={maxLength}
-            className={`h-[10.8rem] w-full rounded-[0.8rem] border px-[1.8rem] py-[1.7rem] text-[1.6rem] font-medium ${
-              error
-                ? 'border-error'
-                : 'border-black-100 placeholder-shown:border-black-30 focus:border-blue-80'
-            } ${className || ''}`}
+            className={`h-[6rem] w-full text-[1.6rem] font-medium`}
             {...props}
           />
           <span className="text-[1.4rem] font-medium text-black-60">
-            {String(props.value || '').length}/{maxLength}
+            {byteLength}/{maxLength}byte
           </span>
         </div>
       );
@@ -500,43 +529,43 @@ export const FieldPosition = ({ value, onChange }: FieldPositionProps) => {
   return (
     <div className="flex gap-[0.6rem]">
       <BaseChip
-        isSelected={value === 'PM'}
-        onClick={() => handleChange('PM')}
+        isSelected={value === 'PLANNER'}
+        onClick={() => handleChange('PLANNER')}
         className="w-[9.2rem]"
       >
         기획
       </BaseChip>
       <BaseChip
-        isSelected={value === 'Design'}
-        onClick={() => handleChange('Design')}
+        isSelected={value === 'DESIGNER'}
+        onClick={() => handleChange('DESIGNER')}
         className="w-[9.2rem]"
       >
         디자인
       </BaseChip>
       <BaseChip
-        isSelected={value === 'Frontend'}
-        onClick={() => handleChange('Frontend')}
+        isSelected={value === 'FRONTEND'}
+        onClick={() => handleChange('FRONTEND')}
         className="w-[9.2rem]"
       >
         프론트엔드
       </BaseChip>
       <BaseChip
-        isSelected={value === 'Backend'}
-        onClick={() => handleChange('Backend')}
+        isSelected={value === 'BACKEND'}
+        onClick={() => handleChange('BACKEND')}
         className="w-[9.2rem]"
       >
         백엔드
       </BaseChip>
       <BaseChip
-        isSelected={value === 'Marketing'}
-        onClick={() => handleChange('Marketing')}
+        isSelected={value === 'MARKETER'}
+        onClick={() => handleChange('MARKETER')}
         className="w-[9.2rem]"
       >
         마케팅
       </BaseChip>
       <BaseChip
-        isSelected={value === 'etc'}
-        onClick={() => handleChange('etc')}
+        isSelected={value === 'OTHER'}
+        onClick={() => handleChange('OTHER')}
         className="w-[9.2rem]"
       >
         기타
@@ -673,7 +702,7 @@ export const FieldPositionSkill = ({
           />
 
           {positionDropdownOpen && (
-            <div className="absolute top-[7rem] grid h-[6rem] w-[61.8rem] grid-cols-6 items-center gap-[0.6rem] rounded-[0.8rem] border border-black-30 bg-black-5 px-[1.8rem]">
+            <div className="absolute left-0 top-[7rem] grid h-[6rem] w-[61.8rem] grid-cols-6 items-center gap-[0.6rem] rounded-[0.8rem] border border-black-30 bg-black-5 px-[1.8rem]">
               <div onClick={(e) => handlePositionSelect(e, '기획')}>
                 <BaseChip
                   isSelected={selectedPosition === '기획'}
