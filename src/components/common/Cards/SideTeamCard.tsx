@@ -231,10 +231,14 @@ const SideTeamCard = ({
             <img
               alt={'프로필 이미지'}
               src={profileImageUrl}
-              className="h-[6.1rem] w-[6.1rem] rounded-[9.9rem] object-cover"
+              className="h-[6.1rem] w-[6.1rem] cursor-pointer rounded-[9.9rem] object-cover"
+              onClick={() => navigate(`/profile/${memberId}`)}
             />
           ) : (
-            <IcCharacter className="h-[6.1rem] w-[6.1rem] rounded-[9.9rem]" />
+            <IcCharacter
+              className="h-[6.1rem] w-[6.1rem] cursor-pointer rounded-[9.9rem]"
+              onClick={() => navigate(`/profile/${memberId}`)}
+            />
           )}
           <div className="flex flex-col items-center gap-[0.4rem]">
             <span className="text-[1.6rem] font-[600] leading-[1.5] text-black-100">
@@ -245,7 +249,7 @@ const SideTeamCard = ({
             </span>
           </div>
           <div className="flex items-start gap-[0.6rem]">
-            {skillsIcon.map((skill) => (
+            {skillsIcon.slice(0, 3).map((skill) => (
               <div
                 key={skill}
                 className="flex aspect-square h-[3.2rem] w-[3.2rem] items-center justify-center gap-[1rem] rounded-[9.9rem] bg-black-10 p-[0.6rem]"
