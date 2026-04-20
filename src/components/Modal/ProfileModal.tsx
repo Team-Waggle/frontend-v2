@@ -36,7 +36,7 @@ interface FormValues {
 }
 
 interface ProfileModalProps extends ModalProps {
-  myData: UserMeResponse;
+  myData?: UserMeResponse;
 }
 
 const positions = Object.keys(

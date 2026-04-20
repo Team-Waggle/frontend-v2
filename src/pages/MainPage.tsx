@@ -8,7 +8,8 @@ import type { PostsSort } from '../types/api/posts';
 import { useGetIsUserProfileComplete } from '../hooks/useUser';
 
 import MainSearch from '../components/Main/MainSearch/MainSearch';
-import OnboardingModal from '../components/Modal/OnboardingModal';
+import ProfileModal from '../components/Modal/ProfileModal';
+
 import { formatPostListCreatedAt } from '../utils/kst-time';
 import type { PostDetailResponse } from '../types/api/posts';
 import { useAuthStore } from '../stores/authStore';
@@ -110,7 +111,13 @@ const MainPage = () => {
           </div>
 
           {posts.length === 0 ? (
-            <PostEmptyPage className="max-1440:h-[45.6rem] max-1440:max-w-[104.8rem]" title="등록된 모집글이 없습니다." subTitle="새로운 팀원을 찾아보세요!" btnText="모집글 작성" onBtnClick={() => navigate('/post/new')} />
+            <PostEmptyPage
+              className="max-1440:h-[45.6rem] max-1440:max-w-[104.8rem]"
+              title="등록된 모집글이 없습니다."
+              subTitle="새로운 팀원을 찾아보세요!"
+              btnText="모집글 작성"
+              onBtnClick={() => navigate('/post/new')}
+            />
           ) : (
             <div className="inline-grid w-full max-w-[152.6rem] auto-rows-max grid-cols-[repeat(auto-fill,minmax(33.6rem,1fr))] gap-x-[1.8rem] gap-y-[1.8rem] max-1440:max-w-full">
               {posts.map((post: PostDetailResponse) => {
@@ -150,7 +157,11 @@ const MainPage = () => {
         </div>
       </div>
 
-      <OnboardingModal isOpen={isOnboardingModalOpen} onClose={() => {}} />
+      <ProfileModal
+        isOpen={isOnboardingModalOpen}
+        onClose={() => {}}
+        mode="onboarding"
+      />
     </>
   );
 };
