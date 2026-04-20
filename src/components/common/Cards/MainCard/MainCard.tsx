@@ -80,7 +80,7 @@ const MainCard = ({
       {/** Frame 02 */}
       <div className="flex flex-col items-start gap-[0.4rem] self-stretch">
         {/* card-skill-box */}
-        <div className="flex items-center gap-[0.6rem] self-stretch">
+        <div className="flex h-[2.4rem] items-center gap-[0.6rem] self-stretch">
           <div className="flex items-center gap-[0.6rem]">
             {(mainCardSkills || []).slice(0, 5).map((skill, index) => {
               const enumValue = (skill || '').trim();

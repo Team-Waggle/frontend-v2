@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router';
+
 import IcProfileImg from '../../assets/icons/image/ic_character_circle_gray_60.svg?react';
 import type { OptimisticMessage } from '../../types/api/message';
 
@@ -9,6 +11,7 @@ type MessageBubbleProps =
       profileImageUrl?: string | null;
       variant?: 'default' | 'modal';
       optimistic?: OptimisticMessage;
+      partnerId?: never;
     }
   | {
       isMine: false;
@@ -17,6 +20,7 @@ type MessageBubbleProps =
       profileImageUrl?: string | null;
       variant?: 'default' | 'modal';
       optimistic?: never;
+      partnerId?: string;
     };
 
 const MyBubble = ({
@@ -86,16 +90,23 @@ const OpponentBubble = ({
   time,
   profileImageUrl,
   variant = 'default',
+  partnerId,
 }: {
   messages: string[];
   time: string;
   profileImageUrl?: string | null;
   variant?: 'default' | 'modal';
+  partnerId?: string;
 }) => {
+  const navigate = useNavigate();
   const isConsecutive = messages.length > 1;
   const maxW = variant === 'modal' ? 'max-w-[23.6rem]' : 'max-w-[36rem]';
   const textSize = variant === 'modal' ? 'text-[1.4rem]' : 'text-[1.6rem]';
   const profileSize = variant === 'modal' ? 'h-[3.6rem] w-[3.6rem]' : 'h-[5.2rem] w-[5.2rem]';
+
+  const handleProfileClick = () => {
+    if (partnerId) navigate(`/profile/${partnerId}`);
+  };
 
   return (
     <div className="flex flex-col items-start gap-[1rem] self-stretch">
@@ -104,10 +115,14 @@ const OpponentBubble = ({
           <img
             src={profileImageUrl}
             alt="프로필"
-            className={`${profileSize} flex-shrink-0 rounded-full object-cover`}
+            onClick={handleProfileClick}
+            className={`${profileSize} flex-shrink-0 rounded-full object-cover ${partnerId ? 'cursor-pointer' : ''}`}
           />
         ) : (
-          <IcProfileImg className={`${profileSize} rounded-full flex-shrink-0`} />
+          <IcProfileImg
+            onClick={handleProfileClick}
+            className={`${profileSize} rounded-full flex-shrink-0 ${partnerId ? 'cursor-pointer' : ''}`}
+          />
         )}
         <div
           className={`flex flex-col items-start justify-center ${isConsecutive ? 'gap-[0.2rem]' : 'gap-[1rem] py-[0.4rem]'}`}
@@ -161,6 +176,7 @@ const MessageBubble = (props: MessageBubbleProps) => {
       time={props.time}
       profileImageUrl={props.profileImageUrl}
       variant={props.variant}
+      partnerId={props.partnerId}
     />
   );
 };
