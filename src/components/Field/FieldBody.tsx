@@ -302,7 +302,9 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        orderedList: false,
+      }),
       Markdown,
       Link.configure({
         openOnClick: false, // 에디터 안에서 클릭 시 바로 이동 방지
@@ -330,6 +332,18 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
     },
     immediatelyRender: false,
   });
+
+  useEffect(() => {
+    if (editor && value !== undefined) {
+      // 현재 에디터 내부의 텍스트와 외부에서 들어온 value를 비교
+      const currentContent = editor.getMarkdown().replace(/&nbsp;/g, ' ');
+
+      // 값이 다를 때만 업데이트하여, 타이핑 중 커서가 튀는 현상 방지
+      if (value !== currentContent) {
+        editor.commands.setContent(value);
+      }
+    }
+  }, [value, editor]);
 
   if (!editor) return null;
 
@@ -607,6 +621,15 @@ export const FieldPositionSkill = ({
 
   const handleSkillRemove = (itemIndex: number, skillName: string) => {
     const newItems = [...items];
+
+    const updatedSkills = newItems[itemIndex].skills.filter(
+      (s) => s !== skillName,
+    );
+
+    if (updatedSkills.length === 0) {
+      onChange?.(newItems.filter((_, i) => i !== itemIndex));
+      return;
+    }
 
     newItems[itemIndex] = {
       ...newItems[itemIndex],

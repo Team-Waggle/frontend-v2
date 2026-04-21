@@ -5,6 +5,7 @@ import {
   getPostDetail,
   getPosts,
   patchPostClose,
+  updatePosts,
 } from '../api/post';
 import type {
   CursorResponsePostDetailResponse,
@@ -106,6 +107,18 @@ export const useCreatePosts = () => {
     },
     onError: (err) => {
       console.error(err);
+    },
+  });
+};
+
+// 모집글 수정
+export const useUpdatePosts = () => {
+  const navigate = useNavigate();
+  return useMutation({
+    mutationFn: ({ postId, postData }: { postId: number; postData: object }) =>
+      updatePosts(postId, postData),
+    onSuccess: (data) => {
+      navigate(`/post/${data.team.teamId}`);
     },
   });
 };
