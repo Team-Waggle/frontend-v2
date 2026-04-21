@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import MsgSendBtn from '../common/IconWrapper/index';
 import MessageScrollArea from './MessageScrollArea';
@@ -11,6 +11,7 @@ import { useChatLogic } from '../../hooks/useChatLogic';
 import { POSITION_CONVERTER } from '../../utils/position';
 
 const ChatArea = ({ partnerId }: { partnerId: string }) => {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const highlight = searchParams.get('highlight');
 
@@ -36,10 +37,14 @@ const ChatArea = ({ partnerId }: { partnerId: string }) => {
             <img
               src={partnerInfo.profileImageUrl}
               alt="프로필"
-              className="h-[4.4rem] w-[4.4rem] flex-shrink-0 rounded-full object-cover"
+              onClick={() => navigate(`/profile/${partnerId}`)}
+              className="h-[4.4rem] w-[4.4rem] flex-shrink-0 cursor-pointer rounded-full object-cover"
             />
           ) : (
-            <IcProfileImg className="h-[4.4rem] w-[4.4rem] flex-shrink-0 rounded-full" />
+            <IcProfileImg
+              onClick={() => navigate(`/profile/${partnerId}`)}
+              className="h-[4.4rem] w-[4.4rem] flex-shrink-0 cursor-pointer rounded-full"
+            />
           )}
           <div className="flex min-w-0 max-w-[20.4rem] flex-col items-start gap-[0.2rem]">
             <span className="text-[1.4rem] font-[500] leading-[1.5] tracking-[-0.028rem] text-black-100">
@@ -60,13 +65,13 @@ const ChatArea = ({ partnerId }: { partnerId: string }) => {
         groupedMessages={groupedMessages}
         failedTempIds={failedTempIds}
         withAnchors
+        partnerId={partnerId}
         className="flex flex-1 flex-col gap-[1rem] overflow-y-auto pb-[10rem] pl-[1.2rem] pr-[2.8rem] pt-[2rem] scrollbar-hide"
       />
 
       {/** 메시지 입력 */}
       <footer
-        className="absolute bottom-0 right-0 flex w-full flex-col items-start gap-[1rem] bg-black-5 px-[1.2rem] py-[2.4rem]"
-        style={{ boxShadow: '0 -2px 10px 0 rgba(0, 0, 0, 0.10)' }}
+        className="absolute bottom-0 right-0 flex w-full flex-col items-start gap-[1rem] bg-black-5 px-[1.2rem] py-[2.4rem] shadow-chat-input-box [clip-path:inset(-20px_-20px_-20px_0)]"
       >
         <div className="flex items-center gap-[2rem] self-stretch">
           <input

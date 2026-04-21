@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useQueryClient } from '@tanstack/react-query';
 
+// Modals
 import ModalOverlay from './ModalOverlay';
 import ModalPortal from './ModalPortal';
 import { useModal } from '../../hooks/useModal';
@@ -11,8 +13,16 @@ import BaseButton from '../common/Button';
 import BaseChip from '../common/Chip/BaseChip';
 import FieldMaster from '../Field/FieldMaster';
 import { SkillIcon } from '../../utils/SkillIcon';
+import { toSkillLabel } from '../../utils/skill';
 import { POSITION_CONVERTER } from '../../utils/position';
-import { useCreateUserProfile } from '../../hooks/useUser';
+import {
+  useCreateUserProfile,
+  useDeleteUserMe,
+  usePutUserMe,
+} from '../../hooks/useUser';
+import { positionSkillData } from '../../constants/positionSkill';
+import { SKILL_MAP } from '../../constants/skillMap';
+import type { UserMeResponse } from '../../types/api/user';
 
 // Icons
 import RequireIcon from '../../assets/icons/ic_require.svg?react';
@@ -25,115 +35,23 @@ interface FormValues {
   bio: string;
 }
 
-const positionData = {
-  기획: ['Figma', 'GA4', 'Jira', 'Notion', 'SQL'],
-  디자인: ['After Effects', 'Figma', 'Illustrator', 'Photoshop', 'ProtoPie'],
-  프론트엔드: [
-    'C#',
-    'Javascript',
-    'Next.js',
-    'React',
-    'React Native',
-    'TypeScript',
-    'UE',
-    'Unity',
-    'Vue.js',
-  ],
-  백엔드: [
-    'AWS',
-    'Django',
-    'express.js',
-    'FastAPI',
-    'Java',
-    'Javascript',
-    'Kotlin',
-    'NestJS',
-    'Node.js',
-    'Python',
-    'Spring',
-  ],
-  마케팅: ['CRM', 'GA4', 'SEO', 'SNS마케팅', '콘텐츠제작'],
-  기타: [
-    'After Effects',
-    'AWS',
-    'C#',
-    'CRM',
-    'Django',
-    'express.js',
-    'FastAPI',
-    'Figma',
-    'GA4',
-    'Illustrator',
-    'Java',
-    'Javascript',
-    'Jira',
-    'Kotlin',
-    'NestJS',
-    'Next.js',
-    'Node.js',
-    'Notion',
-    'Photoshop',
-    'ProtoPie',
-    'Python',
-    'React',
-    'React Native',
-    'SEO',
-    'SNS마케팅',
-    'Spring',
-    'SQL',
-    'TypeScript',
-    'UE',
-    'Unity',
-    'Vue.js',
-    '콘텐츠제작',
-  ],
-};
+interface ProfileModalProps extends ModalProps {
+  myData?: UserMeResponse;
+}
 
-const SKILL_MAP: Record<string, string> = {
-  'After Effects': 'AFTER_EFFECTS',
-  AWS: 'AWS',
-  'C#': 'CSHARP',
-  CRM: 'CRM',
-  Django: 'DJANGO',
-  'express.js': 'EXPRESS',
-  FastAPI: 'FAST_API',
-  Figma: 'FIGMA',
-  GA4: 'GA4',
-  Illustrator: 'ILLUSTRATOR',
-  Java: 'JAVA',
-  Javascript: 'JAVASCRIPT',
-  Jira: 'JIRA',
-  Kotlin: 'KOTLIN',
-  NestJS: 'NEST_JS',
-  'Next.js': 'NEXT_JS',
-  'Node.js': 'NODE_JS',
-  Notion: 'NOTION',
-  Photoshop: 'PHOTOSHOP',
-  ProtoPie: 'PROTO_PIE',
-  Python: 'PYTHON',
-  React: 'REACT',
-  'React Native': 'REACT_NATIVE',
-  SEO: 'SEO',
-  SNS마케팅: 'SNS_MARKETING',
-  Spring: 'SPRING',
-  SQL: 'SQL',
-  TypeScript: 'TYPESCRIPT',
-  UE: 'UE',
-  Unity: 'UNITY',
-  'Vue.js': 'VUE',
-  콘텐츠제작: 'CONTENT_CREATION',
-};
+const positions = Object.keys(
+  positionSkillData,
+) as (keyof typeof positionSkillData)[];
+type PositionType = keyof typeof positionSkillData;
 
-const positions = Object.keys(positionData) as (keyof typeof positionData)[];
-type PositionType = keyof typeof positionData;
-
-const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
+const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
   const {
     register,
     handleSubmit,
     watch,
     setValue,
     setError,
+    reset,
     formState: { errors, isValid },
   } = useForm<FormValues>({
     mode: 'onChange',
@@ -146,12 +64,30 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
     },
   });
 
-  const { mutate: updateUserProfile } = useCreateUserProfile();
+  const queryClient = useQueryClient();
+  const { mutate: createUserProfile } = useCreateUserProfile();
+  const { mutate: updateUserProfile } = usePutUserMe();
+  const { mutate: deleteUser } = useDeleteUserMe();
 
   // 현재 선택된 값들 구독
+  const usernameValue = watch('username', '');
   const activePosition = watch('position');
   const activeSkills = watch('skills');
+  const portfolioUrlsValue = watch('portfolioUrls', '');
   const introValue = watch('bio', '');
+
+  useEffect(() => {
+    if (myData) {
+      reset({
+        username: myData.username || '',
+        position:
+          (POSITION_CONVERTER[myData.position] as PositionType) || '기획',
+        skills: myData.skills.map((skill) => toSkillLabel(skill)),
+        portfolioUrls: myData.portfolioUrls?.[0] || '',
+        bio: myData.bio || '',
+      });
+    }
+  }, [myData, reset]);
 
   useEffect(() => {
     register('skills', {
@@ -162,21 +98,23 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
 
   const onSubmit = async (data: FormValues) => {
     try {
-      const response = await getUserCheck(data.username);
-      if (response?.isAvailable === false) {
-        setError(
-          'username',
-          {
-            type: 'manual',
-            message: '중복된 닉네임입니다.',
-          },
-          { shouldFocus: true },
-        );
-        return;
+      if (mode === 'onboarding') {
+        const response = await getUserCheck(data.username);
+        if (response?.isAvailable === false) {
+          setError(
+            'username',
+            {
+              type: 'manual',
+              message: '이미 사용 중인 닉네임이에요.',
+            },
+            { shouldFocus: true },
+          );
+          return;
+        }
       }
 
       const transformedData = {
-        username: data.username,
+        ...(mode !== 'edit' && { username: data?.username }),
 
         position: POSITION_CONVERTER[data.position] || data.position,
 
@@ -191,13 +129,24 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
         ...(data.bio?.trim() && { bio: data.bio.trim() }),
       };
 
-      updateUserProfile(transformedData);
+      if (mode === 'onboarding') {
+        createUserProfile(transformedData);
+      }
+
+      if (mode === 'edit') {
+        updateUserProfile(transformedData, {
+          onSuccess: async () => {
+            await queryClient.refetchQueries({ queryKey: ['me'] });
+            onClose();
+          },
+        });
+      }
     } catch (error) {
       console.error(error);
     }
   };
 
-  useModal({ isOpen, isOnboarding: true, onClose });
+  useModal({ isOpen, isOnboarding: mode === 'onboarding', onClose });
   if (!isOpen) return null;
 
   return (
@@ -207,16 +156,18 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
         role="dialog"
         aria-modal="true"
       >
-        <ModalOverlay onClose={onClose} isOnboarding={true} />
+        <ModalOverlay onClose={onClose} isOnboarding={mode === 'onboarding'} />
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="relative flex h-[63.2rem] w-[73.8rem] flex-col gap-[4rem] overflow-scroll overflow-y-scroll scroll-smooth rounded-[2rem] bg-white px-[4rem] pt-[4.4rem] scrollbar-hide"
         >
           <div className="flex w-full flex-col gap-[3.4rem]">
-            <div className="flex flex-col text-[3rem] font-bold">
-              <span className="">반가워요!</span>
-              <span className="">어떤 분인지 알려주세요!</span>
-            </div>
+            {mode === 'onboarding' && (
+              <div className="flex flex-col text-[3rem] font-bold">
+                <span className="">반가워요!</span>
+                <span className="">어떤 분인지 알려주세요!</span>
+              </div>
+            )}
             <div className="flex flex-col gap-[3.4rem]">
               <FieldMaster
                 title="닉네임 입력"
@@ -225,28 +176,54 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
                 isRequired
                 errorMessage={errors.username?.message}
                 inputProps={{
-                  placeholder: '최대 10자 제한 / 특수문자 불가',
+                  placeholder:
+                    '한글/영문/숫자만 가능해요. 15byte 이내로 입력해 주세요.',
+                  value: usernameValue,
                   ...register('username', {
                     required: '닉네임은 필수입니다.',
-                    maxLength: {
-                      value: 10,
-                      message: '최대 10자까지 가능합니다.',
-                    },
                     pattern: {
-                      value: /^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ]*$/,
-                      message: '특수문자는 사용 불가합니다.',
+                      value: /^[a-zA-Z0-9가-힣]*$/,
+                      message: '공백과 특수문자는 사용할 수 없어요.',
+                    },
+                    validate: (value) => {
+                      const getByteLength = (str: string) => {
+                        return str
+                          .split('')
+                          .reduce((acc: number, char: string) => {
+                            return acc + (/[가-힣]/.test(char) ? 3 : 1);
+                          }, 0);
+                      };
+
+                      const byteLength = getByteLength(value);
+                      const maxByte = 15;
+
+                      // 2. 조건 검증
+                      if (byteLength < 6) {
+                        return '닉네임은 최소 6byte 이상이어야 합니다.';
+                      }
+                      if (byteLength > maxByte) {
+                        return `글자수를 초과했어요.`;
+                      }
+
+                      return true;
                     },
                   }),
                 }}
+                maxLength={15}
               />
               <div className="flex flex-col gap-[1rem]">
-                <div className="flex items-center gap-[0.4rem]">
-                  <span className="text-[1.6rem] font-semibold">
-                    직무 및 사용 스킬
-                  </span>
-                  <div className="flex h-[1.8rem] w-[1.2rem] items-center">
-                    <RequireIcon />
+                <div className="flex items-center gap-[0.2rem]">
+                  <div className="flex items-center gap-[0.4rem]">
+                    <span className="text-[1.6rem] font-semibold">
+                      직무 및 사용 스킬
+                    </span>
+                    <div className="flex h-[1.8rem] w-[1.2rem] items-center">
+                      <RequireIcon />
+                    </div>
                   </div>
+                  <span className="text-[1.2rem] font-medium text-error">
+                    최대 3개 선택 가능해요
+                  </span>
                 </div>
                 <div className="flex flex-col gap-[2rem]">
                   <div className="flex gap-[0.6rem]">
@@ -265,8 +242,10 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
                     ))}
                   </div>
                   <div className="flex max-h-[14.2rem] flex-wrap gap-x-[0.6rem] gap-y-[1rem] overflow-y-auto pl-[0.1rem] pr-[2rem] pt-[0.1rem]">
-                    {positionData[activePosition].map((skill) => {
+                    {positionSkillData[activePosition].map((skill) => {
                       const isSelected = activeSkills.includes(skill);
+                      const isDisabled =
+                        !isSelected && activeSkills.length >= 3;
                       return (
                         <BaseChip
                           key={`${activePosition} - ${skill}`}
@@ -279,6 +258,7 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
                             });
                           }}
                           isSelected={isSelected}
+                          disabled={isDisabled}
                           mainIcon={<SkillIcon name={skill} />}
                         >
                           {skill}
@@ -294,6 +274,7 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
                 variant="input"
                 inputProps={{
                   ...register('portfolioUrls'),
+                  value: portfolioUrlsValue,
                   placeholder:
                     '현재 가지고 있는 포트폴리오 사이트가 있다면 URL을 입력해 주세요.',
                 }}
@@ -303,7 +284,8 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
                 id="bio"
                 variant="textarea"
                 textareaProps={{
-                  placeholder: '한 줄 소개를 입력해주세요. (100자 이내)',
+                  placeholder:
+                    'React로 MVP 빠르게 만들어요. 주 2회 저녁 참여 가능!',
                   value: introValue,
                   ...register('bio', {
                     onChange: (e) => {
@@ -320,6 +302,14 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
               />
             </div>
           </div>
+          {mode === 'edit' && (
+            <span
+              onClick={() => deleteUser()}
+              className="mx-auto cursor-pointer text-[1.6rem] font-semibold text-black-60"
+            >
+              회원 탈퇴하기
+            </span>
+          )}
           <div className="flex w-full justify-center pb-[3.8rem]">
             <BaseButton
               type="submit"
@@ -336,4 +326,4 @@ const OnboardingModal = ({ isOpen, onClose }: ModalProps) => {
   );
 };
 
-export default OnboardingModal;
+export default ProfileModal;

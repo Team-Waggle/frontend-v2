@@ -35,6 +35,7 @@ export const router = createBrowserRouter(
         </Route>
         <Route path="/post/new" element={<PostFormPage />} />
         <Route path="/post/:postId" element={<PostDetailPage />} />
+        <Route path="/post/:postId/edit" element={<PostFormPage />} />
         <Route path="/profile" element={<ProfileRedirect />} />
         <Route path="/profile/:userId" element={<MyPage />} />
         <Route path="/message" element={<MessagePage />} />

@@ -1,11 +1,17 @@
+import { useEffect } from 'react';
+import { useParams } from 'react-router';
 import { Controller, useForm } from 'react-hook-form';
 import BaseButton from '../components/common/Button';
 import FieldMaster from '../components/Field/FieldMaster';
 import type { RecruitmentsValue } from '../components/Field/FieldBody';
 import { useGetUserMeTeam } from '../hooks/useUser';
-import { useCreatePosts } from '../hooks/usePost';
+import {
+  useCreatePosts,
+  useGetPostDetail,
+  useUpdatePosts,
+} from '../hooks/usePost';
 import { POSITION_CONVERTER, type PositionKey } from '../utils/position';
-import { toSkillEnum } from '../utils/skill';
+import { toSkillEnum, toSkillLabel } from '../utils/skill';
 
 // Icons
 import NewTeamIcon from '../assets/icons/ic_character_new_post.svg?react';
@@ -19,17 +25,47 @@ interface FormValues {
 }
 
 const PostFormPage = () => {
+  const { postId } = useParams<{ postId: string }>();
+  const isEditMode = Boolean(postId);
   const {
     register,
     handleSubmit,
+    watch,
     control,
+    reset,
     formState: { errors, isValid },
   } = useForm<FormValues>({
     mode: 'onChange',
+    defaultValues: {
+      teamId: undefined,
+      title: '',
+      recruitments: [],
+      skills: [],
+      content: '',
+    },
   });
 
   const { data: myTeamData } = useGetUserMeTeam();
+  const { data: myPostData } = useGetPostDetail(Number(postId));
   const { mutate: createPosts } = useCreatePosts();
+  const { mutate: updatePosts } = useUpdatePosts();
+
+  const postnameValue = watch('title', '');
+
+  useEffect(() => {
+    if (isEditMode && myPostData) {
+      reset({
+        teamId: myPostData.team.teamId,
+        title: myPostData.title,
+        recruitments: myPostData.recruitments.map((item) => ({
+          ...item,
+          position: POSITION_CONVERTER[item.position] as PositionKey,
+          skills: item.skills?.map((skill) => toSkillLabel(skill)),
+        })),
+        content: myPostData.content,
+      });
+    }
+  }, [isEditMode, myPostData, reset]);
 
   const onSubmit = (data: FormValues) => {
     const formattedData = {
@@ -42,7 +78,11 @@ const PostFormPage = () => {
       })),
     };
 
-    createPosts(formattedData);
+    if (isEditMode) {
+      updatePosts({ postId: Number(postId), postData: formattedData });
+    } else {
+      createPosts(formattedData);
+    }
   };
 
   return (
@@ -54,7 +94,9 @@ const PostFormPage = () => {
         onSubmit={handleSubmit(onSubmit)}
         className="flex w-[90rem] max-w-full flex-col gap-[4rem] pb-[4.4rem]"
       >
-        <span className="text-[2.4rem] font-bold">모집글 작성해요!</span>
+        <span className="text-[2.4rem] font-bold">
+          {isEditMode ? '모집글 수정해요!' : '모집글 작성해요!'}
+        </span>
         <div className="flex flex-col gap-[3.6rem]">
           <Controller
             name="teamId"
@@ -81,11 +123,14 @@ const PostFormPage = () => {
             errorMessage={errors.title?.message}
             inputProps={{
               placeholder: '최대 30자 제한',
+              value: postnameValue,
               ...register('title', {
-                required: '제목을 입력해주세요.',
+                validate: (value) =>
+                  value.trim().length > 0 || '제목을 입력해주세요.',
                 maxLength: { value: 30, message: '최대 30자까지 가능합니다.' },
               }),
             }}
+            maxLength={30}
           />
 
           <Controller
@@ -130,7 +175,7 @@ const PostFormPage = () => {
           disabled={!isValid}
           className="mx-auto w-[32rem]"
         >
-          작성하기
+          {isEditMode ? '수정하기' : '작성하기'}
         </BaseButton>
       </form>
     </div>

@@ -72,7 +72,7 @@ const SelectBox = ({ onAssignManager, onKickMember }: SelectBoxProps) => {
 };
 
 const toPositionLabel = (position?: string): string => {
-  if (position === 'PLANNER') {
+  if (position === 'PM') {
     return '기획';
   }
 
@@ -108,7 +108,7 @@ const SideTeamCard = ({
   canManage = false,
   isActive = false,
   disabled = false,
-  status = "ACTIVE",
+  status = 'ACTIVE',
   onClick,
   onAssignManager,
   onKickMember,
@@ -181,8 +181,10 @@ const SideTeamCard = ({
             </>
           )}
         </div>
-        <div ref={selectBoxRef} 
-        className="flex aspect-square h-[2.4rem] w-[2.4rem] flex-shrink-0 flex-col items-end justify-center gap-[1rem]">
+        <div
+          ref={selectBoxRef}
+          className="flex aspect-square h-[2.4rem] w-[2.4rem] flex-shrink-0 flex-col items-end justify-center gap-[1rem]"
+        >
           {variant === 'team' && canManage && (
             <>
               <div
@@ -231,10 +233,14 @@ const SideTeamCard = ({
             <img
               alt={'프로필 이미지'}
               src={profileImageUrl}
-              className="h-[6.1rem] w-[6.1rem] rounded-[9.9rem] object-cover"
+              className="h-[6.1rem] w-[6.1rem] cursor-pointer rounded-[9.9rem] object-cover"
+              onClick={() => navigate(`/profile/${memberId}`)}
             />
           ) : (
-            <IcCharacter className="h-[6.1rem] w-[6.1rem] rounded-[9.9rem]" />
+            <IcCharacter
+              className="h-[6.1rem] w-[6.1rem] cursor-pointer rounded-[9.9rem]"
+              onClick={() => navigate(`/profile/${memberId}`)}
+            />
           )}
           <div className="flex flex-col items-center gap-[0.4rem]">
             <span className="text-[1.6rem] font-[600] leading-[1.5] text-black-100">
@@ -245,7 +251,7 @@ const SideTeamCard = ({
             </span>
           </div>
           <div className="flex items-start gap-[0.6rem]">
-            {skillsIcon.map((skill) => (
+            {skillsIcon.slice(0, 3).map((skill) => (
               <div
                 key={skill}
                 className="flex aspect-square h-[3.2rem] w-[3.2rem] items-center justify-center gap-[1rem] rounded-[9.9rem] bg-black-10 p-[0.6rem]"
@@ -270,8 +276,10 @@ const SideTeamCard = ({
         </BaseButton>
       )}
 
-      {variant === 'team' && status === "COMPLETED" && (
-        <BaseButton size="md" color="tertiary" disabled={isMe} children="리뷰 쓰기" />
+      {variant === 'team' && status === 'COMPLETED' && (
+        <BaseButton size="md" color="tertiary" disabled={isMe}>
+          리뷰 쓰기
+        </BaseButton>
       )}
     </div>
   );

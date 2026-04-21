@@ -12,6 +12,7 @@ interface MessageScrollAreaProps {
   variant?: 'default' | 'modal';
   withAnchors?: boolean;
   className?: string;
+  partnerId?: string;
 }
 
 const MessageScrollArea = ({
@@ -23,6 +24,7 @@ const MessageScrollArea = ({
   variant = 'default',
   withAnchors = false,
   className,
+  partnerId,
 }: MessageScrollAreaProps) => (
   <div ref={scrollRef} onScroll={onScroll} className={className}>
     {isFetchingPreviousPage && (
@@ -64,6 +66,7 @@ const MessageScrollArea = ({
                 time={group.time}
                 profileImageUrl={group.profileImageUrl}
                 variant={variant}
+                partnerId={partnerId}
               />
             )}
           </div>

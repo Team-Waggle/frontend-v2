@@ -118,6 +118,10 @@ const TeamHomePage = () => {
     if (workMode === 'OFFLINE') {
       return '오프라인';
     }
+    
+    if (workMode === 'HYBRID') {
+      return '혼합';
+    }
 
     return workMode ?? '온라인';
   };
@@ -198,7 +202,7 @@ const TeamHomePage = () => {
               </div>
             </div>
             <div>
-              <span className="text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black">
+              <span className="break-all text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black">
                 {teamDetail?.description ?? '팀 소개가 들어가는 자리입니다.'}
               </span>
             </div>
@@ -301,7 +305,7 @@ const TeamHomePage = () => {
             {/** 팀원 관리 타이틀 */}
             <div className="flex items-start gap-[1rem] self-stretch border-b border-solid border-b-black-40 p-[1rem]">
               <p className="text-[2rem] font-[600] leading-[1.5] tracking-[-0.04rem] text-black">
-                팀원 관리
+                팀원
               </p>
             </div>
             {/** 팀원 명단 카드 */}

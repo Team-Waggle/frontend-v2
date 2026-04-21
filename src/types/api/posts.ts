@@ -36,7 +36,7 @@ export type PositionType =
   | 'IOS'
   | 'ANDROID'
   | 'DEVOPS'
-  | 'PLANNER'
+  | 'PM'
   | 'MARKETER'
   | 'OTHER';
 
