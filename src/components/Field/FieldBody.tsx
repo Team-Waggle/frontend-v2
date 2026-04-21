@@ -543,8 +543,8 @@ export const FieldPosition = ({ value, onChange }: FieldPositionProps) => {
   return (
     <div className="flex gap-[0.6rem]">
       <BaseChip
-        isSelected={value === 'PLANNER'}
-        onClick={() => handleChange('PLANNER')}
+        isSelected={value === 'PM'}
+        onClick={() => handleChange('PM')}
         className="w-[9.2rem]"
       >
         기획
