@@ -3,7 +3,7 @@
 // POSITION_CONVERTER['프론트엔드'] -> 'FRONTEND'
 
 const POSITION_DATA = {
-  기획: 'PLANNER',
+  기획: 'PM',
   디자인: 'DESIGNER',
   프론트엔드: 'FRONTEND',
   백엔드: 'BACKEND',

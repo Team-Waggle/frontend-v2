@@ -1,7 +1,9 @@
 import { Controller, useForm } from 'react-hook-form';
+import { useCreateTeamApplications } from '../../hooks/useTeam';
 import FieldMaster from '../Field/FieldMaster';
-import type { PositionType } from '../Field/FieldBody';
 import BaseButton from '../common/Button';
+import type { PositionType, PostDetailResponse } from '../../types/api/posts';
+import type { UserMeResponse } from '../../types/api/user';
 
 // Modal
 import { useModal } from '../../hooks/useModal';
@@ -12,10 +14,22 @@ import ModalPortal from './ModalPortal';
 interface FormValues {
   position: PositionType;
   detail: string;
-  portfolioUrls: string[];
+  portfolioUrls: string;
 }
 
-const ApplyModal = ({ isOpen, onClose }: ModalProps) => {
+interface ApplyModalProps extends ModalProps {
+  postData: PostDetailResponse;
+  myData: UserMeResponse;
+  onSuccessApply: () => void;
+}
+
+const ApplyModal = ({
+  postData,
+  myData,
+  onSuccessApply,
+  isOpen,
+  onClose,
+}: ApplyModalProps) => {
   const {
     register,
     handleSubmit,
@@ -26,16 +40,34 @@ const ApplyModal = ({ isOpen, onClose }: ModalProps) => {
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
-      position: '',
+      position: myData?.position as PositionType,
       detail: '',
-      portfolioUrls: [],
+      portfolioUrls: '',
     },
   });
+
+  const { mutate: createApply } = useCreateTeamApplications();
 
   const detailValue = watch('detail', '');
 
   const onSubmit = (data: FormValues) => {
-    console.log(data);
+    const formattedData = {
+      ...data,
+      postId: postData?.postId,
+      portfolioUrls: data.portfolioUrls ? [data.portfolioUrls] : [],
+    };
+
+    createApply(
+      { teamId: postData.team.teamId, postData: formattedData },
+      {
+        onSuccess: () => {
+          onSuccessApply();
+        },
+        onError: (err) => {
+          console.error(err);
+        },
+      },
+    );
   };
 
   useModal({ isOpen, onClose });
@@ -56,14 +88,14 @@ const ApplyModal = ({ isOpen, onClose }: ModalProps) => {
           <div className="flex flex-col gap-[4rem]">
             <div className="flex flex-col gap-[3.4rem]">
               <span className="text-[3rem] font-bold">
-                WAGGLE 팀에 지원합니다!
+                {postData?.team?.name} 팀에 지원합니다!
               </span>
               <div className="flex flex-col gap-[3.4rem]">
                 <Controller
                   name="position"
                   control={control}
                   rules={{
-                    validate: (value) => value !== '',
+                    required: '직무 선택 필수',
                   }}
                   render={({ field }) => (
                     <FieldMaster
@@ -88,20 +120,20 @@ const ApplyModal = ({ isOpen, onClose }: ModalProps) => {
                   }}
                 />
                 <FieldMaster
-                  title="한줄 소개"
+                  title="지원동기"
                   variant="textarea"
                   textareaProps={{
-                    placeholder: '한 줄 소개를 입력해주세요. (500자 이내)',
+                    placeholder: '1500byte 이내 지원동기 (한글 500자 기준)',
                     value: detailValue,
                     ...register('detail', {
                       onChange: (e) => {
                         const value = e.target.value;
-                        if (value.length > 500) {
-                          setValue('detail', value.slice(0, 500));
+                        if (value.length > 1500) {
+                          setValue('detail', value.slice(0, 1500));
                         }
                       },
                     }),
-                    maxLength: 500,
+                    maxLength: 1500,
                   }}
                 />
               </div>

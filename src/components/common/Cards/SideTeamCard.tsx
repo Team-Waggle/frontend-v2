@@ -72,7 +72,7 @@ const SelectBox = ({ onAssignManager, onKickMember }: SelectBoxProps) => {
 };
 
 const toPositionLabel = (position?: string): string => {
-  if (position === 'PLANNER') {
+  if (position === 'PM') {
     return '기획';
   }
 
@@ -108,7 +108,7 @@ const SideTeamCard = ({
   canManage = false,
   isActive = false,
   disabled = false,
-  status = "ACTIVE",
+  status = 'ACTIVE',
   onClick,
   onAssignManager,
   onKickMember,
@@ -181,8 +181,10 @@ const SideTeamCard = ({
             </>
           )}
         </div>
-        <div ref={selectBoxRef} 
-        className="flex aspect-square h-[2.4rem] w-[2.4rem] flex-shrink-0 flex-col items-end justify-center gap-[1rem]">
+        <div
+          ref={selectBoxRef}
+          className="flex aspect-square h-[2.4rem] w-[2.4rem] flex-shrink-0 flex-col items-end justify-center gap-[1rem]"
+        >
           {variant === 'team' && canManage && (
             <>
               <div
@@ -274,8 +276,10 @@ const SideTeamCard = ({
         </BaseButton>
       )}
 
-      {variant === 'team' && status === "COMPLETED" && (
-        <BaseButton size="md" color="tertiary" disabled={isMe} children="리뷰 쓰기" />
+      {variant === 'team' && status === 'COMPLETED' && (
+        <BaseButton size="md" color="tertiary" disabled={isMe}>
+          리뷰 쓰기
+        </BaseButton>
       )}
     </div>
   );
