@@ -696,7 +696,7 @@ export const FieldPositionSkill = ({
           />
 
           {positionDropdownOpen && (
-            <div className="absolute top-[7rem] grid h-[6rem] w-[61.8rem] grid-cols-6 items-center gap-[0.6rem] rounded-[0.8rem] border border-black-30 bg-black-5 px-[1.8rem]">
+            <div className="absolute left-0 top-[7rem] grid h-[6rem] w-[61.8rem] grid-cols-6 items-center gap-[0.6rem] rounded-[0.8rem] border border-black-30 bg-black-5 px-[1.8rem]">
               <div onClick={(e) => handlePositionSelect(e, '기획')}>
                 <BaseChip
                   isSelected={selectedPosition === '기획'}
