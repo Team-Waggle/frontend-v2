@@ -57,3 +57,9 @@ export const createPosts = async (postData: object) => {
   const { data } = await axiosInstance.post(POST_URL, postData);
   return data;
 };
+
+// 모집글 수정
+export const updatePosts = async (postId: number, postData: object) => {
+  const { data } = await axiosInstance.put(POST_DETAIL_URL(postId), postData);
+  return data;
+};
