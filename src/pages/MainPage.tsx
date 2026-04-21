@@ -8,8 +8,8 @@ import type { PostsSort } from '../types/api/posts';
 import { useGetIsUserProfileComplete } from '../hooks/useUser';
 
 import MainSearch from '../components/Main/MainSearch/MainSearch';
-import OnboardingModal from '../components/Modal/OnboardingModal';
-import LoginModal from '../components/Modal/LoginModal';
+import ProfileModal from '../components/Modal/ProfileModal';
+
 import { formatPostListCreatedAt } from '../utils/kst-time';
 import type { PostDetailResponse } from '../types/api/posts';
 import { useAuthStore } from '../stores/authStore';
@@ -153,8 +153,11 @@ const MainPage = () => {
         </div>
       </div>
 
-      <OnboardingModal isOpen={isOnboardingModalOpen} onClose={() => {}} />
-      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+      <ProfileModal
+        isOpen={isOnboardingModalOpen}
+        onClose={() => {}}
+        mode="onboarding"
+      />
     </>
   );
 };

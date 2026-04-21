@@ -9,11 +9,11 @@ import {
   FieldPositionSkill,
   type RecruitmentsValue,
   FieldTab,
-  type PositionType,
   FieldPosition,
 } from './FieldBody';
 import type { DropzoneInputProps, DropzoneRootProps } from 'react-dropzone';
 import type { TeamResponse } from '../../types/api/team';
+import type { PositionType } from '../../types/api/posts';
 
 //  Icons
 import RequireIcon from '../../assets/icons/ic_require.svg?react';
@@ -101,7 +101,12 @@ const FieldMaster = ({
 }: FiledMasterProps) => {
   const renderBody = {
     input: () => (
-      <FieldInput id={id || ''} {...inputProps} error={errorMessage} />
+      <FieldInput
+        id={id || ''}
+        {...inputProps}
+        error={errorMessage}
+        maxLength={maxLength}
+      />
     ),
     textarea: () => (
       <FieldTextarea
