@@ -6,6 +6,7 @@ import type { UserMeResponse } from '../types/api/user';
 import {
   getUserDetail,
   getUserMe,
+  getUserMeApplications,
   getIsUserProfileComplete,
   postUserProfile,
   getUserMeTeam,
@@ -27,6 +28,17 @@ export const useGetUserDetail = (userId: string) => {
     queryKey: ['user', userId],
     queryFn: () => getUserDetail(userId!),
     enabled: !!userId,
+    refetchOnWindowFocus: false,
+  });
+};
+
+// 본인 지원 목록 조회
+export const useGetMyApplications = () => {
+  const { isLoggedIn, isProfileComplete } = useAuthStore();
+  return useQuery({
+    queryKey: ['my-applications'],
+    queryFn: getUserMeApplications,
+    enabled: !!isLoggedIn && !!isProfileComplete,
     refetchOnWindowFocus: false,
   });
 };

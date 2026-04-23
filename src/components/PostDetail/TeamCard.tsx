@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { formatTeamCardCreatedAt } from '../../utils/kst-time';
 
 import IcTeamCardCharacter from '../../assets/icons/image/ic_character_circle_primary_60.svg?react';
@@ -39,6 +41,7 @@ const TeamCard = ({
   description,
   onClick,
 }: TeamCardProps) => {
+  const [imageError, setImageError] = useState(false);
   const workModeLabel = toWorkModeLabel(workMode);
   const createdAtLabel = createdAt ? formatTeamCardCreatedAt(createdAt) : '';
 
@@ -49,11 +52,12 @@ const TeamCard = ({
     >
       {/** 팀 이미지 */}
       <div className="relative flex aspect-[40/21] w-[15.4rem] flex-shrink-0 flex-col items-center justify-center gap-[1rem] self-stretch rounded-[1rem] bg-blue-5 py-[1.9rem]">
-        {teamImageUrl ? (
+        {teamImageUrl && !imageError ? (
           <img
             alt={'팀 대표 이미지'}
             src={teamImageUrl}
             className="absolute inset-0 h-full w-full rounded-[1rem] object-cover"
+            onError={() => setImageError(true)}
           />
         ) : (
           <IcTeamCardCharacter className="h-[11.6rem] w-[11.6rem]" />
