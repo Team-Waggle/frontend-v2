@@ -254,7 +254,7 @@ const MainSearch = ({
                 isOpen={openMenu === 'job'}
                 onToggle={() => toggleMenu('job')}
                 suppressRightBorder={openMenu === 'skill'}
-                hasKeyword={hasKeyword}
+                highlightRightBorder={selectedSkills.length > 0}
               />
 
               <MainSearchSelectField

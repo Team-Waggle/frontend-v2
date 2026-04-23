@@ -166,6 +166,12 @@ export const FieldTextarea = memo(
         setText(formattedValue);
       };
 
+      const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+        e.preventDefault();
+        const text = e.clipboardData.getData('text').replace(/\n/g, '');
+        document.execCommand('insertText', false, text);
+      };
+
       return (
         <div
           className={`flex flex-col items-end rounded-[0.8rem] border px-[1.8rem] pb-[1rem] pt-[1.7rem] ${
@@ -180,6 +186,7 @@ export const FieldTextarea = memo(
             value={text}
             onKeyDown={handleKeyDown}
             onChange={handleChange}
+            onPaste={handlePaste}
             ref={ref}
             id={id}
             maxLength={maxLength}

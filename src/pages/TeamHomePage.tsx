@@ -108,7 +108,6 @@ const TeamHomePage = () => {
 
     deleteTeamMemberMutation.mutate(memberId);
   };
-  const nowMs = useMemo(() => Date.now(), [applications.length]);
 
   const toWorkModeLabel = (workMode?: string): string => {
     if (workMode === 'ONLINE') {
@@ -282,10 +281,7 @@ const TeamHomePage = () => {
                       mainCardSkills={skillsList}
                       mainCardCreatedAt={
                         application.createdAt
-                          ? formatPostListCreatedAt(
-                              application.createdAt,
-                              nowMs,
-                            )
+                          ? formatPostListCreatedAt(application.createdAt)
                           : ''
                       }
                       isActive={activeCard === application.postId}
@@ -323,7 +319,7 @@ const TeamHomePage = () => {
                   isMe={member.userId === me?.userId}
                   isLeader={member.role === 'LEADER'}
                   isManager={member.role === 'MANAGER'}
-                  canManage={isLeaderOrManager && !member.deletedAt}
+                  canManage={isLeaderOrManager && !member.deletedAt && member.role !== 'LEADER'}
                   disabled={!!member.deletedAt}
                   isActive={activeTeamMember === member.memberId}
                   onClick={() => {

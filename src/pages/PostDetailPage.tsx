@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { useGetPostDetail, usePatchPostClose } from '../hooks/usePost';
-import { useGetUserMe } from '../hooks/useUser';
+import { useGetMyApplications, useGetUserMe } from '../hooks/useUser';
 import usePostDetailApplyButtonPosition from '../hooks/usePostDetailApplyButtonPosition';
 import usePostDetailFloatingSideCard from '../hooks/usePostDetailFloatingSideCard';
 
@@ -77,6 +77,7 @@ const PostDetailPage = () => {
 
   const { data: postDetail } = useGetPostDetail(parsedPostId);
   const { data: me } = useGetUserMe();
+  const { data: myApplications } = useGetMyApplications();
   const { mutate: patchPostClose, isPending: isClosing } = usePatchPostClose();
 
   const leftColRef = useRef<HTMLDivElement | null>(null);
@@ -85,6 +86,10 @@ const PostDetailPage = () => {
   const applyButtonPx = usePostDetailApplyButtonPosition(leftColRef);
 
   usePostDetailFloatingSideCard(leftColRef, sideWrapRef);
+
+  const myApplicationStatus = myApplications?.find(
+    (app) => app.postId === parsedPostId,
+  )?.status ?? null;
 
   const myUserId = me?.userId;
   const postUserId = postDetail?.user?.userId;
@@ -142,7 +147,14 @@ const PostDetailPage = () => {
                   </h1>
                 </div>
                 <div className="flex items-center gap-[0.8rem]">
-                  <div className="flex items-center gap-[0.8rem]">
+                  <div
+                    className="flex cursor-pointer items-center gap-[0.8rem]"
+                    onClick={() => {
+                      if (postDetail?.user?.userId) {
+                        navigate(`/profile/${postDetail.user.userId}`);
+                      }
+                    }}
+                  >
                     {postDetail?.user?.profileImageUrl ? (
                       <div className="shadow-insetBorderBlack10 flex aspect-[1/1] h-[2.4rem] w-[2.4rem] flex-col items-center justify-center gap-[1rem] rounded-[0.6rem] bg-black-10">
                         <img
@@ -290,7 +302,8 @@ const PostDetailPage = () => {
         </div>
 
         {/** 지원자 기준 화면: 지원하기 버튼 */}
-        {!isMyPost && applyButtonPx !== null && (
+        {/** 추후 기획에 따라 변경 될 예정 */}
+        {!isMyPost && applyButtonPx !== null && myApplicationStatus !== 'APPROVED' && myApplicationStatus !== 'REJECTED' && (
           <div
             className="fixed bottom-[3.6rem] z-50 -translate-x-1/2"
             style={{ left: applyButtonPx ?? undefined }}
@@ -304,9 +317,10 @@ const PostDetailPage = () => {
                 className="relative z-10 w-[32rem]"
                 size="lg"
                 color="primary"
+                disabled={myApplicationStatus === 'PENDING'}
                 onClick={() => setIsApplyModalOpen(true)}
               >
-                지원하기
+                {myApplicationStatus === 'PENDING' ? '승인 대기중' : '지원하기'}
               </BaseButton>
             </div>
           </div>

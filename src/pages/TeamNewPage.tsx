@@ -42,6 +42,7 @@ const TeamNewPage = () => {
     },
   });
 
+  const teamnameValue = watch('name', '');
   const descriptionValue = watch('description', '');
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -100,19 +101,36 @@ const TeamNewPage = () => {
             isRequired
             errorMessage={errors.name?.message}
             inputProps={{
-              placeholder: '특수문자 제한, 최대 글자 수 20자',
+              placeholder: '팀명을 입력해주세요',
+              value: teamnameValue,
               ...register('name', {
                 required: '팀 이름을 입력해주세요.',
-                maxLength: {
-                  value: 20,
-                  message: '최대 20자까지 가능합니다.',
+                validate: (value) => {
+                  if (value.trim().length === 0) {
+                    return '공백만 입력할 수 없습니다.';
+                  }
+                  const getByteLength = (str: string) => {
+                    return str.split('').reduce((acc: number, char: string) => {
+                      return acc + (/[가-힣]/.test(char) ? 3 : 1);
+                    }, 0);
+                  };
+
+                  const byteLength = getByteLength(value);
+                  const maxByte = 18;
+
+                  // 2. 조건 검증
+                  if (byteLength > maxByte) {
+                    return `글자수를 초과했어요.`;
+                  }
+                  return true;
                 },
                 pattern: {
-                  value: /^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ]*$/,
+                  value: /^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ ]*$/,
                   message: '특수문자는 사용 불가합니다.',
                 },
               }),
             }}
+            maxLength={18}
           />
 
           <FieldMaster
@@ -159,16 +177,22 @@ const TeamNewPage = () => {
               value: descriptionValue,
               ...register('description', {
                 required: '상세 소개를 작성해주세요.',
-                onChange: (e) => {
-                  const value = e.target.value;
-                  if (value.length > 200) {
-                    setValue('description', value.slice(0, 200));
+                validate: (value) => {
+                  const getByteLength = (str: string) => {
+                    return str.split('').reduce((acc: number, char: string) => {
+                      return acc + (/[가-힣]/.test(char) ? 3 : 1);
+                    }, 0);
+                  };
+                  const byteLength = getByteLength(value);
+                  const maxByte = 600;
+                  // 2. 조건 검증
+                  if (byteLength > maxByte) {
+                    return `글자수를 초과했어요.`;
                   }
+                  return true;
                 },
-                validate: (value) =>
-                  value.length <= 200 || '200자 이내로 입력해주세요.',
               }),
-              maxLength: 200,
+              maxLength: 600,
             }}
           />
         </div>
