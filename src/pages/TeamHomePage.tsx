@@ -323,7 +323,7 @@ const TeamHomePage = () => {
                   isMe={member.userId === me?.userId}
                   isLeader={member.role === 'LEADER'}
                   isManager={member.role === 'MANAGER'}
-                  canManage={isLeaderOrManager && !member.deletedAt}
+                  canManage={isLeaderOrManager && !member.deletedAt && member.role !== 'LEADER'}
                   disabled={!!member.deletedAt}
                   isActive={activeTeamMember === member.memberId}
                   onClick={() => {
