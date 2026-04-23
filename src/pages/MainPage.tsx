@@ -9,6 +9,7 @@ import { useGetIsUserProfileComplete } from '../hooks/useUser';
 
 import MainSearch from '../components/Main/MainSearch/MainSearch';
 import ProfileModal from '../components/Modal/ProfileModal';
+import LoginModal from '../components/Modal/LoginModal';
 
 import { formatPostListCreatedAt } from '../utils/kst-time';
 import type { PostDetailResponse } from '../types/api/posts';
@@ -157,6 +158,10 @@ const MainPage = () => {
         isOpen={isOnboardingModalOpen}
         onClose={() => {}}
         mode="onboarding"
+      />
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
       />
     </>
   );

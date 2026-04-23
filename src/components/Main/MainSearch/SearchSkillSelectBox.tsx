@@ -1,3 +1,5 @@
+import BaseChip from '../../common/Chip/BaseChip';
+
 import { SKILL_MAP } from '../../../constants/skillMap';
 import { SkillIcon } from '../../../utils/SkillIcon';
 import { allSkills } from './skill-data';
@@ -26,22 +28,16 @@ const SearchSkillSelectBox = ({
           const id = SKILL_MAP[label as keyof typeof SKILL_MAP];
           const isSelected = selectedSet.has(id);
 
-          const baseStyle =
-            'flex h-[4rem] items-center justify-center gap-[0.5rem] rounded-[9.9rem] border border-solid px-[1.2rem] hover:border-[#06F] hover:bg-[#F0F6FF] hover:text-[#0E0E0F]';
-          const selectedStyle = 'border-[#06F] bg-[#F0F6FF] text-[#0E0E0F]';
-          const unSelectedStyle = 'border-[#CFD1D5] bg-white text-[#51535A]';
-
           return (
-            <button
+            <BaseChip
               key={id}
-              type="button"
+              isSelected={isSelected}
+              mainIcon={<SkillIcon name={label} />}
               onClick={() => onToggleSkill({ id, label })}
-              className={`${baseStyle} ${isSelected ? selectedStyle : unSelectedStyle}`}
               aria-pressed={isSelected}
             >
-              <SkillIcon name={label} className="h-[1.6rem] w-[1.6rem]" />
-              <span className="text-[1.4rem] font-[500]">{label}</span>
-            </button>
+              {label}
+            </BaseChip>
           );
         })}
       </div>
