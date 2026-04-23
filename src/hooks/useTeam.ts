@@ -88,6 +88,7 @@ export const useGetTeamApplications = (
 
 // 팀 지원
 export const useCreateTeamApplications = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
       teamId,
@@ -96,6 +97,9 @@ export const useCreateTeamApplications = () => {
       teamId: number;
       postData: ApplyRequest;
     }) => PostTeamApplications(teamId, postData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-applications'] });
+    },
   });
 };
 

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { useQuery, useInfiniteQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   createPosts,
   getPostDetail,
@@ -28,6 +28,8 @@ export const useGetPostDetail = (postId: number) => {
 
 // 모집글 마감/모집 토글
 export const usePatchPostClose = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({
       postId,
@@ -36,6 +38,9 @@ export const usePatchPostClose = () => {
       postId: number;
       status: RecruitmentStatusType;
     }) => patchPostClose(postId, status),
+    onSuccess: (_, { postId }) => {
+      queryClient.invalidateQueries({ queryKey: ['post-detail', postId] });
+    },
   });
 };
 
