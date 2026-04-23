@@ -55,7 +55,7 @@ const STATUS_INFO = {
     <span className="text-[1.6rem] font-normal text-black-80">
       현재 팀이
       <span className="font-bold text-blue-100"> 진행중 </span>
-      상태입니다. 팀원들과 목표한 작업을 모두 마무리하셨나요? 팀이 끝나면{' '}
+      상태입니다. 팀원들과 목표한 작업을 모두 마무리하셨나요? 팀이 끝나면
       <span className="font-bold text-blue-100">완료 </span>
       처리를 해주세요.
     </span>
@@ -64,7 +64,7 @@ const STATUS_INFO = {
     <span className="text-[1.6rem] font-normal text-black-80">
       모든 프로젝트가 마무리되어 팀 활동이
       <span className="font-bold text-blue-100"> 종료</span>된 상태입니다.
-      <span className="font-bold text-blue-100">리뷰를 진행해주세요.</span>
+      <span className="font-bold text-blue-100">리뷰를 진행해 주세요.</span>
     </span>
   ),
 };
@@ -120,9 +120,6 @@ const TeamStatusPage = () => {
               </div>
             </div>
           </div>
-          <span className="mx-auto text-[1.6rem] font-normal text-black-60">
-            © 2026 Waggle Inc. All rights reserved.
-          </span>
         </div>
       </div>
       <TeamStatusModal
