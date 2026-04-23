@@ -127,6 +127,9 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
         }),
 
         ...(data.bio?.trim() && { bio: data.bio.trim() }),
+        ...(mode === 'edit' && {
+          profileImageUrl: myData?.profileImageUrl,
+        }),
       };
 
       if (mode === 'onboarding') {
