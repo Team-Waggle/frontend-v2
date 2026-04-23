@@ -99,8 +99,6 @@ const MainPage = () => {
     }
   }, [data, isSuccess, setProfileComplete]);
 
-  const nowMs = Date.now();
-
   return (
     <>
       <div className="flex w-full justify-center">
@@ -133,7 +131,7 @@ const MainPage = () => {
                 );
 
                 const createdAtText = post.createdAt
-                  ? formatPostListCreatedAt(post.createdAt, nowMs)
+                  ? formatPostListCreatedAt(post.createdAt)
                   : '';
 
                 return (
