@@ -16,6 +16,7 @@ import TeamDefaultImg from '../assets/icons/image/ic_character_circle_primary_60
 import IcPersons from '../assets/icons/normal/ic_persons.svg?react';
 import IcDesktop from '../assets/icons/normal/ic_desktop.svg?react';
 import IcCompany from '../assets/icons/normal/ic_company.svg?react';
+import IcEdit from '../assets/icons/normal/ic_write.svg?react';
 
 import ChevronLeft from '../assets/icons/normal/chevron/ic_chevronLeft.svg?react';
 import ChevronRight from '../assets/icons/normal/chevron/ic_chevronRight.svg?react';
@@ -117,7 +118,7 @@ const TeamHomePage = () => {
     if (workMode === 'OFFLINE') {
       return '오프라인';
     }
-    
+
     if (workMode === 'HYBRID') {
       return '혼합';
     }
@@ -145,7 +146,7 @@ const TeamHomePage = () => {
       {isLeaderOrManager && <TeamNav />}
       <div className="flex w-full max-w-[clamp(98.2rem,70vw,130rem)] flex-col items-start gap-[4rem]">
         {/** 팀 설명 */}
-        <div className="flex items-start gap-[4rem] self-stretch">
+        <div className="relative flex items-start gap-[4rem] self-stretch">
           {/** 팀 이미지: default 값 */}
           {teamDetail?.profileImageUrl ? (
             <div className="flex aspect-[1/1] h-[22.3rem] w-[22.3rem] flex-col items-center justify-center gap-[1rem] rounded-[1em] bg-black-10">
@@ -205,6 +206,13 @@ const TeamHomePage = () => {
                 {teamDetail?.description ?? '팀 소개가 들어가는 자리입니다.'}
               </span>
             </div>
+          </div>
+          {/** 팀 수정: 경로만 추가해뒀습니다.  */}
+          <div className="absolute right-0 flex aspect-square h-[4.4rem] w-[4.4rem] flex-col items-center justify-center">
+            <IcEdit
+              onClick={() => navigate(`/team/edit`)}
+              className="right-4 top-4 flex aspect-square h-[2.4rem] w-[2.4rem] cursor-pointer flex-col items-center justify-center text-black-50"
+            />
           </div>
         </div>
         {/** 팀 모집글 / 팀원 관리 */}
@@ -311,6 +319,7 @@ const TeamHomePage = () => {
                   key={member.memberId}
                   variant="team"
                   memberId={member.memberId}
+                  userId={member.userId}
                   title={member.username}
                   status={teamDetail?.status}
                   profileImageUrl={member.profileImageUrl}
@@ -319,7 +328,11 @@ const TeamHomePage = () => {
                   isMe={member.userId === me?.userId}
                   isLeader={member.role === 'LEADER'}
                   isManager={member.role === 'MANAGER'}
-                  canManage={isLeaderOrManager && !member.deletedAt && member.role !== 'LEADER'}
+                  canManage={
+                    isLeaderOrManager &&
+                    !member.deletedAt &&
+                    member.role !== 'LEADER'
+                  }
                   disabled={!!member.deletedAt}
                   isActive={activeTeamMember === member.memberId}
                   onClick={() => {

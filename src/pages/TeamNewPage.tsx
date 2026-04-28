@@ -100,8 +100,8 @@ const TeamNewPage = () => {
     if (!file || !presignedUrl) return;
 
     createTeam(data, {
-      onSuccess: (data) => {
-        axios.put(presignedUrl, file, {
+      onSuccess: async (data) => {
+        await axios.put(presignedUrl, file, {
           headers: { 'Content-Type': file.type },
         });
         navigate(`/team/${data.teamId}`);
