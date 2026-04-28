@@ -309,7 +309,7 @@ const PostDetailPage = () => {
 
         {/** 지원자 기준 화면: 지원하기 버튼 */}
         {/** 추후 기획에 따라 변경 될 예정 */}
-        {!isMyPost && applyButtonPx !== null && myApplicationStatus !== 'APPROVED' && myApplicationStatus !== 'REJECTED' && (
+        {!isMyPost && applyButtonPx !== null && postDetail?.isRecruiting && myApplicationStatus !== 'APPROVED' && myApplicationStatus !== 'REJECTED' && (
           <div
             className="fixed bottom-[3.6rem] z-50 -translate-x-1/2"
             style={{ left: applyButtonPx ?? undefined }}
