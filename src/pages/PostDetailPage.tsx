@@ -21,6 +21,9 @@ import BaseButton from '../components/common/Button/index';
 import { FieldViewer } from '../components/FieldViewer';
 import ApplyModal from '../components/Modal/ApplyModal';
 import WaitingModal from '../components/Modal/WaitingModal';
+import LoginModal from '../components/Modal/LoginModal';
+
+import { useAuthStore } from '../stores/authStore';
 
 type RecruitmentCountKey =
   | 'plan'
@@ -74,6 +77,9 @@ const PostDetailPage = () => {
 
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [isApplyWaitingModalOpen, setIsApplyWaitingModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  const { isLoggedIn } = useAuthStore();
 
   const { data: postDetail } = useGetPostDetail(parsedPostId);
   const { data: me } = useGetUserMe();
@@ -318,7 +324,13 @@ const PostDetailPage = () => {
                 size="lg"
                 color="primary"
                 disabled={myApplicationStatus === 'PENDING'}
-                onClick={() => setIsApplyModalOpen(true)}
+                onClick={() => {
+                  if (!isLoggedIn) {
+                    setIsLoginModalOpen(true);
+                  } else {
+                    setIsApplyModalOpen(true);
+                  }
+                }}
               >
                 {myApplicationStatus === 'PENDING' ? '승인 대기중' : '지원하기'}
               </BaseButton>
@@ -341,6 +353,10 @@ const PostDetailPage = () => {
       <WaitingModal
         isOpen={isApplyWaitingModalOpen}
         onClose={() => setIsApplyWaitingModalOpen(false)}
+      />
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
       />
     </>
   );

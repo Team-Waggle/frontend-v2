@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { useAuthStore } from '../../../stores/authStore';
+import LoginModal from '../../Modal/LoginModal';
+
 import BaseButton from '../Button/index';
 
 import IcCrown from '../../../assets/icons/tag/ic_crown.svg?react';
@@ -116,6 +119,8 @@ const SideTeamCard = ({
   onKickMember,
 }: SideTeamCardProps) => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuthStore();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const skillsIcon = Array.from(
     new Set(
@@ -265,17 +270,27 @@ const SideTeamCard = ({
         </div>
       </div>
       {variant === 'post' && (
-        <BaseButton
-          size="md"
-          color="secondary"
-          onClick={() =>
-            navigate(`/message/${memberId}`, {
-              state: { username: title, position, profileImageUrl },
-            })
-          }
-        >
-          문의하기
-        </BaseButton>
+        <>
+          <BaseButton
+            size="md"
+            color="secondary"
+            onClick={() => {
+              if (!isLoggedIn) {
+                setIsLoginModalOpen(true);
+              } else {
+                navigate(`/message/${memberId}`, {
+                  state: { username: title, position, profileImageUrl },
+                });
+              }
+            }}
+          >
+            문의하기
+          </BaseButton>
+          <LoginModal
+            isOpen={isLoginModalOpen}
+            onClose={() => setIsLoginModalOpen(false)}
+          />
+        </>
       )}
 
       {variant === 'team' && status === 'COMPLETED' && (
