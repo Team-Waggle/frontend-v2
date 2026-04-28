@@ -15,6 +15,7 @@ import FieldMaster from '../Field/FieldMaster';
 import { SkillIcon } from '../../utils/SkillIcon';
 import { toSkillLabel } from '../../utils/skill';
 import { POSITION_CONVERTER } from '../../utils/position';
+import { getByteLength } from '../../utils/getByteLength';
 import {
   useCreateUserProfile,
   useDeleteUserMe,
@@ -53,6 +54,7 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
     setError,
     reset,
     formState: { errors, isValid },
+    clearErrors,
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
@@ -149,6 +151,25 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const byteLength = getByteLength(value);
+
+    if (byteLength > 15) {
+      setError('username', {
+        type: 'manual',
+        message: '글자수를 초과했어요.',
+      });
+      return;
+    }
+
+    clearErrors('username');
+    setValue('username', value, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  };
+
   useModal({ isOpen, isOnboarding: mode === 'onboarding', onClose });
   if (!isOpen) return null;
 
@@ -186,31 +207,19 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                     required: '닉네임은 필수입니다.',
                     pattern: {
                       value: /^[a-zA-Z0-9가-힣]*$/,
-                      message: '공백과 특수문자는 사용할 수 없어요.',
+                      message:
+                        '한글 자음/모음, 공백, 특수문자는 사용할 수 없어요.',
                     },
                     validate: (value) => {
-                      const getByteLength = (str: string) => {
-                        return str
-                          .split('')
-                          .reduce((acc: number, char: string) => {
-                            return acc + (/[가-힣]/.test(char) ? 3 : 1);
-                          }, 0);
-                      };
-
                       const byteLength = getByteLength(value);
-                      const maxByte = 15;
-
-                      // 2. 조건 검증
-                      if (byteLength < 6) {
+                      if (byteLength > 0 && byteLength < 6) {
                         return '닉네임은 최소 6byte 이상이어야 합니다.';
                       }
-                      if (byteLength > maxByte) {
-                        return `글자수를 초과했어요.`;
-                      }
-
                       return true;
                     },
                   }),
+                  onChange: handleChange,
+                  disabled: mode === 'edit',
                 }}
                 maxLength={15}
               />
