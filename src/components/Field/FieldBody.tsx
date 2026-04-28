@@ -7,6 +7,7 @@ import IconWrapper from '../common/IconWrapper';
 import { SkillIcon } from '../../utils/SkillIcon';
 import { positionSkillData } from '../../constants/positionSkill';
 import type { PositionKey } from '../../utils/position';
+import { getByteLength } from '../../utils/getByteLength';
 import type { TeamResponse } from '../../types/api/team';
 import type { PositionType } from '../../types/api/posts';
 
@@ -99,24 +100,19 @@ interface FieldTabProps {
 export const FieldInput = memo(
   forwardRef<HTMLInputElement, FieldInputProps>(
     ({ id, error, maxLength, className, ...props }, ref) => {
+      const currentByte = getByteLength(String(props.value ?? ''));
       const isEmpty = !props.value;
-
-      const getByteLength = (str: string) => {
-        return str.split('').reduce((acc: number, char: string) => {
-          return acc + (/[가-힣]/.test(char) ? 3 : 1);
-        }, 0);
-      };
-
-      const byteLength = getByteLength(String(props.value ?? ''));
 
       return (
         <div
           className={`flex h-[6rem] items-center rounded-[0.8rem] border px-[1.8rem] py-[1.7rem] ${
             error
               ? 'border-error'
-              : isEmpty
-                ? 'border-black-30 focus-within:border-blue-80'
-                : 'border-black-100 focus-within:border-blue-80'
+              : props.disabled
+                ? 'bg-black-20 text-black-40'
+                : isEmpty
+                  ? 'border-black-30 focus-within:border-blue-80'
+                  : 'border-black-100 focus-within:border-blue-80'
           } ${className || ''}`}
         >
           <input
@@ -126,9 +122,9 @@ export const FieldInput = memo(
             className={`w-full text-[1.6rem] font-medium`}
             {...props}
           />
-          {maxLength && (
+          {maxLength && !props.disabled && (
             <span className="text-[1.4rem] font-medium text-black-60">
-              {byteLength}/{maxLength}
+              {currentByte}/{maxLength}
             </span>
           )}
         </div>
@@ -144,12 +140,6 @@ export const FieldTextarea = memo(
     ({ id, error, maxLength = 500, className, ...props }, ref) => {
       const [text, setText] = useState('');
       const isEmpty = !props.value;
-
-      const getByteLength = (str: string) => {
-        return str.split('').reduce((acc: number, char: string) => {
-          return acc + (/[가-힣]/.test(char) ? 3 : 1);
-        }, 0);
-      };
 
       const byteLength = getByteLength(String(props.value ?? ''));
 
