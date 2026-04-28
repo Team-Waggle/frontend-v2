@@ -1,5 +1,17 @@
 import type { PositionType } from './posts';
 
+export type MyApplicationResponse = {
+  applicationId: number;
+  position: PositionType;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  teamId: number;
+  postId: number;
+  detail: string;
+  portfolioUrls: string[];
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type UserMeResponse = {
   userId: string;
   username: string;

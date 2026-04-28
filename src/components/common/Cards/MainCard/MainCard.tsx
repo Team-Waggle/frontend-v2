@@ -63,8 +63,8 @@ const MainCard = ({
       {/** Frame 01 */}
       <div className="flex h-[9rem] min-w-[28rem] flex-col items-start gap-[1.6rem] self-stretch">
         {/** MainCard Title */}
-        <div className="flex h-[4.6rem] max-h-[4.6rem] flex-shrink-0 items-start gap-[1.2rem] self-stretch overflow-hidden overflow-ellipsis">
-          <span className="line-clamp-2 overflow-hidden text-left text-ellipsis text-[1.6rem] font-[600] text-[#0E0E0E]">
+        <div className="flex h-[4.8rem] max-h-[4.8rem] flex-shrink-0 items-start gap-[1.2rem] self-stretch overflow-hidden overflow-ellipsis">
+          <span className="line-clamp-2 leading-[1.5] tracking-[-0.032rem] overflow-hidden text-left text-ellipsis text-[1.6rem] font-[600] text-[#0E0E0E]">
             {mainCardTitle}
           </span>
         </div>
@@ -80,7 +80,7 @@ const MainCard = ({
       {/** Frame 02 */}
       <div className="flex flex-col items-start gap-[0.4rem] self-stretch">
         {/* card-skill-box */}
-        <div className="flex h-[2.4rem] items-center gap-[0.6rem] self-stretch">
+        <div className="flex h-[2.8rem] items-center gap-[0.6rem] self-stretch">
           <div className="flex items-center gap-[0.6rem]">
             {(mainCardSkills || []).slice(0, 5).map((skill, index) => {
               const enumValue = (skill || '').trim();
@@ -90,6 +90,7 @@ const MainCard = ({
                 <SkillIconLarge
                   key={`${enumValue}-${iconName}-${index}`}
                   name={iconName}
+                  className="w-[2.8rem]"
                 />
               );
             })}

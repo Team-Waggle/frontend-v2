@@ -16,6 +16,7 @@ type MainSearchSelectFieldProps = {
   suppressRightBorder?: boolean;
   disabled?: boolean;
   hasKeyword?: boolean;
+  highlightRightBorder?: boolean;
 };
 
 const MainSearchSelectField = ({
@@ -28,6 +29,7 @@ const MainSearchSelectField = ({
   suppressRightBorder = false,
   disabled = false,
   hasKeyword = false,
+  highlightRightBorder = false,
 }: MainSearchSelectFieldProps) => {
   const baseCommon =
     'flex-1 flex min-w-0 h-[5rem] px-[2rem] items-center gap-[1rem] border-solid bg-white';
@@ -41,7 +43,7 @@ const MainSearchSelectField = ({
   const closedBorderDefault = 'border-[#B7B9C0]';
   const closedBorderSelected = 'border-[#237BFF]';
 
-  const shouldHighlightText = isSelected || hasKeyword;
+  const shouldHighlightText = isSelected;
 
   const openClass =
     variant === 'job'
@@ -53,6 +55,11 @@ const MainSearchSelectField = ({
     : isSelected
       ? closedBorderSelected
       : closedBorderDefault;
+
+  const rightBorderOverride =
+    !isOpen && !isSelected && (highlightRightBorder || (variant === 'skill' && hasKeyword))
+      ? 'border-r-[#237BFF]'
+      : '';
 
   const textColorClass = isOpen
     ? ''
@@ -73,7 +80,7 @@ const MainSearchSelectField = ({
       disabled={disabled}
       className={`${baseCommon} ${baseVariant} ${
         isOpen ? openClass : `${borderColorClass} ${textColorClass}`
-      } ${suppressRightBorder ? 'border-r-0' : ''}`}
+      } ${rightBorderOverride} ${suppressRightBorder ? 'border-r-0' : ''}`}
     >
       <div className="flex h-[2rem] w-[2rem] items-center justify-center">
         {icon}

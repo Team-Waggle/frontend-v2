@@ -1,7 +1,8 @@
 import axiosInstance from './axiosInstance';
-import type { UserMeResponse } from '../types/api/user';
+import type { MyApplicationResponse, UserMeResponse } from '../types/api/user';
 import {
   USERS_CHECK_URL,
+  USERS_ME_APPLICATIONS_URL,
   USERS_ME_NOTIFICATIONS_COUNT_URL,
   USERS_ME_NOTIFICATIONS_READ_ALL_URL,
   USERS_ME_NOTIFICATIONS_READ_URL,
@@ -32,6 +33,16 @@ export const getUserDetail = async (
 export const getUserCheck = async (username: string) => {
   const { data } = await axiosInstance.get(
     `${USERS_CHECK_URL}?username=${username}`,
+  );
+  return data;
+};
+
+// 본인 지원 목록 조회
+export const getUserMeApplications = async (): Promise<
+  MyApplicationResponse[]
+> => {
+  const { data } = await axiosInstance.get<MyApplicationResponse[]>(
+    USERS_ME_APPLICATIONS_URL,
   );
   return data;
 };
