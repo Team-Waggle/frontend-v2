@@ -244,12 +244,12 @@ const SideTeamCard = ({
                 alt={'프로필 이미지'}
                 src={profileImageUrl}
                 className="h-[6.1rem] w-[6.1rem] cursor-pointer rounded-[9.9rem] object-cover"
-                onClick={() => navigate(`/profile/${memberId}`)}
+                onClick={() => navigate(`/profile/${userId ?? memberId}`)}
               />
             ) : (
               <IcCharacter
                 className="h-[6.1rem] w-[6.1rem] cursor-pointer rounded-[9.9rem]"
-                onClick={() => navigate(`/profile/${memberId}`)}
+                onClick={() => navigate(`/profile/${userId ?? memberId}`)}
               />
             )}
             <div className="flex flex-col items-center gap-[0.4rem]">
