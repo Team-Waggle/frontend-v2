@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { useAuthStore } from '../../../stores/authStore';
+import LoginModal from '../../Modal/LoginModal';
+
 import BaseButton from '../Button/index';
 
 import IcCrown from '../../../assets/icons/tag/ic_crown.svg?react';
@@ -18,6 +21,7 @@ import ReviewModal from '../../Modal/ReviewModal';
 
 interface SideTeamCardProps {
   memberId?: number | string;
+  userId?: number | string;
   title?: string;
   position?: string;
   profileImageUrl?: string;
@@ -98,6 +102,7 @@ const toPositionLabel = (position?: string): string => {
 
 const SideTeamCard = ({
   memberId,
+  userId,
   title = 'title',
   position = 'position',
   profileImageUrl,
@@ -115,6 +120,8 @@ const SideTeamCard = ({
   onKickMember,
 }: SideTeamCardProps) => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuthStore();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const skillsIcon = Array.from(
     new Set(
@@ -269,27 +276,34 @@ const SideTeamCard = ({
           <BaseButton
             size="md"
             color="secondary"
-            onClick={() =>
-              navigate(`/message/${memberId}`, {
-                state: { username: title, position, profileImageUrl },
-              })
-            }
+            onClick={() => {
+              if (!isLoggedIn) {
+                setIsLoginModalOpen(true);
+              } else {
+                navigate(`/message/${memberId}`, {
+                  state: { username: title, position, profileImageUrl },
+                });
+              }
+            }}
           >
             문의하기
           </BaseButton>
         )}
-
         {variant === 'team' && status === 'COMPLETED' && (
           <BaseButton
             size="md"
             color="tertiary"
-            disabled={isMe}
+            disabled={isMe || disabled}
             onClick={() => setIsReviewModalOpen(true)}
           >
             리뷰 쓰기
           </BaseButton>
         )}
       </div>
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
       <ReviewModal
         isOpen={isReviewModalOpen}
         onClose={() => setIsReviewModalOpen(false)}
