@@ -144,7 +144,7 @@ const ApplyModal = ({
               disabled={!isValid}
               className="mx-auto w-[25rem]"
             >
-              지원완료
+              지원하기
             </BaseButton>
           </div>
         </form>

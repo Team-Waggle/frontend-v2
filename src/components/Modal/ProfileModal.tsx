@@ -79,24 +79,31 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
   const introValue = watch('bio', '');
 
   useEffect(() => {
-    if (myData) {
-      reset({
-        username: myData.username || '',
-        position:
-          (POSITION_CONVERTER[myData.position] as PositionType) || '기획',
-        skills: myData.skills.map((skill) => toSkillLabel(skill)),
-        portfolioUrls: myData.portfolioUrls?.[0] || '',
-        bio: myData.bio || '',
-      });
+    if (!isOpen) {
+      if (myData) {
+        reset({
+          username: myData.username || '',
+          position:
+            (POSITION_CONVERTER[myData.position] as PositionType) || '기획',
+          skills: myData.skills.map((skill) => toSkillLabel(skill)),
+          portfolioUrls: myData.portfolioUrls?.[0] || '',
+          bio: myData.bio || '',
+        });
+      } else {
+        reset();
+      }
     }
-  }, [myData, reset]);
+  }, [isOpen, myData, reset]);
 
   useEffect(() => {
-    register('skills', {
-      required: '스킬을 최소 하나 이상 선택해주세요.',
-      validate: (value) => value.length > 0 || '스킬을 선택해주세요.',
-    });
-  }, [register]);
+    if (isOpen) {
+      register('skills', {
+        required: '스킬을 최소 하나 이상 선택해주세요.',
+        validate: (value) =>
+          (Array.isArray(value) && value.length > 0) || '스킬을 선택해주세요.',
+      });
+    }
+  }, [register, isOpen]);
 
   const onSubmit = async (data: FormValues) => {
     try {
@@ -245,8 +252,11 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                         key={pos}
                         isSelected={activePosition === pos}
                         onClick={() => {
-                          setValue('position', pos);
-                          setValue('skills', [], { shouldValidate: true });
+                          setValue('position', pos, { shouldDirty: true });
+                          setValue('skills', [], {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                          });
                         }}
                       >
                         {pos}

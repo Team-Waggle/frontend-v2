@@ -94,7 +94,7 @@ interface FieldTabProps {
   value?: string[];
   onChange?: (value: string[]) => void;
   options?: string[];
-  reviewType?: 'LIKE' | 'DISLIKE';
+  type?: 'LIKE' | 'DISLIKE';
 }
 
 export const FieldInput = memo(
@@ -930,9 +930,9 @@ export const FieldTab = ({
   value = [],
   onChange,
   options,
-  reviewType,
+  type,
 }: FieldTabProps) => {
-  const isInverted = reviewType === 'DISLIKE';
+  const isInverted = type === 'DISLIKE';
 
   const handleClick = (item: string) => {
     const isSelected = value.includes(item);
@@ -950,7 +950,7 @@ export const FieldTab = ({
     onChange?.([...value, item]);
   };
   return (
-    <div className="flex flex-wrap gap-x-[0.6rem] gap-y-[1rem] pr-[2rem]">
+    <div className="flex h-[10.8rem] flex-wrap content-start gap-[1rem] pr-[2rem]">
       {options?.map((item, idx) => {
         const isSelected = value.includes(item);
         const isDisabled = !isSelected && value.length >= 3;
@@ -962,7 +962,7 @@ export const FieldTab = ({
             onClick={() => handleClick(item)}
             className={`${isSelected && isInverted ? 'border-error bg-error-2' : ''}`}
           >
-            {item}
+            #{item}
           </BaseChip>
         );
       })}

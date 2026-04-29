@@ -77,7 +77,7 @@ interface FiledMasterProps {
     value?: string[];
     onChange?: (value: string[]) => void;
     options: string[];
-    reviewType?: 'LIKE' | 'DISLIKE';
+    type?: 'LIKE' | 'DISLIKE';
   };
 }
 
