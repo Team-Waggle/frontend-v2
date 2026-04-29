@@ -21,6 +21,9 @@ import BaseButton from '../components/common/Button/index';
 import { FieldViewer } from '../components/FieldViewer';
 import ApplyModal from '../components/Modal/ApplyModal';
 import WaitingModal from '../components/Modal/WaitingModal';
+import LoginModal from '../components/Modal/LoginModal';
+
+import { useAuthStore } from '../stores/authStore';
 
 type RecruitmentCountKey =
   | 'plan'
@@ -74,6 +77,9 @@ const PostDetailPage = () => {
 
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [isApplyWaitingModalOpen, setIsApplyWaitingModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  const { isLoggedIn } = useAuthStore();
 
   const { data: postDetail } = useGetPostDetail(parsedPostId);
   const { data: me } = useGetUserMe();
@@ -303,7 +309,7 @@ const PostDetailPage = () => {
 
         {/** 지원자 기준 화면: 지원하기 버튼 */}
         {/** 추후 기획에 따라 변경 될 예정 */}
-        {!isMyPost && applyButtonPx !== null && myApplicationStatus !== 'APPROVED' && myApplicationStatus !== 'REJECTED' && (
+        {!isMyPost && applyButtonPx !== null && postDetail?.isRecruiting && myApplicationStatus !== 'APPROVED' && myApplicationStatus !== 'REJECTED' && (
           <div
             className="fixed bottom-[3.6rem] z-50 -translate-x-1/2"
             style={{ left: applyButtonPx ?? undefined }}
@@ -318,7 +324,13 @@ const PostDetailPage = () => {
                 size="lg"
                 color="primary"
                 disabled={myApplicationStatus === 'PENDING'}
-                onClick={() => setIsApplyModalOpen(true)}
+                onClick={() => {
+                  if (!isLoggedIn) {
+                    setIsLoginModalOpen(true);
+                  } else {
+                    setIsApplyModalOpen(true);
+                  }
+                }}
               >
                 {myApplicationStatus === 'PENDING' ? '승인 대기중' : '지원하기'}
               </BaseButton>
@@ -341,6 +353,10 @@ const PostDetailPage = () => {
       <WaitingModal
         isOpen={isApplyWaitingModalOpen}
         onClose={() => setIsApplyWaitingModalOpen(false)}
+      />
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
       />
     </>
   );
