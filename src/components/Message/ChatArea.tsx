@@ -29,7 +29,7 @@ const ChatArea = ({ partnerId }: { partnerId: string }) => {
   } = useChatLogic(partnerId, highlight);
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col">
+    <div className="relative flex h-full min-h-0 flex-1 flex-col overflow-hidden">
       {/** 헤더 */}
       <header className="flex items-center gap-[0.7rem] self-stretch border-b border-solid border-black-30 p-[2.4rem]">
         <div className="flex items-center gap-[1rem]">
@@ -66,7 +66,7 @@ const ChatArea = ({ partnerId }: { partnerId: string }) => {
         failedTempIds={failedTempIds}
         withAnchors
         partnerId={partnerId}
-        className="flex flex-1 flex-col gap-[1rem] overflow-y-auto pb-[10rem] pl-[1.2rem] pr-[2.8rem] pt-[2rem] scrollbar-hide"
+        className="min-h-0 flex flex-1 flex-col gap-[1rem] overflow-y-auto pb-[10rem] pl-[1.2rem] pr-[2.8rem] pt-[2rem] scrollbar-hide"
       />
 
       {/** 메시지 입력 */}

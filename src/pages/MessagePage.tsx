@@ -9,7 +9,7 @@ const MessagePage = () => {
   const { partnerId } = useParams<{ partnerId: string }>();
 
   return (
-    <div className="flex h-full min-h-screen flex-1 flex-row overflow-hidden">
+    <div className="flex h-screen flex-row overflow-hidden">
       <MessageList />
 
       {!partnerId ? (
