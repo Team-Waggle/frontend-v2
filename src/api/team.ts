@@ -9,12 +9,14 @@ import {
   TEAMS_STATUS_URL,
   APPLICATION_READ_URL,
   APPLICATION_STATUS_URL,
+  MEMBER_REVIEW_URL,
 } from '../constants/endpoint';
 import type {
   TeamResponse,
   MemberResponse,
   CursorResponseApplicantResponse,
   GetApplicationsParams,
+  ReviewRequestType,
 } from '../types/api/team';
 import type { ApplyRequest, PostDetailResponse } from '../types/api/posts';
 import axiosInstance from './axiosInstance';
@@ -105,6 +107,18 @@ export const PatchTeamMemberRole = async (
 // 팀 멤버 추방
 export const DeleteTeamMember = async (memberId: number) => {
   const { data } = await axiosInstance.delete(MEMBER_URL(memberId));
+  return data;
+};
+
+// 팀원 리뷰 작성/수정
+export const putTeamMemberReview = async (
+  memberId: number,
+  reviewBody: ReviewRequestType,
+) => {
+  const { data } = await axiosInstance.put(
+    MEMBER_REVIEW_URL(memberId),
+    reviewBody,
+  );
   return data;
 };
 
