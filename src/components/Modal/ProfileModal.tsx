@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -177,6 +177,25 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
     });
   };
 
+  const handleBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value.replace(/\n/g, ' ');
+    const byteLength = getByteLength(value);
+
+    if (byteLength > 100) {
+      setError('bio', {
+        type: 'manual',
+        message: '글자수를 초과했어요.',
+      });
+      return;
+    }
+
+    clearErrors('bio');
+    setValue('bio', value, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  };
+
   useModal({ isOpen, isOnboarding: mode === 'onboarding', onClose });
   if (!isOpen) return null;
 
@@ -305,22 +324,15 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                 title="한줄소개"
                 id="bio"
                 variant="textarea"
+                errorMessage={errors.bio?.message}
                 textareaProps={{
                   placeholder:
                     'React로 MVP 빠르게 만들어요. 주 2회 저녁 참여 가능!',
                   value: introValue,
-                  ...register('bio', {
-                    onChange: (e) => {
-                      const value = e.target.value;
-                      if (value.length > 100) {
-                        setValue('bio', value.slice(0, 100));
-                      }
-                    },
-                    validate: (value) =>
-                      value.length <= 100 || '100자 이내로 입력해주세요.',
-                  }),
-                  maxLength: 100,
+                  ...register('bio'),
+                  onChange: handleBioChange,
                 }}
+                maxLength={100}
               />
             </div>
           </div>
