@@ -19,6 +19,7 @@ interface SidebarItemProps {
   onClick?: () => void;
   subItems?: SubItem[];
   unreadNotificationCount: number;
+  setIsNotificationOpen: (v: boolean) => void;
 }
 
 const SidebarItem = ({
@@ -28,6 +29,7 @@ const SidebarItem = ({
   onClick,
   subItems,
   unreadNotificationCount,
+  setIsNotificationOpen,
 }: SidebarItemProps) => {
   const navigate = useNavigate();
   const { teamId } = useParams<{ teamId: string }>();
@@ -128,6 +130,7 @@ const SidebarItem = ({
                   key={team.teamId}
                   onClick={(e) => {
                     e.stopPropagation();
+                    setIsNotificationOpen(false);
                     navigate(`/team/${team.teamId}`);
                   }}
                   className="group flex h-[4.4rem] w-full items-center gap-[0.4rem] rounded-[0.8rem] px-[2.4rem] hover:bg-hover-5"
