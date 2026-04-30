@@ -332,6 +332,7 @@ const MyPage = () => {
                         isLeader={team.role === 'LEADER'}
                         profileImageUrl={team.profileImageUrl}
                         status={team.status}
+                        teamId={team.teamId}
                       />
                     ))}
               </div>

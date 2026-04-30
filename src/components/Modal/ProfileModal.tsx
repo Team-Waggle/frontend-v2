@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -15,6 +15,7 @@ import FieldMaster from '../Field/FieldMaster';
 import { SkillIcon } from '../../utils/SkillIcon';
 import { toSkillLabel } from '../../utils/skill';
 import { POSITION_CONVERTER } from '../../utils/position';
+import { getByteLength } from '../../utils/getByteLength';
 import {
   useCreateUserProfile,
   useDeleteUserMe,
@@ -53,6 +54,7 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
     setError,
     reset,
     formState: { errors, isValid },
+    clearErrors,
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
@@ -77,24 +79,31 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
   const introValue = watch('bio', '');
 
   useEffect(() => {
-    if (myData) {
-      reset({
-        username: myData.username || '',
-        position:
-          (POSITION_CONVERTER[myData.position] as PositionType) || '기획',
-        skills: myData.skills.map((skill) => toSkillLabel(skill)),
-        portfolioUrls: myData.portfolioUrls?.[0] || '',
-        bio: myData.bio || '',
-      });
+    if (!isOpen) {
+      if (myData) {
+        reset({
+          username: myData.username || '',
+          position:
+            (POSITION_CONVERTER[myData.position] as PositionType) || '기획',
+          skills: myData.skills.map((skill) => toSkillLabel(skill)),
+          portfolioUrls: myData.portfolioUrls?.[0] || '',
+          bio: myData.bio || '',
+        });
+      } else {
+        reset();
+      }
     }
-  }, [myData, reset]);
+  }, [isOpen, myData, reset]);
 
   useEffect(() => {
-    register('skills', {
-      required: '스킬을 최소 하나 이상 선택해주세요.',
-      validate: (value) => value.length > 0 || '스킬을 선택해주세요.',
-    });
-  }, [register]);
+    if (isOpen) {
+      register('skills', {
+        required: '스킬을 최소 하나 이상 선택해주세요.',
+        validate: (value) =>
+          (Array.isArray(value) && value.length > 0) || '스킬을 선택해주세요.',
+      });
+    }
+  }, [register, isOpen]);
 
   const onSubmit = async (data: FormValues) => {
     try {
@@ -127,6 +136,9 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
         }),
 
         ...(data.bio?.trim() && { bio: data.bio.trim() }),
+        ...(mode === 'edit' && {
+          profileImageUrl: myData?.profileImageUrl,
+        }),
       };
 
       if (mode === 'onboarding') {
@@ -144,6 +156,44 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const byteLength = getByteLength(value);
+
+    if (byteLength > 15) {
+      setError('username', {
+        type: 'manual',
+        message: '글자수를 초과했어요.',
+      });
+      return;
+    }
+
+    clearErrors('username');
+    setValue('username', value, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  };
+
+  const handleBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value.replace(/\n/g, ' ');
+    const byteLength = getByteLength(value);
+
+    if (byteLength > 100) {
+      setError('bio', {
+        type: 'manual',
+        message: '글자수를 초과했어요.',
+      });
+      return;
+    }
+
+    clearErrors('bio');
+    setValue('bio', value, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
   };
 
   useModal({ isOpen, isOnboarding: mode === 'onboarding', onClose });
@@ -183,31 +233,19 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                     required: '닉네임은 필수입니다.',
                     pattern: {
                       value: /^[a-zA-Z0-9가-힣]*$/,
-                      message: '공백과 특수문자는 사용할 수 없어요.',
+                      message:
+                        '한글 자음/모음, 공백, 특수문자는 사용할 수 없어요.',
                     },
                     validate: (value) => {
-                      const getByteLength = (str: string) => {
-                        return str
-                          .split('')
-                          .reduce((acc: number, char: string) => {
-                            return acc + (/[가-힣]/.test(char) ? 3 : 1);
-                          }, 0);
-                      };
-
                       const byteLength = getByteLength(value);
-                      const maxByte = 15;
-
-                      // 2. 조건 검증
-                      if (byteLength < 6) {
+                      if (byteLength > 0 && byteLength < 6) {
                         return '닉네임은 최소 6byte 이상이어야 합니다.';
                       }
-                      if (byteLength > maxByte) {
-                        return `글자수를 초과했어요.`;
-                      }
-
                       return true;
                     },
                   }),
+                  onChange: handleChange,
+                  disabled: mode === 'edit',
                 }}
                 maxLength={15}
               />
@@ -233,8 +271,11 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                         key={pos}
                         isSelected={activePosition === pos}
                         onClick={() => {
-                          setValue('position', pos);
-                          setValue('skills', [], { shouldValidate: true });
+                          setValue('position', pos, { shouldDirty: true });
+                          setValue('skills', [], {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                          });
                         }}
                       >
                         {pos}
@@ -272,8 +313,14 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                 title="포트폴리오"
                 id="portfolioUrls"
                 variant="input"
+                errorMessage={errors.portfolioUrls?.message}
                 inputProps={{
-                  ...register('portfolioUrls'),
+                  ...register('portfolioUrls', {
+                    pattern: {
+                      value: /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/\S*)?$/,
+                      message: '올바른 URL 형식을 입력해 주세요.',
+                    },
+                  }),
                   value: portfolioUrlsValue,
                   placeholder:
                     '현재 가지고 있는 포트폴리오 사이트가 있다면 URL을 입력해 주세요.',
@@ -283,22 +330,15 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                 title="한줄소개"
                 id="bio"
                 variant="textarea"
+                errorMessage={errors.bio?.message}
                 textareaProps={{
                   placeholder:
                     'React로 MVP 빠르게 만들어요. 주 2회 저녁 참여 가능!',
                   value: introValue,
-                  ...register('bio', {
-                    onChange: (e) => {
-                      const value = e.target.value;
-                      if (value.length > 100) {
-                        setValue('bio', value.slice(0, 100));
-                      }
-                    },
-                    validate: (value) =>
-                      value.length <= 100 || '100자 이내로 입력해주세요.',
-                  }),
-                  maxLength: 100,
+                  ...register('bio'),
+                  onChange: handleBioChange,
                 }}
+                maxLength={100}
               />
             </div>
           </div>

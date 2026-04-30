@@ -50,6 +50,24 @@ export const useStompClient = (partnerId?: string) => {
             reconnectAttempts = 0;
             setStompClient(client);
 
+            // 연결 시 대기 중인 실패 메시지 재전송
+            const { pendingRetry, clearPendingRetry, unmarkTempFailed } =
+              useMessageStore.getState();
+            if (pendingRetry.length > 0) {
+              const toRetry = [...pendingRetry];
+              clearPendingRetry();
+              toRetry.forEach(({ receiverId, content, tempId }) => {
+                unmarkTempFailed(tempId);
+                client.publish({
+                  destination: '/app/message/send',
+                  body: JSON.stringify({ receiverId, content }),
+                });
+                setTimeout(() => {
+                  queryClient.invalidateQueries({ queryKey: ['messages', receiverId] });
+                }, 800);
+              });
+            }
+
             // 재연결 시 끊긴 동안 놓친 메시지 동기화
             if (!isFirstConnectRef.current) {
               queryClient.invalidateQueries({ queryKey: ['conversations'] });
@@ -110,6 +128,7 @@ export const useStompClient = (partnerId?: string) => {
               );
 
               queryClient.invalidateQueries({ queryKey: ['messages', msg.sender.userId] });
+              queryClient.invalidateQueries({ queryKey: ['conversations'] });
             });
           },
 

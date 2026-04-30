@@ -6,6 +6,7 @@ import BaseButton from '../components/common/Button';
 import FieldMaster from '../components/Field/FieldMaster';
 import { useDropzone } from 'react-dropzone';
 import { useCreateTeam, useCreateTeamImage } from '../hooks/useTeam';
+import { getByteLength } from '../utils/getByteLength';
 
 // Icons
 import NewTeamIcon from '../assets/icons/ic_character_new_team.svg?react';
@@ -31,6 +32,8 @@ const TeamNewPage = () => {
     watch,
     control,
     setValue,
+    setError,
+    clearErrors,
     formState: { errors, isValid },
   } = useForm<FormValues>({
     mode: 'onChange',
@@ -67,12 +70,38 @@ const TeamNewPage = () => {
     },
   });
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (/[\p{Extended_Pictographic}]/gu.test(value)) {
+      setError('name', {
+        type: 'manual',
+        message: '이모티콘은 사용할 수 없어요.',
+      });
+      return;
+    }
+    const byteLength = getByteLength(value);
+
+    if (byteLength > 18) {
+      setError('name', {
+        type: 'manual',
+        message: '글자수를 초과했어요.',
+      });
+      return;
+    }
+
+    clearErrors('name');
+    setValue('name', value, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  };
+
   const onSubmit = (data: FormValues) => {
     if (!file || !presignedUrl) return;
 
     createTeam(data, {
-      onSuccess: (data) => {
-        axios.put(presignedUrl, file, {
+      onSuccess: async (data) => {
+        await axios.put(presignedUrl, file, {
           headers: { 'Content-Type': file.type },
         });
         navigate(`/team/${data.teamId}`);
@@ -105,30 +134,18 @@ const TeamNewPage = () => {
               value: teamnameValue,
               ...register('name', {
                 required: '팀 이름을 입력해주세요.',
-                validate: (value) => {
-                  if (value.trim().length === 0) {
-                    return '공백만 입력할 수 없습니다.';
-                  }
-                  const getByteLength = (str: string) => {
-                    return str.split('').reduce((acc: number, char: string) => {
-                      return acc + (/[가-힣]/.test(char) ? 3 : 1);
-                    }, 0);
-                  };
-
-                  const byteLength = getByteLength(value);
-                  const maxByte = 18;
-
-                  // 2. 조건 검증
-                  if (byteLength > maxByte) {
-                    return `글자수를 초과했어요.`;
-                  }
-                  return true;
-                },
                 pattern: {
                   value: /^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ ]*$/,
                   message: '특수문자는 사용 불가합니다.',
                 },
+                validate: (value) => {
+                  if (value.trim().length === 0) {
+                    return '공백만 입력할 수 없습니다.';
+                  }
+                  return true;
+                },
               }),
+              onChange: handleChange,
             }}
             maxLength={18}
           />
@@ -178,14 +195,8 @@ const TeamNewPage = () => {
               ...register('description', {
                 required: '상세 소개를 작성해주세요.',
                 validate: (value) => {
-                  const getByteLength = (str: string) => {
-                    return str.split('').reduce((acc: number, char: string) => {
-                      return acc + (/[가-힣]/.test(char) ? 3 : 1);
-                    }, 0);
-                  };
                   const byteLength = getByteLength(value);
                   const maxByte = 600;
-                  // 2. 조건 검증
                   if (byteLength > maxByte) {
                     return `글자수를 초과했어요.`;
                   }

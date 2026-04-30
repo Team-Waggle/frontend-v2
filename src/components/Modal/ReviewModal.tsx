@@ -1,7 +1,11 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import FieldMaster from '../Field/FieldMaster';
 import BaseButton from '../common/Button';
 import BaseChip from '../common/Chip/BaseChip';
+import { formatReviewTag } from '../../utils/review-tag';
+import { usePutTeamMemberReview } from '../../hooks/useTeam';
+import type { ReviewRequestType } from '../../types/api/team';
 
 // Modal
 import { useModal } from '../../hooks/useModal';
@@ -14,61 +18,66 @@ import CloseIcon from '../../assets/icons/normal/ic_close.svg?react';
 import LikeIcon from '../../assets/icons/normal/ic_like.svg?react';
 import BadIcon from '../../assets/icons/normal/ic_bad.svg?react';
 
-type ReviewTagType =
-  | 'PUNCTUAL'
-  | 'EMOTIONAL'
-  | 'SKILLED'
-  | 'FAST_FEEDBACK'
-  | 'GOOD_COMMUNICATOR'
-  | 'POSITIVE'
-  | 'RESPONSIBLE'
-  | 'MOOD_MAKER';
+const LIKE_OPTIONS = [
+  '시간엄수',
+  '개발왕',
+  '소통왕',
+  '책임감',
+  '친절함',
+  '피카소',
+  '홍보왕',
+  '고트',
+  '레전드',
+  '꼼꼼함',
+];
 
-interface FormValues {
-  reviewType: 'LIKE' | 'DISLIKE';
-  tags: ReviewTagType[];
+const DISLIKE_OPTIONS = ['지각쟁이', '잠수왕', '예민함', '불친절', '이탈자'];
+
+interface ReviewModalProps extends ModalProps {
+  memberId?: number | string;
+  username: string;
 }
 
-const LIKE_OPTIONS = [
-  '#시간엄수',
-  '#개발왕',
-  '#소통왕',
-  '#책임감',
-  '#친절함',
-  '#피카소',
-  '#홍보왕',
-  '#고트',
-  '#레전드',
-  '#꼼꼼함',
-];
-
-const DISLIKE_OPTIONS = [
-  '#지각쟁이',
-  '#잠수왕',
-  '#예민함',
-  '#불친절',
-  '#이탈자',
-];
-
-const ReviewModal = ({ isOpen, onClose }: ModalProps) => {
+const ReviewModal = ({
+  isOpen,
+  onClose,
+  memberId,
+  username,
+}: ReviewModalProps) => {
+  const queryClient = useQueryClient();
   const {
-    register,
     handleSubmit,
     control,
     setValue,
     formState: { isValid },
-  } = useForm<FormValues>({
+  } = useForm<ReviewRequestType>({
     mode: 'onChange',
     defaultValues: {
-      reviewType: 'LIKE',
+      type: 'LIKE',
       tags: [],
     },
   });
 
-  const watchReviewType = useWatch({ control, name: 'reviewType' });
+  const watchReviewType = useWatch({ control, name: 'type' });
 
-  const onSubmit = (data: FormValues) => {
-    console.log(data);
+  const { mutate: createReview } = usePutTeamMemberReview();
+
+  const onSubmit = (data: ReviewRequestType) => {
+    const transformedData = {
+      ...data,
+      tags: data?.tags.map((tag) => formatReviewTag(tag)),
+    };
+    createReview(
+      { memberId: Number(memberId), reviewBody: transformedData },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: ['team-members'],
+          });
+          onClose();
+        },
+      },
+    );
   };
 
   const handleTypeChange = (
@@ -92,13 +101,13 @@ const ReviewModal = ({ isOpen, onClose }: ModalProps) => {
         <ModalOverlay onClose={onClose} />
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="relative h-[61.3rem] w-[56.9rem] rounded-[2rem] bg-black-5 px-[4rem] pt-[3.6rem]"
+          className="relative w-[56.9rem] rounded-[2rem] bg-black-5 px-[4rem] pt-[3.6rem]"
         >
           <div className="flex flex-col gap-[4rem]">
             <div className="flex flex-col gap-[3.4rem]">
-              <div className="flex gap-[3.4rem]">
+              <div className="flex h-[9rem] justify-between gap-[3.4rem]">
                 <span className="text-[3rem] font-bold text-black-100">
-                  <span className="text-blue-80">일이삼사오육칠팔구십</span>
+                  <span className="text-blue-80">{username}</span>
                   님과의 협업은 어떠셨나요?
                 </span>
                 <button onClick={onClose} className="flex text-black-60">
@@ -107,7 +116,7 @@ const ReviewModal = ({ isOpen, onClose }: ModalProps) => {
               </div>
               <div className="flex flex-col gap-[3.4rem]">
                 <Controller
-                  name="reviewType"
+                  name="type"
                   control={control}
                   render={({ field }) => (
                     <div className="flex gap-[0.9rem]">
@@ -145,8 +154,8 @@ const ReviewModal = ({ isOpen, onClose }: ModalProps) => {
                     <FieldMaster
                       title={
                         watchReviewType === 'LIKE'
-                          ? '일이삼사오육칠팔구십님은 어떤점이 인상적이었나요?'
-                          : '일이삼사오육칠팔구십님은 어떤점이 아쉬웠나요?'
+                          ? `${username}님은 어떤점이 인상적이었나요?`
+                          : `${username}님은 어떤점이 아쉬웠나요?`
                       }
                       variant="tab"
                       isRequired
@@ -158,21 +167,23 @@ const ReviewModal = ({ isOpen, onClose }: ModalProps) => {
                           watchReviewType === 'LIKE'
                             ? LIKE_OPTIONS
                             : DISLIKE_OPTIONS,
-                        reviewType: watchReviewType,
+                        type: watchReviewType,
                       }}
                     />
                   )}
                 />
               </div>
             </div>
-            <BaseButton
-              type="submit"
-              size="xl"
-              disabled={!isValid}
-              className="mx-auto w-[25rem]"
-            >
-              평가 제출하기
-            </BaseButton>
+            <div className="flex justify-center pb-[3.8rem]">
+              <BaseButton
+                type="submit"
+                size="xl"
+                disabled={!isValid}
+                className="w-[25rem]"
+              >
+                평가 제출하기
+              </BaseButton>
+            </div>
           </div>
         </form>
       </div>

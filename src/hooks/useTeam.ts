@@ -17,9 +17,13 @@ import {
   PostTeamApplications,
   postTeamApplicationRead,
   patchTeamApplicationStatus,
+  putTeamMemberReview,
 } from '../api/team';
 import type { ApplyRequest } from '../types/api/posts';
-import type { GetApplicationsParams } from '../types/api/team';
+import type {
+  GetApplicationsParams,
+  ReviewRequestType,
+} from '../types/api/team';
 
 // 팀 생성
 export const useCreateTeam = () => {
@@ -161,6 +165,19 @@ export const useDeleteTeamMember = (teamId: number) => {
   });
 };
 
+// 팀원 리뷰 작성/수정
+export const usePutTeamMemberReview = () => {
+  return useMutation({
+    mutationFn: ({
+      memberId,
+      reviewBody,
+    }: {
+      memberId: number;
+      reviewBody: ReviewRequestType;
+    }) => putTeamMemberReview(memberId, reviewBody),
+  });
+};
+
 // 팀 상태 변경
 export const usePatchTeamStatus = () => {
   return useMutation({
@@ -176,7 +193,7 @@ export const usePostTeamApplicationRead = () => {
     mutationFn: postTeamApplicationRead,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['team-applicantions'],
+        queryKey: ['team-applications'],
       });
     },
   });
@@ -195,7 +212,7 @@ export const usePatchTeamApplicationStatus = () => {
     }) => patchTeamApplicationStatus(applicantId, status),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['team-applicantions'],
+        queryKey: ['team-applications'],
       });
     },
   });

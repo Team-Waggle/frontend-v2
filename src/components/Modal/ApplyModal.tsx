@@ -4,6 +4,7 @@ import FieldMaster from '../Field/FieldMaster';
 import BaseButton from '../common/Button';
 import type { PositionType, PostDetailResponse } from '../../types/api/posts';
 import type { UserMeResponse } from '../../types/api/user';
+import { getByteLength } from '../../utils/getByteLength';
 
 // Modal
 import { useModal } from '../../hooks/useModal';
@@ -35,8 +36,10 @@ const ApplyModal = ({
     handleSubmit,
     watch,
     control,
-    formState: { isValid },
+    formState: { errors, isValid },
     setValue,
+    setError,
+    clearErrors,
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
@@ -68,6 +71,25 @@ const ApplyModal = ({
         },
       },
     );
+  };
+
+  const handleDetailChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value.replace(/\n/g, ' ');
+    const byteLength = getByteLength(value);
+
+    if (byteLength > 1500) {
+      setError('detail', {
+        type: 'manual',
+        message: '글자수를 초과했어요.',
+      });
+      return;
+    }
+
+    clearErrors('detail');
+    setValue('detail', value, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
   };
 
   useModal({ isOpen, onClose });
@@ -113,28 +135,30 @@ const ApplyModal = ({
                   title="포트폴리오"
                   id="portfolioUrls"
                   variant="input"
+                  errorMessage={errors.portfolioUrls?.message}
                   warningMessage="URL 추가 시 권한제한/암호 없이 공유해주세요"
                   inputProps={{
-                    ...register('portfolioUrls'),
+                    ...register('portfolioUrls', {
+                      pattern: {
+                        value: /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/\S*)?$/,
+                        message: '올바른 URL 형식을 입력해 주세요.',
+                      },
+                    }),
                     placeholder: 'URL::',
                   }}
                 />
                 <FieldMaster
                   title="지원동기"
+                  id="detail"
                   variant="textarea"
+                  errorMessage={errors.detail?.message}
                   textareaProps={{
                     placeholder: '1500byte 이내 지원동기 (한글 500자 기준)',
                     value: detailValue,
-                    ...register('detail', {
-                      onChange: (e) => {
-                        const value = e.target.value;
-                        if (value.length > 1500) {
-                          setValue('detail', value.slice(0, 1500));
-                        }
-                      },
-                    }),
-                    maxLength: 1500,
+                    ...register('detail'),
+                    onChange: handleDetailChange,
                   }}
+                  maxLength={1500}
                 />
               </div>
             </div>
@@ -144,7 +168,7 @@ const ApplyModal = ({
               disabled={!isValid}
               className="mx-auto w-[25rem]"
             >
-              지원완료
+              지원하기
             </BaseButton>
           </div>
         </form>
