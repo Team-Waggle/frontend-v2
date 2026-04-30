@@ -1,5 +1,4 @@
 import { useLocation, useNavigate } from 'react-router';
-import { useGetNotificationsCount } from '../../hooks/useUser';
 import type { TeamResponse } from '../../types/api/team';
 import SidebarIcon from './SidebarIcon';
 import SidebarItem from './SidebarItem';
@@ -50,27 +49,34 @@ const SIDEBAR_MENUS: SidebarMenu[] = [
   },
 ];
 
+type NotificationCountDataType = {
+  totalCount: number;
+  unreadCount: number;
+};
+
+interface SidebarMenuProps {
+  isLoggedIn: boolean;
+  setIsLoginModalOpen: () => void;
+  isFolded: boolean;
+  teamData: TeamResponse[];
+  userId?: string;
+  notificationCountData: NotificationCountDataType;
+  isNotificationOpen?: boolean;
+  setIsNotificationOpen: (v: boolean) => void;
+}
+
 const SidebarMenu = ({
   isLoggedIn,
   setIsLoginModalOpen,
   isFolded,
   teamData,
   userId,
+  notificationCountData,
   isNotificationOpen,
   setIsNotificationOpen,
-}: {
-  isLoggedIn: boolean;
-  setIsLoginModalOpen: () => void;
-  isFolded: boolean;
-  teamData: TeamResponse[];
-  userId?: string;
-  isNotificationOpen?: boolean;
-  setIsNotificationOpen: (v: boolean) => void;
-}) => {
+}: SidebarMenuProps) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-
-  const { data } = useGetNotificationsCount();
 
   const visibleMenus = isLoggedIn
     ? SIDEBAR_MENUS
@@ -103,11 +109,12 @@ const SidebarMenu = ({
           }
 
           if (key === 'notification') {
-            setIsNotificationOpen(true);
+            setIsNotificationOpen(!isNotificationOpen);
             return;
           }
 
           if (!path) return;
+          setIsNotificationOpen(false);
           navigate(path);
         };
 
@@ -118,7 +125,7 @@ const SidebarMenu = ({
             label={label}
             isActive={isActive}
             onClick={handleClick}
-            unreadNotificationCount={data?.unreadCount}
+            unreadNotificationCount={notificationCountData?.unreadCount}
           />
         ) : (
           <SidebarItem
@@ -128,7 +135,8 @@ const SidebarMenu = ({
             isActive={isActive}
             subItems={key === 'team' ? teamSubItems : undefined}
             onClick={handleClick}
-            unreadNotificationCount={data?.unreadCount}
+            unreadNotificationCount={notificationCountData?.unreadCount}
+            setIsNotificationOpen={setIsNotificationOpen}
           />
         );
       })}

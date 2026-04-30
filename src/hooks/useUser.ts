@@ -206,9 +206,8 @@ export const usePatchNotificationsRead = () => {
     mutationFn: (notificationIds: number[]) =>
       patchNotificationsRead(notificationIds),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['my-notifications', 'my-notifications-count'],
-      });
+      queryClient.invalidateQueries({ queryKey: ['my-notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['my-notifications-count'] });
     },
   });
 };

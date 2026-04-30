@@ -7,6 +7,7 @@ import BaseButton from '../common/Button';
 import IconWrapper from '../common/IconWrapper';
 import {
   useGetIsUserProfileComplete,
+  useGetNotificationsCount,
   useGetUserMe,
   useGetUserMeTeam,
 } from '../../hooks/useUser';
@@ -27,6 +28,7 @@ const Sidebar = () => {
   const { data: isProfileCompleteData } = useGetIsUserProfileComplete();
   const { data: myData } = useGetUserMe();
   const { data: myteamData } = useGetUserMeTeam();
+  const { data: notificationCountData } = useGetNotificationsCount();
 
   const [isFolded, setIsFolded] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -63,6 +65,7 @@ const Sidebar = () => {
               data={myData}
               isFolded={isFolded}
               isLoggedIn={isProfileComplete}
+              setIsNotificationOpen={setIsNotificationOpen}
             />
 
             {isFolded ? (
@@ -118,6 +121,7 @@ const Sidebar = () => {
             isFolded={isFolded}
             teamData={isProfileComplete ? (myteamData ?? []) : []}
             userId={myData?.userId}
+            notificationCountData={notificationCountData}
             isNotificationOpen={isNotificationOpen}
             setIsNotificationOpen={setIsNotificationOpen}
           />
@@ -130,9 +134,12 @@ const Sidebar = () => {
             <div className="flex flex-col gap-[0.8rem] px-[2rem]">
               <div className="flex flex-col gap-[0.4rem]">
                 <LogoIcon className="text-black-50" />
-                <span className="text-[1.4rem] font-normal text-black-60">
-                  waggle.offcial@gmaill.com
-                </span>
+                <a
+                  href="mailto:team.waggle.offcial@gmaill.com"
+                  className="text-[1.4rem] font-normal text-black-60"
+                >
+                  team.waggle.offcial@gmaill.com
+                </a>
               </div>
               <div className="flex flex-col gap-[0.2rem] text-[1.4rem] font-medium text-black-60">
                 <a
@@ -142,9 +149,17 @@ const Sidebar = () => {
                 >
                   고객지원/문의
                 </a>
-                <span>서비스 이용약관</span>
-                <span>개인정보 취급 방침</span>
+                <a
+                  href="https://satin-mint-d68.notion.site/34738daa31cd80af8a40cfab76a855d0"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  와글 정책 안내
+                </a>
               </div>
+              <span className="text-[1.4rem] font-normal text-black-60">
+                © 2026 Waggle Inc. All rights reserved.
+              </span>
             </div>
           </div>
         )}
@@ -153,6 +168,7 @@ const Sidebar = () => {
         <Notifications
           isFolded={isFolded}
           onClose={() => setIsNotificationOpen(false)}
+          notificationCountData={notificationCountData}
         />
       )}
       <LoginModal
