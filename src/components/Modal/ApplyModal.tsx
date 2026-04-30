@@ -135,9 +135,15 @@ const ApplyModal = ({
                   title="포트폴리오"
                   id="portfolioUrls"
                   variant="input"
+                  errorMessage={errors.portfolioUrls?.message}
                   warningMessage="URL 추가 시 권한제한/암호 없이 공유해주세요"
                   inputProps={{
-                    ...register('portfolioUrls'),
+                    ...register('portfolioUrls', {
+                      pattern: {
+                        value: /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/\S*)?$/,
+                        message: '올바른 URL 형식을 입력해 주세요.',
+                      },
+                    }),
                     placeholder: 'URL::',
                   }}
                 />

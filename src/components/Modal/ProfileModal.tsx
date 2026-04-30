@@ -313,8 +313,14 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                 title="포트폴리오"
                 id="portfolioUrls"
                 variant="input"
+                errorMessage={errors.portfolioUrls?.message}
                 inputProps={{
-                  ...register('portfolioUrls'),
+                  ...register('portfolioUrls', {
+                    pattern: {
+                      value: /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/\S*)?$/,
+                      message: '올바른 URL 형식을 입력해 주세요.',
+                    },
+                  }),
                   value: portfolioUrlsValue,
                   placeholder:
                     '현재 가지고 있는 포트폴리오 사이트가 있다면 URL을 입력해 주세요.',
