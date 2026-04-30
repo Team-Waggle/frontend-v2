@@ -10,10 +10,12 @@ const SidebarProfile = ({
   data,
   isFolded,
   isLoggedIn,
+  setIsNotificationOpen,
 }: {
   data: UserMeResponse;
   isFolded: boolean;
   isLoggedIn: boolean;
+  setIsNotificationOpen: (v: boolean) => void;
 }) => {
   const { mutate: logout } = usePostLogout();
 
@@ -46,7 +48,10 @@ const SidebarProfile = ({
       </div>
       {isLoggedIn && (
         <button
-          onClick={() => logout()}
+          onClick={() => {
+            setIsNotificationOpen(false);
+            logout();
+          }}
           className="h-[3.2rem] w-[3.2rem] rounded-full px-[0.8rem] py-[0.8rem] hover:bg-black-10"
         >
           <LogoutIcon className="h-[1.6rem] w-[1.6rem] text-black-40" />
