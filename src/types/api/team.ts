@@ -56,9 +56,9 @@ export type CursorResponseApplicantResponse = {
 
 export type NotificationType =
   | 'APPLICATION_RECEIVED'
-  | 'APPLICATION_ACCEPTED'
   | 'APPLICATION_REJECTED'
   | 'APPLICATION_REMIND'
+  | 'TEAM_JOINED'
   | 'MEMBER_JOINED'
   | 'MEMBER_LEFT'
   | 'MEMBER_REMOVED'
@@ -68,14 +68,22 @@ export type NotificationType =
 export type NotificationResponse = {
   notificationId: number;
   type: NotificationType;
-  team: {
-    teamId: number;
-    name: string;
-    profileImageUrl: string;
-  };
-  triggeredBy: {
-    userId: string;
-    username: string;
+  metadata: {
+    post: {
+      postId: number;
+      title: string;
+    };
+    team: {
+      teamId: number;
+      name: string;
+      profileImageUrl: string;
+    };
+    triggeredBy: {
+      userId: string;
+      username: string;
+    };
+    position: PositionType;
+    unreadApplicationCount: number;
   };
   readAt?: string;
   createdAt: string;
@@ -93,4 +101,26 @@ export type GetApplicationsParams = {
   cursor?: number;
   size?: number;
   direction?: 'BEFORE' | 'AFTER';
+};
+
+export type UserReviewTag =
+  | 'PUNCTUAL'
+  | 'SKILLED'
+  | 'GOOD_COMMUNICATOR'
+  | 'RESPONSIBLE'
+  | 'KIND'
+  | 'PICASSO'
+  | 'PROMOTER'
+  | 'GOAT'
+  | 'LEGEND'
+  | 'METICULOUS'
+  | 'LATE'
+  | 'NO_SHOW'
+  | 'SENSITIVE'
+  | 'UNKIND'
+  | 'DESERTER';
+
+export type ReviewRequestType = {
+  type: 'LIKE' | 'DISLIKE';
+  tags: UserReviewTag[];
 };

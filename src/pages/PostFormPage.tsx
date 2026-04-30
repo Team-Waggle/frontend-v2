@@ -12,6 +12,7 @@ import {
 } from '../hooks/usePost';
 import { POSITION_CONVERTER, type PositionKey } from '../utils/position';
 import { toSkillEnum, toSkillLabel } from '../utils/skill';
+import { getByteLength } from '../utils/getByteLength';
 
 // Icons
 import NewTeamIcon from '../assets/icons/ic_character_new_post.svg?react';
@@ -33,6 +34,9 @@ const PostFormPage = () => {
     watch,
     control,
     reset,
+    setError,
+    clearErrors,
+    setValue,
     formState: { errors, isValid },
   } = useForm<FormValues>({
     mode: 'onChange',
@@ -66,6 +70,25 @@ const PostFormPage = () => {
       });
     }
   }, [isEditMode, myPostData, reset]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const byteLength = getByteLength(value);
+
+    if (byteLength > 30) {
+      setError('title', {
+        type: 'manual',
+        message: '글자수를 초과했어요.',
+      });
+      return;
+    }
+
+    clearErrors('title');
+    setValue('title', value, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  };
 
   const onSubmit = (data: FormValues) => {
     const formattedData = {
@@ -124,11 +147,8 @@ const PostFormPage = () => {
             inputProps={{
               placeholder: '최대 30자 제한',
               value: postnameValue,
-              ...register('title', {
-                validate: (value) =>
-                  value.trim().length > 0 || '제목을 입력해주세요.',
-                maxLength: { value: 30, message: '최대 30자까지 가능합니다.' },
-              }),
+              ...register('title'),
+              onChange: handleChange,
             }}
             maxLength={30}
           />

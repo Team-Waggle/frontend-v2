@@ -7,6 +7,7 @@ import IconWrapper from '../common/IconWrapper';
 import { SkillIcon } from '../../utils/SkillIcon';
 import { positionSkillData } from '../../constants/positionSkill';
 import type { PositionKey } from '../../utils/position';
+import { getByteLength } from '../../utils/getByteLength';
 import type { TeamResponse } from '../../types/api/team';
 import type { PositionType } from '../../types/api/posts';
 
@@ -93,30 +94,25 @@ interface FieldTabProps {
   value?: string[];
   onChange?: (value: string[]) => void;
   options?: string[];
-  reviewType?: 'LIKE' | 'DISLIKE';
+  type?: 'LIKE' | 'DISLIKE';
 }
 
 export const FieldInput = memo(
   forwardRef<HTMLInputElement, FieldInputProps>(
     ({ id, error, maxLength, className, ...props }, ref) => {
+      const currentByte = getByteLength(String(props.value ?? ''));
       const isEmpty = !props.value;
-
-      const getByteLength = (str: string) => {
-        return str.split('').reduce((acc: number, char: string) => {
-          return acc + (/[가-힣]/.test(char) ? 3 : 1);
-        }, 0);
-      };
-
-      const byteLength = getByteLength(String(props.value ?? ''));
 
       return (
         <div
           className={`flex h-[6rem] items-center rounded-[0.8rem] border px-[1.8rem] py-[1.7rem] ${
             error
               ? 'border-error'
-              : isEmpty
-                ? 'border-black-30 focus-within:border-blue-80'
-                : 'border-black-100 focus-within:border-blue-80'
+              : props.disabled
+                ? 'bg-black-20 text-black-40'
+                : isEmpty
+                  ? 'border-black-30 focus-within:border-blue-80'
+                  : 'border-black-100 focus-within:border-blue-80'
           } ${className || ''}`}
         >
           <input
@@ -126,9 +122,9 @@ export const FieldInput = memo(
             className={`w-full text-[1.6rem] font-medium`}
             {...props}
           />
-          {maxLength && (
+          {maxLength && !props.disabled && (
             <span className="text-[1.4rem] font-medium text-black-60">
-              {byteLength}/{maxLength}
+              {currentByte}/{maxLength}
             </span>
           )}
         </div>
@@ -141,16 +137,8 @@ FieldInput.displayName = 'FieldInput';
 
 export const FieldTextarea = memo(
   forwardRef<HTMLTextAreaElement, FieldTextareaProps>(
-    ({ id, error, maxLength = 500, className, ...props }, ref) => {
-      const [text, setText] = useState('');
+    ({ id, error, maxLength = 100, className, onChange, ...props }, ref) => {
       const isEmpty = !props.value;
-
-      const getByteLength = (str: string) => {
-        return str.split('').reduce((acc: number, char: string) => {
-          return acc + (/[가-힣]/.test(char) ? 3 : 1);
-        }, 0);
-      };
-
       const byteLength = getByteLength(String(props.value ?? ''));
 
       const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -158,18 +146,6 @@ export const FieldTextarea = memo(
         if (e.key === 'Enter') {
           e.preventDefault(); // 줄바꿈 방지
         }
-      };
-
-      const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        // 복사 붙여넣기로 들어오는 줄바꿈도 제거하고 싶다면:
-        const formattedValue = e.target.value.replace(/\n/g, '');
-        setText(formattedValue);
-      };
-
-      const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
-        e.preventDefault();
-        const text = e.clipboardData.getData('text').replace(/\n/g, '');
-        document.execCommand('insertText', false, text);
       };
 
       return (
@@ -183,13 +159,10 @@ export const FieldTextarea = memo(
           } ${className || ''}`}
         >
           <textarea
-            value={text}
             onKeyDown={handleKeyDown}
-            onChange={handleChange}
-            onPaste={handlePaste}
+            onChange={onChange}
             ref={ref}
             id={id}
-            maxLength={maxLength}
             className={`h-[6rem] w-full text-[1.6rem] font-medium`}
             {...props}
           />
@@ -940,9 +913,9 @@ export const FieldTab = ({
   value = [],
   onChange,
   options,
-  reviewType,
+  type,
 }: FieldTabProps) => {
-  const isInverted = reviewType === 'DISLIKE';
+  const isInverted = type === 'DISLIKE';
 
   const handleClick = (item: string) => {
     const isSelected = value.includes(item);
@@ -960,7 +933,7 @@ export const FieldTab = ({
     onChange?.([...value, item]);
   };
   return (
-    <div className="flex flex-wrap gap-x-[0.6rem] gap-y-[1rem] pr-[2rem]">
+    <div className="flex h-[10.8rem] flex-wrap content-start gap-[1rem] pr-[2rem]">
       {options?.map((item, idx) => {
         const isSelected = value.includes(item);
         const isDisabled = !isSelected && value.length >= 3;
@@ -972,7 +945,7 @@ export const FieldTab = ({
             onClick={() => handleClick(item)}
             className={`${isSelected && isInverted ? 'border-error bg-error-2' : ''}`}
           >
-            {item}
+            #{item}
           </BaseChip>
         );
       })}

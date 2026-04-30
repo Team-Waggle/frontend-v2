@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { useAuthStore } from '../../../stores/authStore';
+import LoginModal from '../../Modal/LoginModal';
+
 import BaseButton from '../Button/index';
 
 import IcCrown from '../../../assets/icons/tag/ic_crown.svg?react';
@@ -14,9 +17,11 @@ import IcSelectBoxTrash from '../../../assets/icons/normal/ic_trash.svg?react';
 
 import { SkillIcon } from '../../../utils/SkillIcon';
 import { toSkillLabel } from '../../../utils/skill';
+import ReviewModal from '../../Modal/ReviewModal';
 
 interface SideTeamCardProps {
   memberId?: number | string;
+  userId?: number | string;
   title?: string;
   position?: string;
   profileImageUrl?: string;
@@ -97,6 +102,7 @@ const toPositionLabel = (position?: string): string => {
 
 const SideTeamCard = ({
   memberId,
+  userId,
   title = 'title',
   position = 'position',
   profileImageUrl,
@@ -114,6 +120,8 @@ const SideTeamCard = ({
   onKickMember,
 }: SideTeamCardProps) => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuthStore();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const skillsIcon = Array.from(
     new Set(
@@ -125,6 +133,7 @@ const SideTeamCard = ({
 
   const positionLabel = toPositionLabel(position);
   const [isSelectBoxOpen, setIsSelectBoxOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   const selectBoxRef = useRef<HTMLDivElement | null>(null);
 
@@ -161,127 +170,147 @@ const SideTeamCard = ({
   const disabledStyle = 'bg-black-20';
 
   return (
-    <div
-      className={[
-        baseStyle,
-        variant === 'team' && !disabled,
-        isActive && activeStyle,
-        disabled && disabledStyle,
-      ]
-        .filter(Boolean)
-        .join(' ')}
-    >
-      <div className="absolute flex w-[17.8rem] items-center justify-between">
-        <div className="flex items-center gap-[0.4rem]">
-          {variant === 'post' && <IcCrown />}
-          {variant === 'team' && (
-            <>
-              {isLeader ? <IcCrown /> : isManager ? <IcShield /> : null}
-              {isMe && <IcMe />}
-            </>
-          )}
-        </div>
-        <div
-          ref={selectBoxRef}
-          className="flex aspect-square h-[2.4rem] w-[2.4rem] flex-shrink-0 flex-col items-end justify-center gap-[1rem]"
-        >
-          {variant === 'team' && canManage && (
-            <>
-              <div
-                className="cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsSelectBoxOpen((prev) => !prev);
-                }}
-              >
-                <IcVertical className="h-[2.4rem] text-black-50" />
-              </div>
-
-              {isSelectBoxOpen && (
-                <div
-                  className="absolute right-0 top-0 z-[20]"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                >
-                  <SelectBox
-                    onAssignManager={() => {
-                      onAssignManager?.(Number(memberId!));
-                      setIsSelectBoxOpen(false);
-                    }}
-                    onKickMember={() => {
-                      onKickMember?.(Number(memberId!));
-                      setIsSelectBoxOpen(false);
-                    }}
-                  />
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      </div>
+    <>
       <div
         className={[
-          'flex flex-col items-center self-stretch rounded-[0.6rem] pt-[1.2rem]',
-          disabled && 'opacity-[0.4]',
+          baseStyle,
+          variant === 'team' && !disabled,
+          isActive && activeStyle,
+          disabled && disabledStyle,
         ]
           .filter(Boolean)
           .join(' ')}
       >
-        <div className="flex flex-col items-center gap-[1.7rem]">
-          {profileImageUrl ? (
-            <img
-              alt={'프로필 이미지'}
-              src={profileImageUrl}
-              className="h-[6.1rem] w-[6.1rem] cursor-pointer rounded-[9.9rem] object-cover"
-              onClick={() => navigate(`/profile/${memberId}`)}
-            />
-          ) : (
-            <IcCharacter
-              className="h-[6.1rem] w-[6.1rem] cursor-pointer rounded-[9.9rem]"
-              onClick={() => navigate(`/profile/${memberId}`)}
-            />
-          )}
-          <div className="flex flex-col items-center gap-[0.4rem]">
-            <span className="text-[1.6rem] font-[600] leading-[1.5] text-black-100">
-              {title}
-            </span>
-            <span className="text-[1.4rem] font-[500] leading-[1.5] text-black-60">
-              {positionLabel}
-            </span>
+        <div className="absolute flex w-[17.8rem] items-center justify-between">
+          <div className="flex items-center gap-[0.4rem]">
+            {variant === 'post' && <IcCrown />}
+            {variant === 'team' && (
+              <>
+                {isLeader ? <IcCrown /> : isManager ? <IcShield /> : null}
+                {isMe && <IcMe />}
+              </>
+            )}
           </div>
-          <div className="flex items-start gap-[0.6rem]">
-            {skillsIcon.slice(0, 3).map((skill) => (
-              <div
-                key={skill}
-                className="flex aspect-square h-[3.2rem] w-[3.2rem] items-center justify-center gap-[1rem] rounded-[9.9rem] bg-black-10 p-[0.6rem]"
-              >
-                <SkillIcon name={skill} className="" />
-              </div>
-            ))}
+          <div
+            ref={selectBoxRef}
+            className="flex aspect-square h-[2.4rem] w-[2.4rem] flex-shrink-0 flex-col items-end justify-center gap-[1rem]"
+          >
+            {variant === 'team' && canManage && (
+              <>
+                <div
+                  className="cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsSelectBoxOpen((prev) => !prev);
+                  }}
+                >
+                  <IcVertical className="h-[2.4rem] text-black-50" />
+                </div>
+
+                {isSelectBoxOpen && (
+                  <div
+                    className="absolute right-0 top-0 z-[20]"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    <SelectBox
+                      onAssignManager={() => {
+                        onAssignManager?.(Number(memberId!));
+                        setIsSelectBoxOpen(false);
+                      }}
+                      onKickMember={() => {
+                        onKickMember?.(Number(memberId!));
+                        setIsSelectBoxOpen(false);
+                      }}
+                    />
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
-      </div>
-      {variant === 'post' && (
-        <BaseButton
-          size="md"
-          color="secondary"
-          onClick={() =>
-            navigate(`/message/${memberId}`, {
-              state: { username: title, position, profileImageUrl },
-            })
-          }
+        <div
+          className={[
+            'flex flex-col items-center self-stretch rounded-[0.6rem] pt-[1.2rem]',
+            disabled && 'opacity-[0.4]',
+          ]
+            .filter(Boolean)
+            .join(' ')}
         >
-          문의하기
-        </BaseButton>
-      )}
-
-      {variant === 'team' && status === 'COMPLETED' && (
-        <BaseButton size="md" color="tertiary" disabled={isMe}>
-          리뷰 쓰기
-        </BaseButton>
-      )}
-    </div>
+          <div className="flex flex-col items-center gap-[1.7rem]">
+            {profileImageUrl ? (
+              <img
+                alt={'프로필 이미지'}
+                src={profileImageUrl}
+                className="h-[6.1rem] w-[6.1rem] cursor-pointer rounded-[9.9rem] object-cover"
+                onClick={() => navigate(`/profile/${userId ?? memberId}`)}
+              />
+            ) : (
+              <IcCharacter
+                className="h-[6.1rem] w-[6.1rem] cursor-pointer rounded-[9.9rem]"
+                onClick={() => navigate(`/profile/${userId ?? memberId}`)}
+              />
+            )}
+            <div className="flex flex-col items-center gap-[0.4rem]">
+              <span className="text-[1.6rem] font-[600] leading-[1.5] text-black-100">
+                {title}
+              </span>
+              <span className="text-[1.4rem] font-[500] leading-[1.5] text-black-60">
+                {positionLabel}
+              </span>
+            </div>
+            <div className="flex items-start gap-[0.6rem]">
+              {skillsIcon.slice(0, 3).map((skill) => (
+                <div
+                  key={skill}
+                  className="flex aspect-square h-[3.2rem] w-[3.2rem] items-center justify-center gap-[1rem] rounded-[9.9rem] bg-black-10 p-[0.6rem]"
+                >
+                  <SkillIcon name={skill} className="" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        {variant === 'post' && (
+          <BaseButton
+            size="md"
+            color="secondary"
+            onClick={() => {
+              if (!isLoggedIn) {
+                setIsLoginModalOpen(true);
+              } else {
+                navigate(`/message/${memberId}`, {
+                  state: { username: title, position, profileImageUrl },
+                });
+              }
+            }}
+          >
+            문의하기
+          </BaseButton>
+        )}
+        {variant === 'team' && status === 'COMPLETED' && (
+          <BaseButton
+            size="md"
+            color="tertiary"
+            disabled={isMe || disabled}
+            onClick={() => setIsReviewModalOpen(true)}
+          >
+            리뷰 쓰기
+          </BaseButton>
+        )}
+      </div>
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        memberId={memberId}
+        username={title}
+      />
+    </>
   );
 };
 
