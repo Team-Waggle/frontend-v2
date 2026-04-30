@@ -4,6 +4,7 @@ import FieldMaster from '../Field/FieldMaster';
 import BaseButton from '../common/Button';
 import type { PositionType, PostDetailResponse } from '../../types/api/posts';
 import type { UserMeResponse } from '../../types/api/user';
+import { getByteLength } from '../../utils/getByteLength';
 
 // Modal
 import { useModal } from '../../hooks/useModal';
@@ -35,8 +36,10 @@ const ApplyModal = ({
     handleSubmit,
     watch,
     control,
-    formState: { isValid },
+    formState: { errors, isValid },
     setValue,
+    setError,
+    clearErrors,
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
@@ -68,6 +71,25 @@ const ApplyModal = ({
         },
       },
     );
+  };
+
+  const handleDetailChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value.replace(/\n/g, ' ');
+    const byteLength = getByteLength(value);
+
+    if (byteLength > 1500) {
+      setError('detail', {
+        type: 'manual',
+        message: '글자수를 초과했어요.',
+      });
+      return;
+    }
+
+    clearErrors('detail');
+    setValue('detail', value, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
   };
 
   useModal({ isOpen, onClose });
@@ -121,20 +143,16 @@ const ApplyModal = ({
                 />
                 <FieldMaster
                   title="지원동기"
+                  id="detail"
                   variant="textarea"
+                  errorMessage={errors.detail?.message}
                   textareaProps={{
                     placeholder: '1500byte 이내 지원동기 (한글 500자 기준)',
                     value: detailValue,
-                    ...register('detail', {
-                      onChange: (e) => {
-                        const value = e.target.value;
-                        if (value.length > 1500) {
-                          setValue('detail', value.slice(0, 1500));
-                        }
-                      },
-                    }),
-                    maxLength: 1500,
+                    ...register('detail'),
+                    onChange: handleDetailChange,
                   }}
+                  maxLength={1500}
                 />
               </div>
             </div>

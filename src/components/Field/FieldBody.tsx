@@ -137,10 +137,8 @@ FieldInput.displayName = 'FieldInput';
 
 export const FieldTextarea = memo(
   forwardRef<HTMLTextAreaElement, FieldTextareaProps>(
-    ({ id, error, maxLength = 500, className, ...props }, ref) => {
-      const [text, setText] = useState('');
+    ({ id, error, maxLength = 100, className, onChange, ...props }, ref) => {
       const isEmpty = !props.value;
-
       const byteLength = getByteLength(String(props.value ?? ''));
 
       const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -148,18 +146,6 @@ export const FieldTextarea = memo(
         if (e.key === 'Enter') {
           e.preventDefault(); // 줄바꿈 방지
         }
-      };
-
-      const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        // 복사 붙여넣기로 들어오는 줄바꿈도 제거하고 싶다면:
-        const formattedValue = e.target.value.replace(/\n/g, '');
-        setText(formattedValue);
-      };
-
-      const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
-        e.preventDefault();
-        const text = e.clipboardData.getData('text').replace(/\n/g, '');
-        document.execCommand('insertText', false, text);
       };
 
       return (
@@ -173,13 +159,10 @@ export const FieldTextarea = memo(
           } ${className || ''}`}
         >
           <textarea
-            value={text}
             onKeyDown={handleKeyDown}
-            onChange={handleChange}
-            onPaste={handlePaste}
+            onChange={onChange}
             ref={ref}
             id={id}
-            maxLength={maxLength}
             className={`h-[6rem] w-full text-[1.6rem] font-medium`}
             {...props}
           />
