@@ -1,11 +1,12 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import type { InfiniteData } from '@tanstack/react-query';
 import { useLocation } from 'react-router';
 
 import { useGetConversations, useGetMessages, useGetMessagesAfter, useReadConversation } from './useMessage';
 import { useGetUserDetail, useGetUserMe } from './useUser';
 import { TEMP_ID_BASE, useMessageStore } from '../stores/messageStore';
-import type { MessageResponse } from '../types/api/message';
+import type { ConversationResponse, CursorResponse, MessageResponse } from '../types/api/message';
 import { formatKstHhMm, formatKstYyyyMmDd } from '../utils/kst-time';
 
 const HISTORY_REFETCH_DELAY_MS = 800;
@@ -26,9 +27,9 @@ export interface GroupedMessages {
 }
 
 /**
- * ChatArea와 ModalChatView의 공통 채팅 로직을 담당하는 훅.
- * @param partnerId 대화 상대 userId
- * @param highlight 검색에서 이동한 경우 하이라이트할 messageId
+ * ChatArea와 ModalChatView의 공통 채팅 로직을 담당
+ * @param partnerId
+ * @param highlight
  */
 export const useChatLogic = (partnerId: string, highlight?: string | null) => {
   const queryClient = useQueryClient();
@@ -50,7 +51,7 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
 
   const [inputValue, setInputValue] = useState('');
 
-  const { realtimeMessages, failedTempIds, appendRealtimeMessage, markTempFailed, publish } =
+  const { realtimeMessages, failedTempIds, appendRealtimeMessage, markTempFailed, queueRetry, publish } =
     useMessageStore();
   const { mutate: readConversation } = useReadConversation();
 
@@ -208,6 +209,17 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
     }
   };
 
+  // overflow-anchor: none 상태에서 로딩 스피너 출현/소멸 시 viewport 보정 (날짜 깜빡임 방지)
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (!el || prevScrollHeightRef.current === 0) return;
+    const diff = el.scrollHeight - prevScrollHeightRef.current;
+    if (diff > 0) {
+      el.scrollTop += diff;
+      prevScrollHeightRef.current = el.scrollHeight;
+    }
+  }, [isFetchingPreviousPage]);
+
   // 과거 메시지 로드 후 스크롤 위치 보존
   useLayoutEffect(() => {
     const el = scrollRef.current;
@@ -255,11 +267,19 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
     isAtBottomRef.current = true;
   }, [partnerId]);
 
+  // 대화방을 떠날 때 messages 캐시 제거 → 재입장 시 항상 최신부터 fetch
+  useEffect(() => {
+    return () => {
+      queryClient.removeQueries({ queryKey: ['messages', partnerId] });
+    };
+  }, [partnerId, queryClient]);
+
   const handleSend = () => {
     const content = inputValue.trim();
     if (!content) return;
 
     const tempId = TEMP_ID_BASE + (++tempIdCounterRef.current);
+    const now = new Date().toISOString();
 
     // 전송 즉시 임시 메시지로 화면에 표시
     if (me) {
@@ -273,23 +293,76 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
         },
         receiver: { userId: partnerId, username: null, profileImageUrl: null, position: '' },
         content,
-        createdAt: new Date().toISOString(),
+        createdAt: now,
         readAt: null,
       });
+
+      // 대화 목록 낙관적 업데이트
+      const updatedLastMessage = { messageId: tempId, content, createdAt: now };
+      const conversationsCache = queryClient.getQueryData<InfiniteData<CursorResponse<ConversationResponse>>>(['conversations', undefined]);
+      const exists = conversationsCache?.pages.some((page) =>
+        page.data.some((conv) => String(conv.partner.userId) === String(partnerId)),
+      );
+
+      if (exists) {
+        queryClient.setQueryData<InfiniteData<CursorResponse<ConversationResponse>>>(
+          ['conversations', undefined],
+          (old) => {
+            if (!old) return old;
+            return {
+              ...old,
+              pages: old.pages.map((page) => ({
+                ...page,
+                data: page.data.map((conv) =>
+                  String(conv.partner.userId) === String(partnerId)
+                    ? { ...conv, lastMessage: updatedLastMessage }
+                    : conv,
+                ),
+              })),
+            };
+          },
+        );
+      } else if (partnerInfo && conversationsCache) {
+        const newConversation: ConversationResponse = {
+          partner: {
+            userId: partnerInfo.userId,
+            username: partnerInfo.username,
+            profileImageUrl: partnerInfo.profileImageUrl,
+            position: partnerInfo.position ?? '',
+          },
+          unreadCount: 0,
+          lastReadMessageId: null,
+          lastMessage: updatedLastMessage,
+        };
+        queryClient.setQueryData<InfiniteData<CursorResponse<ConversationResponse>>>(
+          ['conversations', undefined],
+          (old) => {
+            if (!old) return old;
+            return {
+              ...old,
+              pages: old.pages.map((page, idx) =>
+                idx === 0 ? { ...page, data: [newConversation, ...page.data] } : page,
+              ),
+            };
+          },
+        );
+      }
     }
 
     const sent = publish(partnerId, content);
     if (!sent) {
       markTempFailed(tempId);
+      queueRetry(partnerId, content, tempId);
       return;
     }
 
     setInputValue('');
     prevScrollHeightRef.current = 0;
 
-    // 서버 저장 완료 후 히스토리 갱신
+    // 서버 저장 완료 후 히스토리 및 대화 목록 갱신
     setTimeout(() => {
       queryClient.invalidateQueries({ queryKey: ['messages', partnerId] });
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
     }, HISTORY_REFETCH_DELAY_MS);
   };
 
