@@ -26,7 +26,7 @@ const MessageScrollArea = ({
   className,
   partnerId,
 }: MessageScrollAreaProps) => (
-  <div ref={scrollRef} onScroll={onScroll} className={className}>
+  <div ref={scrollRef} onScroll={onScroll} className={className} style={{ overflowAnchor: 'none' }}>
     {isFetchingPreviousPage && (
       <div className="flex justify-center py-[1rem]">
         <span className="text-[1.2rem] text-black-50">이전 메시지 불러오는 중...</span>
