@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useGetUserMeTeam } from '../hooks/useUser';
 import { usePatchTeamStatus } from '../hooks/useTeam';
@@ -56,7 +56,7 @@ const STATUS_INFO = {
       현재 팀이
       <span className="font-bold text-blue-100"> 진행중 </span>
       상태입니다. 팀원들과 목표한 작업을 모두 마무리하셨나요? 팀이 끝나면
-      <span className="font-bold text-blue-100">완료 </span>
+      <span className="font-bold text-blue-100"> 완료 </span>
       처리를 해주세요.
     </span>
   ),
@@ -72,18 +72,20 @@ const STATUS_INFO = {
 const TeamStatusPage = () => {
   const navigate = useNavigate();
   const { data } = useGetUserMeTeam();
+  const { teamId } = useParams<{ teamId: string }>();
+  const currentTeam = data?.find((team) => team.teamId === Number(teamId));
   const { mutate } = usePatchTeamStatus();
   const queryClient = useQueryClient();
 
   const [isOpenModal, setIsOpenModal] = useState(false);
 
   const handleClick = () => {
-    if (data?.[0]?.status === 'PREPARING') {
+    if (currentTeam?.status === 'PREPARING') {
       navigate('/post/new');
-    } else if (data?.[0]?.status === 'ACTIVE') {
+    } else if (currentTeam?.status === 'ACTIVE') {
       setIsOpenModal(true);
-    } else if (data?.[0]?.status === 'COMPLETED') {
-      navigate(`/team/${data?.[0]?.teamId}`);
+    } else if (currentTeam?.status === 'COMPLETED') {
+      navigate(`/team/${currentTeam?.teamId}`);
     }
   };
 
@@ -98,7 +100,7 @@ const TeamStatusPage = () => {
                 <TeamStatusCard
                   key={item.type}
                   type={item.type}
-                  currentStatus={data?.[0]?.status ?? 'PREPARING'}
+                  currentStatus={currentTeam?.status ?? 'PREPARING'}
                   title={item.title}
                   description={item.description}
                   ActiveIcon={item.ActiveIcon}
@@ -116,7 +118,7 @@ const TeamStatusPage = () => {
                 <span className="text-[1.8rem] font-semibold text-black-100">
                   현재 상태 안내
                 </span>
-                {STATUS_INFO[data?.[0]?.status as keyof typeof STATUS_INFO]}
+                {STATUS_INFO[currentTeam?.status as keyof typeof STATUS_INFO]}
               </div>
             </div>
           </div>
@@ -126,13 +128,17 @@ const TeamStatusPage = () => {
         isOpen={isOpenModal}
         onClose={() => setIsOpenModal(false)}
         handleDone={() => {
-          const teamId = data?.[0]?.teamId;
+          const teamId = currentTeam?.teamId;
           if (!teamId) return;
           mutate(
             { teamId, status: 'COMPLETED' },
             {
               onSuccess: () => {
                 queryClient.invalidateQueries({ queryKey: ['user-me-team'] });
+                queryClient.invalidateQueries({
+                  queryKey: ['my-notifications-count'],
+                });
+
                 setIsOpenModal(false);
               },
               onError: (err) => {
