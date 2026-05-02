@@ -96,12 +96,6 @@ const MainPage = () => {
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  // useEffect(() => {
-  //   if (isSuccess && data !== undefined) {
-  //     setProfileComplete(data?.isComplete);
-  //   }
-  // }, [data, isSuccess, setProfileComplete]);
-
   return (
     <>
       <div className="flex w-full justify-center">
