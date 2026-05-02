@@ -241,7 +241,7 @@ const MainSearch = ({
     });
 
   return (
-    <div className="flex w-full max-w-[152.6rem] flex-col items-start gap-[2rem] pt-[5.4rem]">
+    <div className="flex w-full max-w-[152.6rem] flex-col items-start gap-[2rem]">
       <div className="flex h-[5rem] items-center gap-[2.4rem] self-stretch max-1440:w-full">
         <div className="flex min-w-0 flex-1 items-center self-stretch">
           <div ref={containerRef} className="relative min-w-0 flex-1">
