@@ -205,7 +205,7 @@ const PostDetailPage = () => {
                         return (
                           <div
                             key={position.key}
-                            className={`flex items-center gap-[1rem] self-stretch${count === 0 ? ' invisible' : ''}`}
+                            className={`flex items-center gap-[1rem] self-stretch ${count === 0 ? ' invisible' : ''}`}
                           >
                             <span
                               className={
