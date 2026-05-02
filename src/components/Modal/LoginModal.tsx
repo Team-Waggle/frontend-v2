@@ -14,6 +14,12 @@ const LoginModal = ({ isOpen, onClose }: ModalProps) => {
   useModal({ isOpen, onClose });
   if (!isOpen) return null;
 
+  const handleLoginClick = (provider: 'google' | 'kakao') => {
+    const currentPath = window.location.pathname + window.location.search;
+    sessionStorage.setItem('returnUrl', currentPath);
+    window.location.href = `${BASE_URL}/oauth2/authorization/${provider}`;
+  };
+
   return (
     <ModalPortal>
       <div
@@ -38,15 +44,11 @@ const LoginModal = ({ isOpen, onClose }: ModalProps) => {
             {/* 버튼 */}
             <div className="mt-[7.8rem] grid gap-[0.8rem]">
               <GoogleBtn
-                onClick={() => {
-                  window.location.href = `${BASE_URL}/oauth2/authorization/google`;
-                }}
+                onClick={() => handleLoginClick('google')}
                 className="cursor-pointer"
               />
               <KakaoBtn
-                onClick={() => {
-                  window.location.href = `${BASE_URL}/oauth2/authorization/kakao`;
-                }}
+                onClick={() => handleLoginClick('kakao')}
                 className="cursor-pointer"
               />
             </div>

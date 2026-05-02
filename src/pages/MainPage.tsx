@@ -53,9 +53,12 @@ const MainPage = () => {
     sort,
   });
 
-  const { data, isSuccess } = useGetIsUserProfileComplete();
-  const { setProfileComplete, isLoggedIn } = useAuthStore();
-  const isOnboardingModalOpen = data?.isComplete === false;
+  const { accessToken } = useAuthStore();
+  const isLoggedIn = !!accessToken;
+  const { data: profileData, isSuccess } = useGetIsUserProfileComplete();
+
+  const isOnboardingModalOpen =
+    isLoggedIn && isSuccess && profileData?.isComplete === false;
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
@@ -93,19 +96,25 @@ const MainPage = () => {
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  useEffect(() => {
-    if (isSuccess && data !== undefined) {
-      setProfileComplete(data?.isComplete);
-    }
-  }, [data, isSuccess, setProfileComplete]);
+  // useEffect(() => {
+  //   if (isSuccess && data !== undefined) {
+  //     setProfileComplete(data?.isComplete);
+  //   }
+  // }, [data, isSuccess, setProfileComplete]);
 
   return (
     <>
       <div className="flex w-full justify-center">
         <div className="flex w-full max-w-[152.6rem] flex-col gap-[5.6rem] px-[4.8rem] pt-[5.4rem]">
           <div className="h-[35.4rem] max-w-[152.6rem] self-stretch rounded-[2.4rem] bg-gradient-to-tr from-blue-80 to-blue-20 p-40">
-            <h1 className="text-black-5 text-[6.853rem] font-[500] leading-normal"> WAGGLE </h1>
-            <h2 className="text-black-5 text-[3rem] font-[500] leading-normal"> 디자인 확정 후, 배너가 들어갈 임시 자리입니다. </h2>
+            <h1 className="text-[6.853rem] font-[500] leading-normal text-black-5">
+              {' '}
+              WAGGLE{' '}
+            </h1>
+            <h2 className="text-[3rem] font-[500] leading-normal text-black-5">
+              {' '}
+              디자인 확정 후, 배너가 들어갈 임시 자리입니다.{' '}
+            </h2>
           </div>
 
           <div className="flex w-full flex-col items-start gap-[2rem]">
@@ -117,7 +126,15 @@ const MainPage = () => {
           </div>
 
           {!isLoading && posts.length === 0 ? (
-            <PostEmptyPage className="max-1440:h-[45.6rem] max-1440:max-w-[104.8rem]" title="등록된 모집글이 없습니다." subTitle="새로운 팀원을 찾아보세요!" btnText="모집글 작성" onBtnClick={() => isLoggedIn ? navigate('/post/new') : setIsLoginModalOpen(true)} />
+            <PostEmptyPage
+              className="max-1440:h-[45.6rem] max-1440:max-w-[104.8rem]"
+              title="등록된 모집글이 없습니다."
+              subTitle="새로운 팀원을 찾아보세요!"
+              btnText="모집글 작성"
+              onBtnClick={() =>
+                isLoggedIn ? navigate('/post/new') : setIsLoginModalOpen(true)
+              }
+            />
           ) : (
             <div className="inline-grid w-full max-w-[152.6rem] auto-rows-max grid-cols-[repeat(auto-fill,minmax(33.6rem,1fr))] gap-x-[1.8rem] gap-y-[1.8rem] max-1440:max-w-full">
               {posts.map((post: PostDetailResponse) => {

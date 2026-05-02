@@ -120,7 +120,7 @@ const SideTeamCard = ({
   onKickMember,
 }: SideTeamCardProps) => {
   const navigate = useNavigate();
-  const { isLoggedIn } = useAuthStore();
+  const { accessToken } = useAuthStore();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const skillsIcon = Array.from(
@@ -276,7 +276,7 @@ const SideTeamCard = ({
             color="secondary"
             onClick={(e) => {
               e.stopPropagation();
-              if (!isLoggedIn) {
+              if (!accessToken) {
                 setIsLoginModalOpen(true);
               } else {
                 navigate(`/message/${memberId}`, {
