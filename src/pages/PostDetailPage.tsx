@@ -200,7 +200,7 @@ const PostDetailPage = () => {
                       return (
                         <div
                           key={position.key}
-                          className="flex items-center gap-[1rem] self-stretch"
+                          className={`flex items-center gap-[1rem] self-stretch${count === 0 ? ' invisible' : ''}`}
                         >
                           <span
                             className={
@@ -294,7 +294,7 @@ const PostDetailPage = () => {
         </div>
 
         {/** 팀 구간 */}
-        <div className="flex self-start pt-[17.8rem]">
+        <div className="flex self-start pt-[12.7rem]">
           <div ref={sideWrapRef} className="self-start will-change-transform">
             <SideTeamCard
               memberId={postDetail?.user?.userId}

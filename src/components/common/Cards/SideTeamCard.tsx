@@ -174,12 +174,14 @@ const SideTeamCard = ({
       <div
         className={[
           baseStyle,
+          'cursor-pointer',
           variant === 'team' && !disabled,
           isActive && activeStyle,
           disabled && disabledStyle,
         ]
           .filter(Boolean)
           .join(' ')}
+        onClick={() => navigate(`/profile/${userId ?? memberId}`)}
       >
         <div className="absolute flex w-[17.8rem] items-center justify-between">
           <div className="flex items-center gap-[0.4rem]">
@@ -243,14 +245,10 @@ const SideTeamCard = ({
               <img
                 alt={'프로필 이미지'}
                 src={profileImageUrl}
-                className="h-[6.1rem] w-[6.1rem] cursor-pointer rounded-[9.9rem] object-cover"
-                onClick={() => navigate(`/profile/${userId ?? memberId}`)}
+                className="h-[6.1rem] w-[6.1rem] rounded-[9.9rem] object-cover"
               />
             ) : (
-              <IcCharacter
-                className="h-[6.1rem] w-[6.1rem] cursor-pointer rounded-[9.9rem]"
-                onClick={() => navigate(`/profile/${userId ?? memberId}`)}
-              />
+              <IcCharacter className="h-[6.1rem] w-[6.1rem] rounded-[9.9rem]" />
             )}
             <div className="flex flex-col items-center gap-[0.4rem]">
               <span className="text-[1.6rem] font-[600] leading-[1.5] text-black-100">
@@ -276,7 +274,8 @@ const SideTeamCard = ({
           <BaseButton
             size="md"
             color="secondary"
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               if (!isLoggedIn) {
                 setIsLoginModalOpen(true);
               } else {
@@ -294,7 +293,10 @@ const SideTeamCard = ({
             size="md"
             color="tertiary"
             disabled={isMe || disabled}
-            onClick={() => setIsReviewModalOpen(true)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsReviewModalOpen(true);
+            }}
           >
             리뷰 쓰기
           </BaseButton>
