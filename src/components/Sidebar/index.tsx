@@ -37,7 +37,8 @@ const Sidebar = () => {
   const accessToken = useAuthStore((state) => state.accessToken);
   const isLoggedIn = !!accessToken;
 
-  const isProfileComplete = isLoggedIn && isProfileCompleteData?.isComplete;
+  const isProfileComplete =
+    isLoggedIn && isProfileCompleteData?.isComplete === true;
 
   useModal({
     isOpen: isNotificationOpen,
@@ -71,13 +72,9 @@ const Sidebar = () => {
             {isFolded ? (
               <IconWrapper
                 onClick={() => {
-                  if (!isLoggedIn) setIsLoginModalOpen(true);
-                  if (myteamData?.length === 0) {
-                    navigate('/team/new');
-                  }
-                  if (myteamData && myteamData?.length >= 1) {
-                    navigate('/post/new');
-                  }
+                  if (!isLoggedIn) return setIsLoginModalOpen(true);
+                  if (myteamData?.length === 0) navigate('/team/new');
+                  else navigate('/post/new');
                 }}
               >
                 {isLoggedIn ? <PencilIcon /> : <LogInIcon />}
@@ -87,7 +84,7 @@ const Sidebar = () => {
                 <BaseButton onClick={() => navigate('/team/new')}>
                   새 팀 만들기
                 </BaseButton>
-              ) : myteamData && myteamData?.length >= 1 ? (
+              ) : (
                 <div className="flex gap-[1.2rem]">
                   <BaseButton
                     color="secondary"
@@ -103,14 +100,14 @@ const Sidebar = () => {
                     모집글 작성
                   </BaseButton>
                 </div>
-              ) : (
-                <BaseButton onClick={() => navigate('/post/new')}>
-                  모집글 작성
-                </BaseButton>
               )
             ) : (
-              <BaseButton onClick={() => setIsLoginModalOpen(true)}>
-                로그인
+              <BaseButton
+                onClick={() =>
+                  isLoggedIn ? navigate('/post/new') : setIsLoginModalOpen(true)
+                }
+              >
+                {isLoggedIn ? '모집글 작성' : '로그인'}
               </BaseButton>
             )}
           </div>
