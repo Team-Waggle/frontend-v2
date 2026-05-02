@@ -121,6 +121,11 @@ const PostDetailPage = () => {
     return counts;
   }, [postDetail]);
 
+  const sortedPositions = useMemo(
+    () => [...POSITION_ITEMS].sort((a, b) => (apiCounts[b.key] ? 1 : 0) - (apiCounts[a.key] ? 1 : 0)),
+    [apiCounts],
+  );
+
   const postSkills = useMemo(() => {
     const recruitments = postDetail?.recruitments ?? [];
 
@@ -194,27 +199,27 @@ const PostDetailPage = () => {
                     </span>
                   </div>
                   <div className="inline-grid h-[6.2rem] gap-x-[48px] gap-y-[2rem] px-[1rem] [grid-template-columns:repeat(3,fit-content(100%))] [grid-template-rows:repeat(2,fit-content(100%))]">
-                    {POSITION_ITEMS.map((position) => {
-                      const count = apiCounts[position.key] ?? 0;
+                    {sortedPositions.map((position) => {
+                        const count = apiCounts[position.key] ?? 0;
 
-                      return (
-                        <div
-                          key={position.key}
-                          className={`flex items-center gap-[1rem] self-stretch${count === 0 ? ' invisible' : ''}`}
-                        >
-                          <span
-                            className={
-                              position.noWrap
-                                ? LABEL_NOWRAP_STYLE
-                                : LABEL_BASE_STYLE
-                            }
+                        return (
+                          <div
+                            key={position.key}
+                            className={`flex items-center gap-[1rem] self-stretch ${count === 0 ? ' invisible' : ''}`}
                           >
-                            {position.label}
-                          </span>
-                          <span className={VALUE_STYLE}>{count}</span>
-                        </div>
-                      );
-                    })}
+                            <span
+                              className={
+                                position.noWrap
+                                  ? LABEL_NOWRAP_STYLE
+                                  : LABEL_BASE_STYLE
+                              }
+                            >
+                              {position.label}
+                            </span>
+                            <span className={VALUE_STYLE}>{count}</span>
+                          </div>
+                        );
+                      })}
                   </div>
                 </div>
 
