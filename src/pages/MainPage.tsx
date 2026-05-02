@@ -146,6 +146,7 @@ const MainPage = () => {
                     mainCardPositions={positionList}
                     mainCardSkills={skillsList}
                     mainCardCreatedAt={createdAtText}
+                    isClosed={!post.isRecruiting}
                     onClick={() => navigate(`/post/${post.postId}`)}
                   />
                 );
