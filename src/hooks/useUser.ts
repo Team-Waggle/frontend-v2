@@ -65,10 +65,14 @@ export const usePutUserMe = () => {
 
 // 회원 탈퇴
 export const useDeleteUserMe = () => {
+  const queryClient = useQueryClient();
+  const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
   return useMutation({
     mutationFn: deleteUserMe,
     onSuccess: () => {
+      queryClient.removeQueries({ queryKey: ['me'] });
+      logout();
       navigate('/');
     },
   });
