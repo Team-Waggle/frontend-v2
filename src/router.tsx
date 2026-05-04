@@ -9,7 +9,7 @@ import App from './App';
 // Pages
 import MainPage from './pages/MainPage';
 import LoginPage from './pages/LoginPage';
-import TeamNewPage from './pages/TeamNewPage';
+import TeamFormPage from './pages/TeamFormPage';
 import TeamHomePage from './pages/TeamHomePage';
 import TeamPostManagementPage from './pages/TeamPostManagementPage';
 import PostDetailPage from './pages/PostDetailPage';
@@ -26,9 +26,10 @@ export const router = createBrowserRouter(
     <>
       <Route element={<App />}>
         <Route path="/" element={<MainPage />} />
-        <Route path="/team/new" element={<TeamNewPage />} />
+        <Route path="/team/new" element={<TeamFormPage />} />
         <Route path="/team/:teamId">
           <Route index element={<TeamHomePage />} />
+          <Route path="edit" element={<TeamFormPage />} />
           <Route path="posts" element={<TeamPostManagementPage />} />
           <Route path="applicants" element={<TeamApplicantPage />} />
           <Route path="status" element={<TeamStatusPage />} />
