@@ -11,17 +11,12 @@ function App() {
   const messageMatch = useMatch('/message/:partnerId');
   useStompClient(messageMatch?.params?.partnerId);
 
-  const { accessToken, isProfileComplete } = useAuthStore();
+  const { accessToken } = useAuthStore();
   const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
     const initAuth = async () => {
       if (accessToken) {
-        setIsInitializing(false);
-        return;
-      }
-
-      if (!isProfileComplete) {
         setIsInitializing(false);
         return;
       }
@@ -36,7 +31,7 @@ function App() {
     };
 
     initAuth();
-  }, [accessToken, isProfileComplete, silentRefresh]);
+  }, [accessToken, silentRefresh]);
 
   // 초기 인증 확인 중에는 화면을 가려줍니다 (깜빡임 방지)
   if (isInitializing) {
