@@ -19,11 +19,13 @@ const SidebarProfile = ({
 }) => {
   const { mutate: logout } = usePostLogout();
 
+  const hasToken = !!data;
+
   const profileImage = data?.profileImageUrl ? (
     <img
       src={data.profileImageUrl}
       alt=""
-      className="h-[4.4rem] w-[4.4rem] rounded-[0.6rem]"
+      className="h-[4.4rem] w-[4.4rem] rounded-[0.6rem] object-cover"
     />
   ) : (
     <BaicProfileIcon />
@@ -36,14 +38,16 @@ const SidebarProfile = ({
       {profileImage}
       <div className="flex w-[15.2rem] flex-col justify-center">
         <span className="text-[1.6rem] font-semibold text-black-100">
-          {isLoggedIn ? data?.username || '게스트' : '게스트'}
+          {hasToken ? data?.username || '게스트' : '게스트'}
         </span>
         <span
           className={`h-[2rem] text-[1.3rem] font-medium ${isLoggedIn ? 'text-black-60' : 'text-blue-60'}`}
         >
           {isLoggedIn && data?.position
-            ? POSITION_CONVERTER[data?.position] || '로그인해주세요'
-            : '로그인해주세요'}
+            ? POSITION_CONVERTER[data?.position]
+            : hasToken
+              ? '프로필을 완성해주세요'
+              : '로그인해주세요'}
         </span>
       </div>
       {isLoggedIn && (

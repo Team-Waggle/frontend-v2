@@ -54,7 +54,10 @@ const BaseChip = memo(
               className={`${CHIP_ICON_SIZE[variant]} ${iconColorClass} empty:hidden`}
             >
               {typeof mainIcon === 'string' ? (
-                <img src={mainIcon} className="rounded-[0.6rem]" />
+                <img
+                  src={mainIcon}
+                  className="h-full w-full rounded-[0.6rem] object-cover"
+                />
               ) : (
                 mainIcon
               )}

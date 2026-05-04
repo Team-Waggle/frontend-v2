@@ -68,6 +68,7 @@ interface FiledMasterProps {
   positionProps?: {
     value?: PositionType | null;
     onChange?: (value: PositionType) => void;
+    availablePositions?: PositionType[];
   };
   positionSkillProps?: {
     value?: RecruitmentsValue[];

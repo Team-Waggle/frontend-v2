@@ -34,22 +34,24 @@ export const useGetUserDetail = (userId: string) => {
 
 // 본인 지원 목록 조회
 export const useGetMyApplications = () => {
-  const { isLoggedIn, isProfileComplete } = useAuthStore();
+  const { accessToken } = useAuthStore();
+  const { data: profileStatus } = useGetIsUserProfileComplete();
+
   return useQuery({
     queryKey: ['my-applications'],
     queryFn: getUserMeApplications,
-    enabled: !!isLoggedIn && !!isProfileComplete,
+    enabled: !!accessToken && !!profileStatus?.isComplete,
     refetchOnWindowFocus: false,
   });
 };
 
 // 본인 프로필 조회
 export const useGetUserMe = () => {
-  const { isLoggedIn, isProfileComplete } = useAuthStore();
+  const { accessToken } = useAuthStore();
   return useQuery({
     queryKey: ['me'],
     queryFn: () => getUserMe(),
-    enabled: !!isLoggedIn && !!isProfileComplete,
+    enabled: !!accessToken,
     refetchOnWindowFocus: false,
   });
 };
@@ -63,10 +65,14 @@ export const usePutUserMe = () => {
 
 // 회원 탈퇴
 export const useDeleteUserMe = () => {
+  const queryClient = useQueryClient();
+  const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
   return useMutation({
     mutationFn: deleteUserMe,
     onSuccess: () => {
+      queryClient.removeQueries({ queryKey: ['me'] });
+      logout();
       navigate('/');
     },
   });
@@ -76,11 +82,9 @@ export const useDeleteUserMe = () => {
 export const useCreateUserProfile = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { setProfileComplete } = useAuthStore();
   return useMutation({
     mutationFn: (profileData: object) => postUserProfile(profileData),
     onSuccess: () => {
-      setProfileComplete(true);
       queryClient.invalidateQueries({ queryKey: ['profile-complete'] });
       queryClient.invalidateQueries({ queryKey: ['me'] });
       navigate('/');
@@ -162,11 +166,13 @@ export const usePatchTeamVisibility = () => {
 
 // 본인 참여 팀 목록 조회
 export const useGetUserMeTeam = () => {
-  const { isLoggedIn, isProfileComplete } = useAuthStore();
+  const { accessToken } = useAuthStore();
+  const { data: profileStatus } = useGetIsUserProfileComplete();
+
   return useQuery({
     queryKey: ['user-me-team'],
     queryFn: () => getUserMeTeam(),
-    enabled: !!isLoggedIn && !!isProfileComplete,
+    enabled: !!accessToken && !!profileStatus?.isComplete,
     refetchOnWindowFocus: false,
   });
 };
@@ -218,9 +224,8 @@ export const usePatchNotificationsReadAll = () => {
   return useMutation({
     mutationFn: patchNotificationsReadAll,
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['my-notifications', 'my-notifications-count'],
-      });
+      queryClient.invalidateQueries({ queryKey: ['my-notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['my-notifications-count'] });
     },
   });
 };

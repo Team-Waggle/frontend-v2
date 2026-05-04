@@ -79,7 +79,7 @@ const PostDetailPage = () => {
   const [isApplyWaitingModalOpen, setIsApplyWaitingModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
-  const { isLoggedIn } = useAuthStore();
+  const { accessToken } = useAuthStore();
 
   const { data: postDetail } = useGetPostDetail(parsedPostId);
   const { data: me } = useGetUserMe();
@@ -93,9 +93,8 @@ const PostDetailPage = () => {
 
   usePostDetailFloatingSideCard(leftColRef, sideWrapRef);
 
-  const myApplicationStatus = myApplications?.find(
-    (app) => app.postId === parsedPostId,
-  )?.status ?? null;
+  const myApplicationStatus =
+    myApplications?.find((app) => app.postId === parsedPostId)?.status ?? null;
 
   const myUserId = me?.userId;
   const postUserId = postDetail?.user?.userId;
@@ -120,6 +119,14 @@ const PostDetailPage = () => {
 
     return counts;
   }, [postDetail]);
+
+  const sortedPositions = useMemo(
+    () =>
+      [...POSITION_ITEMS].sort(
+        (a, b) => (apiCounts[b.key] ? 1 : 0) - (apiCounts[a.key] ? 1 : 0),
+      ),
+    [apiCounts],
+  );
 
   const postSkills = useMemo(() => {
     const recruitments = postDetail?.recruitments ?? [];
@@ -194,13 +201,13 @@ const PostDetailPage = () => {
                     </span>
                   </div>
                   <div className="inline-grid h-[6.2rem] gap-x-[48px] gap-y-[2rem] px-[1rem] [grid-template-columns:repeat(3,fit-content(100%))] [grid-template-rows:repeat(2,fit-content(100%))]">
-                    {POSITION_ITEMS.map((position) => {
+                    {sortedPositions.map((position) => {
                       const count = apiCounts[position.key] ?? 0;
 
                       return (
                         <div
                           key={position.key}
-                          className="flex items-center gap-[1rem] self-stretch"
+                          className={`flex items-center gap-[1rem] self-stretch ${count === 0 ? 'invisible' : ''}`}
                         >
                           <span
                             className={
@@ -294,7 +301,7 @@ const PostDetailPage = () => {
         </div>
 
         {/** 팀 구간 */}
-        <div className="flex self-start pt-[17.8rem]">
+        <div className="flex self-start pt-[12.7rem]">
           <div ref={sideWrapRef} className="self-start will-change-transform">
             <SideTeamCard
               memberId={postDetail?.user?.userId}
@@ -309,34 +316,40 @@ const PostDetailPage = () => {
 
         {/** 지원자 기준 화면: 지원하기 버튼 */}
         {/** 추후 기획에 따라 변경 될 예정 */}
-        {!isMyPost && applyButtonPx !== null && postDetail?.isRecruiting && myApplicationStatus !== 'APPROVED' && myApplicationStatus !== 'REJECTED' && (
-          <div
-            className="fixed bottom-[3.6rem] z-50 -translate-x-1/2"
-            style={{ left: applyButtonPx ?? undefined }}
-          >
-            <div className="relative w-[32rem]">
-              <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2">
-                <ButtonBlur className="h-[10rem] w-[40rem]" />
-              </div>
+        {!isMyPost &&
+          applyButtonPx !== null &&
+          postDetail?.isRecruiting &&
+          myApplicationStatus !== 'APPROVED' &&
+          myApplicationStatus !== 'REJECTED' && (
+            <div
+              className="fixed bottom-[3.6rem] z-50 -translate-x-1/2"
+              style={{ left: applyButtonPx ?? undefined }}
+            >
+              <div className="relative w-[32rem]">
+                <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2">
+                  <ButtonBlur className="h-[10rem] w-[40rem]" />
+                </div>
 
-              <BaseButton
-                className="relative z-10 w-[32rem]"
-                size="lg"
-                color="primary"
-                disabled={myApplicationStatus === 'PENDING'}
-                onClick={() => {
-                  if (!isLoggedIn) {
-                    setIsLoginModalOpen(true);
-                  } else {
-                    setIsApplyModalOpen(true);
-                  }
-                }}
-              >
-                {myApplicationStatus === 'PENDING' ? '승인 대기중' : '지원하기'}
-              </BaseButton>
+                <BaseButton
+                  className="relative z-10 w-[32rem]"
+                  size="lg"
+                  color="primary"
+                  disabled={myApplicationStatus === 'PENDING'}
+                  onClick={() => {
+                    if (!accessToken) {
+                      setIsLoginModalOpen(true);
+                    } else {
+                      setIsApplyModalOpen(true);
+                    }
+                  }}
+                >
+                  {myApplicationStatus === 'PENDING'
+                    ? '승인 대기중'
+                    : '지원하기'}
+                </BaseButton>
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
       {postDetail && (
         <ApplyModal

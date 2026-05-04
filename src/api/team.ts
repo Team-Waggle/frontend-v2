@@ -27,6 +27,18 @@ export const PostTeam = async (teamData: object) => {
   return data;
 };
 
+// 팀 수정
+export const updateTeam = async (teamId: number, teamData: object) => {
+  const { data } = await axiosInstance.put(TEAMS_DETAIL_URL(teamId), teamData);
+  return data;
+};
+
+// 팀 삭제
+export const deleteTeam = async (teamId: number) => {
+  const { data } = await axiosInstance.delete(TEAMS_DETAIL_URL(teamId));
+  return data;
+};
+
 // 팀 프로필 이미지 업로드용 Presigned URL 생성
 export const PostTeamImage = async (contentType: string) => {
   const { data } = await axiosInstance.post(TEAMS_PRESIGNED_URL, {
