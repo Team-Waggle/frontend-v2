@@ -25,7 +25,7 @@ const SidebarProfile = ({
     <img
       src={data.profileImageUrl}
       alt=""
-      className="h-[4.4rem] w-[4.4rem] rounded-[0.6rem]"
+      className="h-[4.4rem] w-[4.4rem] rounded-[0.6rem] object-cover"
     />
   ) : (
     <BaicProfileIcon />

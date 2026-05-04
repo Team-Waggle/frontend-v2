@@ -139,7 +139,7 @@ const SidebarItem = ({
                     <img
                       src={team.profileImageUrl}
                       alt=""
-                      className="h-[2.4rem] w-[2.4rem] rounded-[0.6rem]"
+                      className="h-[2.4rem] w-[2.4rem] rounded-[0.6rem] object-cover"
                     />
                   )}
                   <span
