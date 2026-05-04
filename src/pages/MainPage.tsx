@@ -15,6 +15,10 @@ import { formatPostListCreatedAt } from '../utils/kst-time';
 import type { PostDetailResponse } from '../types/api/posts';
 import { useAuthStore } from '../stores/authStore';
 
+import IcBannerCircle from '../assets/icons/image/ic_character_banner_circle.svg?react';
+import IcBannerSquare from '../assets/icons/image/ic_character_banner_square.svg?react';
+import IcBannerTriangle from '../assets/icons/image/ic_character_banner_triangle.svg?react';
+
 /**
  *
  * Main Page
@@ -100,15 +104,20 @@ const MainPage = () => {
     <>
       <div className="flex w-full justify-center">
         <div className="flex w-full max-w-[152.6rem] flex-col gap-[5.6rem] px-[4.8rem] pt-[5.4rem]">
-          <div className="h-[35.4rem] max-w-[152.6rem] self-stretch rounded-[2.4rem] bg-gradient-to-tr from-blue-80 to-blue-20 p-40">
-            <h1 className="text-[6.853rem] font-[500] leading-normal text-black-5">
-              {' '}
-              WAGGLE{' '}
-            </h1>
-            <h2 className="text-[3rem] font-[500] leading-normal text-black-5">
-              {' '}
-              디자인 확정 후, 배너가 들어갈 임시 자리입니다.{' '}
-            </h2>
+          <div className="relative h-[35.4rem] max-w-[152.6rem] self-stretch overflow-hidden rounded-[2.4rem] bg-blue-60">
+            {/** 문구 */}
+            <div className="pl-[6.4rem] pt-[6.4rem]">
+              <p className="text-black-5 text-[6.863rem] font-[500] font-mulmaru">나랑 같이 사.프하러</p>
+              <p className="text-black-5 text-[6.863rem] font-[500] font-mulmaru">가지 않을래?</p>
+            </div>
+            {/** 캐릭터 이미지 */}
+            <div className="absolute max-w-[152.6rem] h-[7.4rem] bottom-[3.89rem] right-[7.4047rem] z-10 flex items-end gap-[2.3782rem]">
+              <IcBannerCircle />
+              <IcBannerTriangle />
+              <IcBannerSquare />
+            </div>
+            {/** 하단 색상 바 */}
+            <div className="absolute bottom-0 h-[5.7478rem] w-full bg-blue-50" />
           </div>
 
           <div className="flex w-full flex-col items-start gap-[2rem]">
