@@ -245,9 +245,9 @@ const MainSearch = ({
     });
 
   return (
-    <div className="flex w-full max-w-[152.6rem] flex-col items-start gap-[2rem]">
-      {/* Wide 레이아웃 (xl+): 단일 row 융합 디자인 */}
-      <div className="hidden h-[5rem] items-center gap-[0.8rem] self-stretch wide:flex">
+    <div className="@container flex w-full max-w-[152.6rem] flex-col items-start gap-[2rem]">
+      {/* Wide 레이아웃: 컨테이너 폭 ≥ 800px일 때 단일 row 융합 디자인 */}
+      <div className="hidden h-[5rem] items-center gap-[0.8rem] self-stretch @[800px]:flex">
         <div className="flex h-[5rem] flex-1 items-center">
           <div ref={containerRef} className="relative min-w-0 flex-1 self-stretch">
             <div className="flex h-[5rem] w-full items-center rounded-[0.8rem] rounded-r-none border border-x-0 border-solid border-[#B7B9C0] bg-white">
@@ -336,10 +336,10 @@ const MainSearch = ({
         </button>
       </div>
 
-      {/* Narrow 레이아웃 (<xl): 4행 stack */}
+      {/* Narrow 레이아웃: 컨테이너 폭 < 800px일 때 4행 stack */}
       <div
         ref={narrowContainerRef}
-        className="flex flex-col gap-[1.2rem] self-stretch wide:hidden"
+        className="flex flex-col gap-[1.2rem] self-stretch @[800px]:hidden"
       >
         {/* Row 1: 키워드 + 필터 적용 + 리셋 */}
         <div className="flex h-[5rem] items-center gap-[0.8rem] self-stretch">
