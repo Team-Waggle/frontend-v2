@@ -1,11 +1,16 @@
 import axios from 'axios';
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import { Controller, useForm } from 'react-hook-form';
 import BaseButton from '../components/common/Button';
 import FieldMaster from '../components/Field/FieldMaster';
 import { useDropzone } from 'react-dropzone';
-import { useCreateTeam, useCreateTeamImage } from '../hooks/useTeam';
+import {
+  useCreateTeam,
+  useCreateTeamImage,
+  useGetTeamDetail,
+  useUpdateTeam,
+} from '../hooks/useTeam';
 import { getByteLength } from '../utils/getByteLength';
 
 // Icons
@@ -18,19 +23,26 @@ interface FormValues {
   profileImageUrl: string;
 }
 
-const TeamNewPage = () => {
+const TeamFormPage = () => {
+  const navigate = useNavigate();
+  const { teamId } = useParams<{ teamId: string }>();
+  const isEditMode = Boolean(teamId);
+
+  const { data: teamData } = useGetTeamDetail(Number(teamId));
   const { mutate: createImage } = useCreateTeamImage();
   const { mutate: createTeam } = useCreateTeam();
+  const { mutate: updateTeam } = useUpdateTeam();
+
   const [preview, setPreview] = useState<string | undefined>(undefined);
   const [file, setFile] = useState<File | null>(null);
   const [presignedUrl, setPresignedUrl] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
     watch,
     control,
+    reset,
     setValue,
     setError,
     clearErrors,
@@ -47,6 +59,18 @@ const TeamNewPage = () => {
 
   const teamnameValue = watch('name', '');
   const descriptionValue = watch('description', '');
+
+  useEffect(() => {
+    if (isEditMode && teamData) {
+      reset({
+        name: teamData.name,
+        profileImageUrl: teamData.profileImageUrl,
+        workMode: teamData.workMode,
+        description: teamData.description,
+      });
+      setPreview(teamData.profileImageUrl);
+    }
+  }, [isEditMode, teamData, reset]);
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: { 'image/*': ['.png', '.jpg'] },
@@ -96,18 +120,38 @@ const TeamNewPage = () => {
     });
   };
 
-  const onSubmit = (data: FormValues) => {
-    if (!file || !presignedUrl) return;
-
-    createTeam(data, {
-      onSuccess: async (data) => {
+  const onSubmit = async (data: FormValues) => {
+    if (file && presignedUrl) {
+      try {
         await axios.put(presignedUrl, file, {
           headers: { 'Content-Type': file.type },
         });
-        navigate(`/team/${data.teamId}`);
-      },
-      onError: (error) => console.error(error),
-    });
+      } catch (error) {
+        console.error('이미지 파일 업로드 실패:', error);
+        return;
+      }
+    }
+
+    if (isEditMode) {
+      updateTeam(
+        { teamId: Number(teamId), teamData: data },
+        {
+          onSuccess: () => {
+            navigate(`/team/${teamId}`);
+          },
+          onError: (error) => console.error(error),
+        },
+      );
+    } else {
+      if (!file || !presignedUrl) return;
+
+      createTeam(data, {
+        onSuccess: (responseData) => {
+          navigate(`/team/${responseData.teamId}`);
+        },
+        onError: (error) => console.error(error),
+      });
+    }
   };
 
   return (
@@ -120,7 +164,7 @@ const TeamNewPage = () => {
         className="mb-[17.9rem] flex w-[90rem] max-w-full flex-col gap-[4rem]"
       >
         <span className="text-[2.4rem] font-bold text-black-100">
-          새로운 팀을 만들어요!
+          {isEditMode ? '팀 정보를 수정해요!' : '새로운 팀을 만들어요!'}
         </span>
         <div className="flex h-[74.7rem] flex-col gap-[3.6rem]">
           <FieldMaster
@@ -213,11 +257,11 @@ const TeamNewPage = () => {
           disabled={!isValid}
           className="mx-auto w-[32rem]"
         >
-          팀 만들기
+          {isEditMode ? '수정하기' : '팀 만들기'}
         </BaseButton>
       </form>
     </div>
   );
 };
 
-export default TeamNewPage;
+export default TeamFormPage;
