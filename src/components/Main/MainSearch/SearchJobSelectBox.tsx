@@ -25,7 +25,7 @@ const JobItem = ({
         : '';
 
   const baseStyle =
-    'flex w-[11.8rem] min-w-[11.8rem] items-center justify-center self-stretch px-[2.8rem]';
+    'flex h-[4.8rem] basis-1/3 items-center justify-center self-stretch px-[1.6rem] wide:basis-auto wide:w-[11.8rem] wide:min-w-[11.8rem] wide:px-[2.8rem]';
 
   const dividerStyle = hasDivider
     ? 'border border-y-0 border-l-0 border-solid border-[#E7E8EA]'
@@ -54,8 +54,8 @@ const SearchJobSelectBox = ({ values, onToggle }: SearchJobSelectBoxProps) => {
   const jobs = ['기획', '디자인', '프론트엔드', '백엔드', '마케팅', '기타'];
 
   return (
-    <div className="absolute left-0 top-[calc(5rem+0.8rem)] z-[20]">
-      <div className="flex h-[4.8rem] max-w-[129.2rem] items-start overflow-hidden rounded-[0.8rem] border border-solid border-[#237BFF] bg-white shadow-search-select-box">
+    <div className="absolute left-0 top-[calc(5rem+0.8rem)] z-[20] w-full wide:w-auto">
+      <div className="flex h-auto flex-wrap max-w-[129.2rem] items-stretch overflow-hidden rounded-[0.8rem] border border-solid border-[#237BFF] bg-white shadow-search-select-box wide:h-[4.8rem] wide:flex-nowrap">
         {jobs.map((label, idx) => (
           <JobItem
             key={label}

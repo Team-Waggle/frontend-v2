@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import Notifications from '../Notifications';
 import { useAuthStore } from '../../stores/authStore';
@@ -12,6 +12,7 @@ import {
   useGetUserMeTeam,
 } from '../../hooks/useUser';
 import { useModal } from '../../hooks/useModal';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 // Sidebar Components
 import SidebarLogo from './SidebarLogo';
@@ -30,9 +31,14 @@ const Sidebar = () => {
   const { data: myteamData } = useGetUserMeTeam();
   const { data: notificationCountData } = useGetNotificationsCount();
 
-  const [isFolded, setIsFolded] = useState(false);
+  const isWide = useMediaQuery('(min-width: 1440px)');
+  const [isFolded, setIsFolded] = useState(!isWide);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+
+  useEffect(() => {
+    setIsFolded(!isWide);
+  }, [isWide]);
 
   const accessToken = useAuthStore((state) => state.accessToken);
   const isLoggedIn = !!accessToken;

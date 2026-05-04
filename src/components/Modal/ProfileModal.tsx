@@ -209,9 +209,9 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
         <ModalOverlay onClose={onClose} isOnboarding={mode === 'onboarding'} />
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="relative flex h-[63.2rem] w-[73.8rem] flex-col gap-[4rem] overflow-scroll overflow-y-scroll scroll-smooth rounded-[2rem] bg-white px-[4rem] pt-[4.4rem] scrollbar-hide"
+          className="relative flex max-h-[90vh] w-[73.8rem] flex-col rounded-[2rem] bg-white"
         >
-          <div className="flex w-full flex-col gap-[3.4rem]">
+          <div className="flex flex-1 flex-col gap-[3.4rem] overflow-y-auto px-[4rem] pb-[2.4rem] pt-[4.4rem] scrollbar-hide">
             {mode === 'onboarding' && (
               <div className="flex flex-col text-[3rem] font-bold">
                 <span className="">반가워요!</span>
@@ -341,16 +341,16 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                 maxLength={100}
               />
             </div>
+            {mode === 'edit' && (
+              <span
+                onClick={() => deleteUser()}
+                className="mx-auto cursor-pointer text-[1.6rem] font-semibold text-black-60"
+              >
+                회원 탈퇴하기
+              </span>
+            )}
           </div>
-          {mode === 'edit' && (
-            <span
-              onClick={() => deleteUser()}
-              className="mx-auto cursor-pointer text-[1.6rem] font-semibold text-black-60"
-            >
-              회원 탈퇴하기
-            </span>
-          )}
-          <div className="flex w-full justify-center pb-[3.8rem]">
+          <div className="flex w-full justify-center px-[4rem] py-[2.4rem]">
             <BaseButton
               type="submit"
               size="xl"
