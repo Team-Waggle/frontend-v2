@@ -82,7 +82,7 @@ const TeamApplicantPage = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center gap-[6rem] pt-[5.4rem]">
+      <div className="flex flex-col items-center gap-[6rem] px-[2rem] pt-[5.4rem]">
         <TeamNav />
         <div className="flex w-full max-w-[clamp(98.2rem,70vw,130rem)] justify-between gap-[clamp(5rem,calc(-7.3rem+6.875vw),6.2rem)]">
           {/* 프로젝트 목록 */}

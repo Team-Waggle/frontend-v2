@@ -12,7 +12,7 @@ const TeamPostManagementPage = () => {
   const { data: posts = [] } = useGetTeamPosts(Number(teamId));
 
   return (
-    <div className="flex flex-col items-center gap-[6rem] self-stretch pt-[5.4rem]">
+    <div className="flex flex-col items-center gap-[6rem] self-stretch px-[2rem] pt-[5.4rem]">
       <TeamNav />
       <div className="flex w-[clamp(98.2rem,70vw,130rem)] flex-col items-start">
         {posts.length > 0 && (

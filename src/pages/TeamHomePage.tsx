@@ -136,7 +136,7 @@ const TeamHomePage = () => {
   return (
     <div
       className={[
-        'flex flex-1 flex-col items-center gap-[6rem] self-stretch',
+        'flex flex-1 flex-col items-center gap-[6rem] self-stretch px-[2rem]',
         isLeaderOrManager ? 'pt-[5.4rem]' : 'pt-[9.2rem]',
       ]
         .filter(Boolean)
