@@ -1,4 +1,12 @@
-import React, { forwardRef, memo, useEffect, useRef, useState } from 'react';
+import React, {
+  forwardRef,
+  memo,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import type { DropzoneInputProps, DropzoneRootProps } from 'react-dropzone';
 import BaseChip from '../common/Chip/BaseChip';
 import BaseButton from '../common/Button';
@@ -140,6 +148,21 @@ export const FieldTextarea = memo(
     ({ id, error, maxLength = 100, className, onChange, ...props }, ref) => {
       const isEmpty = !props.value;
       const byteLength = getByteLength(String(props.value ?? ''));
+      const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+      useImperativeHandle(
+        ref,
+        () => textareaRef.current as HTMLTextAreaElement,
+      );
+
+      // 콘텐츠 길이에 맞춰 자동 grow, 단 max-h에서 내부 스크롤로 전환
+      const MAX_HEIGHT_PX = 200; // = 20rem (1rem = 10px)
+      useLayoutEffect(() => {
+        const ta = textareaRef.current;
+        if (!ta) return;
+        ta.style.height = 'auto';
+        ta.style.height = `${Math.min(ta.scrollHeight, MAX_HEIGHT_PX)}px`;
+      }, [props.value]);
 
       const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         // Enter 키인지 확인 (Shift + Enter도 막으려면 e.shiftKey 조건 제외)
@@ -161,9 +184,9 @@ export const FieldTextarea = memo(
           <textarea
             onKeyDown={handleKeyDown}
             onChange={onChange}
-            ref={ref}
+            ref={textareaRef}
             id={id}
-            className={`h-[6rem] w-full text-[1.6rem] font-medium`}
+            className="min-h-[6rem] w-full overflow-y-auto text-[1.6rem] font-medium"
             {...props}
           />
           <span className="text-[1.4rem] font-medium text-black-60">
@@ -184,7 +207,7 @@ export const FieldThumbnail = memo(
           id={id}
           type="button"
           {...rootProps}
-          className={`relative flex h-[17.4rem] flex-col items-center gap-[1.2rem] rounded-[0.8rem] border border-solid border-black-30 px-[1.8rem] py-[4rem]`}
+          className={`relative flex h-[12rem] flex-col items-center justify-center gap-[1rem] rounded-[0.8rem] border border-solid border-black-30 px-[1.8rem] py-[2rem]`}
         >
           <input {...inputProps} />
           {preview ? (

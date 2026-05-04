@@ -111,18 +111,18 @@ const TeamNewPage = () => {
   };
 
   return (
-    <div className="flex w-full flex-col items-center gap-[7rem]">
-      <div className="relative flex h-[20rem] w-full justify-center bg-blue-10">
-        <NewTeamIcon className="absolute top-[8.887rem] max-w-full" />
+    <div className="flex w-full flex-col items-center gap-[4rem]">
+      <div className="relative flex h-[14rem] w-full justify-center bg-blue-10">
+        <NewTeamIcon className="absolute top-[5rem] max-w-full" />
       </div>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mb-[17.9rem] flex w-[90rem] max-w-full flex-col gap-[4rem]"
+        className="flex w-[90rem] max-w-full flex-col gap-[2.4rem] px-[2rem] pb-[4rem]"
       >
         <span className="text-[2.4rem] font-bold text-black-100">
           새로운 팀을 만들어요!
         </span>
-        <div className="flex h-[74.7rem] flex-col gap-[3.6rem]">
+        <div className="flex flex-col gap-[2.4rem]">
           <FieldMaster
             title="팀 명"
             id="title"
