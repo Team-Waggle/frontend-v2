@@ -5,6 +5,9 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        mulmaru: ['Mulmaru', 'sans-serif'],
+      },
       colors: {
         blue: {
           DEFAULT: '#0066FF',
