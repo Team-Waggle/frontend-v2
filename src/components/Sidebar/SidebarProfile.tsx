@@ -61,10 +61,10 @@ const SidebarProfile = ({
           className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full transition-[max-width,opacity] duration-sidebar ease-sidebar hover:bg-black-10 ${
             isFolded
               ? 'max-w-0 opacity-0'
-              : 'max-w-[3.2rem] px-[0.8rem] py-[0.8rem] opacity-100'
-          } h-[3.2rem]`}
+              : 'max-w-[3.6rem] px-[0.8rem] py-[0.8rem] opacity-100'
+          } h-[3.6rem]`}
         >
-          <LogoutIcon className="h-[1.6rem] w-[1.6rem] shrink-0 text-black-40" />
+          <LogoutIcon className="h-[2rem] w-[2rem] shrink-0 text-black-40" />
         </button>
       )}
     </div>

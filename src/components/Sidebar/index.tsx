@@ -23,6 +23,7 @@ import SidebarMenu from './SidebarMenu';
 
 // Icons
 import PencilIcon from '../../assets/icons/normal/ic_pencil.svg?react';
+import PlusIcon from '../../assets/icons/normal/ic_plus.svg?react';
 import LogInIcon from '../../assets/icons/normal/ic_login.svg?react';
 import WaggleWordmark from '../../assets/icons/waggle-wordmark.svg?react';
 
@@ -94,26 +95,45 @@ const Sidebar = () => {
               setIsNotificationOpen={setIsNotificationOpen}
             />
 
-            <div className="relative h-[4.4rem]">
-              {/* Folded state: pencil/login icon */}
+            <div
+              className={`relative transition-[height] duration-sidebar ease-sidebar ${
+                isFolded && isProfileComplete && myteamData && myteamData.length >= 1
+                  ? 'h-[9.2rem]'
+                  : 'h-[4.4rem]'
+              }`}
+            >
+              {/* Folded state: 컨텍스트별 아이콘 (로그인 / 새 팀 / 새 팀 + 모집글) */}
               <div
-                className={`absolute left-0 top-0 transition-opacity duration-sidebar ease-sidebar ${
+                className={`absolute left-0 top-0 flex flex-col gap-[0.4rem] transition-opacity duration-sidebar ease-sidebar ${
                   isFolded ? 'opacity-100' : 'pointer-events-none opacity-0'
                 }`}
               >
-                <IconWrapper
-                  onClick={() => {
-                    if (!isLoggedIn) setIsLoginModalOpen(true);
-                    if (myteamData?.length === 0) {
-                      navigate('/team/new');
-                    }
-                    if (myteamData && myteamData?.length >= 1) {
-                      navigate('/post/new');
-                    }
-                  }}
-                >
-                  {isLoggedIn ? <PencilIcon /> : <LogInIcon />}
-                </IconWrapper>
+                {!isProfileComplete ? (
+                  <IconWrapper
+                    title="로그인"
+                    onClick={() => setIsLoginModalOpen(true)}
+                  >
+                    <LogInIcon />
+                  </IconWrapper>
+                ) : (
+                  <>
+                    <IconWrapper
+                      color="outline"
+                      title="새 팀 만들기"
+                      onClick={() => navigate('/team/new')}
+                    >
+                      <PlusIcon />
+                    </IconWrapper>
+                    {myteamData && myteamData.length >= 1 && (
+                      <IconWrapper
+                        title="모집글 작성"
+                        onClick={() => navigate('/post/new')}
+                      >
+                        <PencilIcon />
+                      </IconWrapper>
+                    )}
+                  </>
+                )}
               </div>
               {/* Unfolded state: full buttons */}
               <div
