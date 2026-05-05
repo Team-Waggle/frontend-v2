@@ -32,6 +32,7 @@ const Sidebar = () => {
   const { data: notificationCountData } = useGetNotificationsCount();
 
   const isWide = useMediaQuery('(min-width: 1440px)');
+  const isNarrow = useMediaQuery('(max-width: 1024px)');
   const [isFolded, setIsFolded] = useState(!isWide);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
@@ -39,6 +40,8 @@ const Sidebar = () => {
   useEffect(() => {
     setIsFolded(!isWide);
   }, [isWide]);
+
+  const isOverlay = isNarrow && !isFolded;
 
   const accessToken = useAuthStore((state) => state.accessToken);
   const isLoggedIn = !!accessToken;
@@ -50,10 +53,29 @@ const Sidebar = () => {
     onClose: () => setIsNotificationOpen(false),
   });
 
+  useModal({
+    isOpen: isOverlay,
+    onClose: () => setIsFolded(true),
+  });
+
   return (
     <>
+      {/* 오버레이 모드일 때 레이아웃 자리 보존용 placeholder (접힌 너비 유지) */}
+      {isOverlay && <div className="w-[8.8rem] shrink-0" aria-hidden="true" />}
+      {/* 오버레이 모드 backdrop */}
+      {isOverlay && (
+        <div
+          className="fixed inset-0 z-40 bg-black-100/40"
+          onClick={() => setIsFolded(true)}
+          aria-hidden="true"
+        />
+      )}
       <aside
-        className={`sticky top-0 z-50 flex h-screen flex-col gap-[1.6rem] border-r border-black-20 bg-black-5 pt-[2.8rem] ${
+        className={`${
+          isOverlay
+            ? 'fixed left-0 top-0 z-50 h-screen'
+            : 'sticky top-0 z-50 h-screen'
+        } flex flex-col gap-[1.6rem] border-r border-black-20 bg-black-5 pt-[2.8rem] ${
           isFolded ? 'w-[8.8rem]' : 'w-[29.8rem]'
         }`}
       >
