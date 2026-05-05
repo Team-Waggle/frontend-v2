@@ -102,7 +102,7 @@ const MainPage = () => {
   return (
     <>
       <div className="flex w-full justify-center">
-        <div className="flex w-full max-w-[152.6rem] flex-col gap-[5.6rem] px-[4.8rem] pt-[5.4rem]">
+        <div className="@container flex w-full max-w-[152.6rem] flex-col gap-[5.6rem] px-[4.8rem] pt-[5.4rem]">
           <div className="h-[35.4rem] max-w-[152.6rem] self-stretch rounded-[2.4rem] bg-gradient-to-tr from-blue-80 to-blue-20 p-40">
             <h1 className="text-black-5 text-[6.853rem] font-[500] leading-normal"> WAGGLE </h1>
             <h2 className="text-black-5 text-[3rem] font-[500] leading-normal"> 디자인 확정 후, 배너가 들어갈 임시 자리입니다. </h2>
@@ -119,7 +119,7 @@ const MainPage = () => {
           {!isLoading && posts.length === 0 ? (
             <PostEmptyPage className="max-1440:h-[45.6rem] max-1440:max-w-[104.8rem]" title="등록된 모집글이 없습니다." subTitle="새로운 팀원을 찾아보세요!" btnText="모집글 작성" onBtnClick={() => isLoggedIn ? navigate('/post/new') : setIsLoginModalOpen(true)} />
           ) : (
-            <div className="inline-grid w-full max-w-[152.6rem] auto-rows-max grid-cols-[repeat(auto-fill,minmax(33.6rem,1fr))] gap-x-[1.8rem] gap-y-[1.8rem] max-1440:max-w-full">
+            <div className="inline-grid w-full auto-rows-max grid-cols-1 gap-x-[1.8rem] gap-y-[1.8rem] @[50rem]:grid-cols-2 @[75rem]:grid-cols-3 @[130rem]:grid-cols-4">
               {posts.map((post: PostDetailResponse) => {
                 const positionList: string[] = Array.from(
                   new Set(

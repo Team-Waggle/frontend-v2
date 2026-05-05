@@ -53,7 +53,7 @@ const Sidebar = () => {
   return (
     <>
       <aside
-        className={`z-50 flex flex-col gap-[1.6rem] border-r border-black-20 bg-black-5 pt-[2.8rem] ${
+        className={`sticky top-0 z-50 flex h-screen flex-col gap-[1.6rem] border-r border-black-20 bg-black-5 pt-[2.8rem] ${
           isFolded ? 'w-[8.8rem]' : 'w-[29.8rem]'
         }`}
       >
