@@ -8,6 +8,11 @@
   src: url('/assets/fonts/PretendardVariable.woff2') format('woff-variations');
 }
 
+@font-face {
+  font-family: 'Mulmaru';
+  src: url('/assets/fonts/Mulmaru.woff2') format('woff2');
+}
+
 html {
   font-size: 10px;
   /* line-height: 150%, letter-spacing: -2% */

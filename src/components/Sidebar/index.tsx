@@ -50,7 +50,8 @@ const Sidebar = () => {
   const accessToken = useAuthStore((state) => state.accessToken);
   const isLoggedIn = !!accessToken;
 
-  const isProfileComplete = isLoggedIn && isProfileCompleteData?.isComplete;
+  const isProfileComplete =
+    isLoggedIn && isProfileCompleteData?.isComplete === true;
 
   useModal({
     isOpen: isOverlay,
@@ -102,7 +103,7 @@ const Sidebar = () => {
                   : 'h-[4.4rem]'
               }`}
             >
-              {/* Folded state: 컨텍스트별 아이콘 (로그인 / 새 팀 / 새 팀 + 모집글) */}
+              {/* Folded state: 컨텍스트별 아이콘 */}
               <div
                 className={`absolute left-0 top-0 flex flex-col gap-[0.4rem] transition-opacity duration-sidebar ease-sidebar ${
                   isFolded ? 'opacity-100' : 'pointer-events-none opacity-0'
@@ -110,10 +111,14 @@ const Sidebar = () => {
               >
                 {!isProfileComplete ? (
                   <IconWrapper
-                    title="로그인"
-                    onClick={() => setIsLoginModalOpen(true)}
+                    title={isLoggedIn ? '모집글 작성' : '로그인'}
+                    onClick={() =>
+                      isLoggedIn
+                        ? navigate('/post/new')
+                        : setIsLoginModalOpen(true)
+                    }
                   >
-                    <LogInIcon />
+                    {isLoggedIn ? <PencilIcon /> : <LogInIcon />}
                   </IconWrapper>
                 ) : (
                   <>
@@ -146,7 +151,7 @@ const Sidebar = () => {
                     <BaseButton onClick={() => navigate('/team/new')}>
                       새 팀 만들기
                     </BaseButton>
-                  ) : myteamData && myteamData?.length >= 1 ? (
+                  ) : (
                     <div className="flex gap-[1.2rem]">
                       <BaseButton
                         color="secondary"
@@ -162,14 +167,16 @@ const Sidebar = () => {
                         모집글 작성
                       </BaseButton>
                     </div>
-                  ) : (
-                    <BaseButton onClick={() => navigate('/post/new')}>
-                      모집글 작성
-                    </BaseButton>
                   )
                 ) : (
-                  <BaseButton onClick={() => setIsLoginModalOpen(true)}>
-                    로그인
+                  <BaseButton
+                    onClick={() =>
+                      isLoggedIn
+                        ? navigate('/post/new')
+                        : setIsLoginModalOpen(true)
+                    }
+                  >
+                    {isLoggedIn ? '모집글 작성' : '로그인'}
                   </BaseButton>
                 )}
               </div>

@@ -26,6 +26,7 @@ interface MainCardProps {
   variant?: 'main' | 'team';
   className?: string;
   isActive?: boolean;
+  isClosed?: boolean;
   onClick?: () => void;
 }
 
@@ -35,6 +36,7 @@ const MainCard = ({
   mainCardSkills,
   variant = 'main',
   isActive = false,
+  isClosed = false,
   mainCardCreatedAt,
   className,
   onClick,
@@ -44,6 +46,7 @@ const MainCard = ({
   const hoverStyle =
     variant === 'main' ? 'hover:shadow-main-card' : 'hover:bg-hover-5';
   const activeStyle = isActive ? 'border-blue-70' : '';
+  const closedStyle = isClosed ? 'opacity-50' : '';
 
   const uniquePositions = useMemo(() => {
     const list = (mainCardPositions || [])
@@ -57,7 +60,7 @@ const MainCard = ({
     <button
       type="button"
       data-main-card="true"
-      className={`${baseStyle} ${hoverStyle} ${activeStyle} ${className}`}
+      className={`${baseStyle} ${hoverStyle} ${activeStyle} ${closedStyle} ${className}`}
       onClick={onClick}
     >
       {/** Frame 01 */}

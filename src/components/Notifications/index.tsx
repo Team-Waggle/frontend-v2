@@ -166,63 +166,64 @@ const Notifications = ({
             모두 읽음 처리
           </BaseButton>
         </div>
-        <div className="flex h-full flex-col overflow-y-scroll">
-          {mynotificationsData?.data?.map((data) => {
-            const config = NOTIFICATION_CONFIG[data.type];
-            const Icon = config.Icon;
-            return (
-              <div
-                key={data.notificationId}
-                onClick={() => {
-                  patchRead([data.notificationId], {
-                    onSuccess: () => {
-                      const route = config.getRoute?.(data);
-                      if (route) navigate(route);
-                      onClose();
-                    },
-                  });
-                }}
-                className="cursor-pointer bg-black-5 px-[2.4rem] hover:bg-black-10"
-              >
-                <div className="flex flex-col gap-[1rem] border-b border-black-20 py-[2.4rem]">
-                  <div className="flex flex-col gap-[0.8rem]">
-                    <div className="flex items-center gap-[0.8rem]">
-                      <div className="flex h-[2.4rem] w-[2.4rem] items-center justify-center rounded-[4.569rem] bg-blue-5">
-                        <Icon
-                          className={`h-[1.6rem] w-[1.6rem] ${data.readAt ? 'text-black-40' : 'text-blue-40'}`}
-                        />
+        {mynotificationsData?.data.length !== 0 && (
+          <div className="flex h-full flex-col overflow-y-scroll">
+            {mynotificationsData?.data?.map((data) => {
+              const config = NOTIFICATION_CONFIG[data.type];
+              const Icon = config.Icon;
+              return (
+                <div
+                  key={data.notificationId}
+                  onClick={() => {
+                    patchRead([data.notificationId], {
+                      onSuccess: () => {
+                        const route = config.getRoute?.(data);
+                        if (route) navigate(route);
+                        onClose();
+                      },
+                    });
+                  }}
+                  className="cursor-pointer bg-black-5 px-[2.4rem] hover:bg-black-10"
+                >
+                  <div className="flex flex-col gap-[1rem] border-b border-black-20 py-[2.4rem]">
+                    <div className="flex flex-col gap-[0.8rem]">
+                      <div className="flex items-center gap-[0.8rem]">
+                        <div className="flex h-[2.4rem] w-[2.4rem] items-center justify-center rounded-[4.569rem] bg-blue-5">
+                          <Icon
+                            className={`h-[1.6rem] w-[1.6rem] ${data.readAt ? 'text-black-40' : 'text-blue-40'}`}
+                          />
+                        </div>
+                        <div
+                          className={`text-[1.4rem] font-semibold ${data.readAt ? 'text-black-40' : 'text-blue-70'}`}
+                        >
+                          {config.title}
+                        </div>
                       </div>
-                      <div
-                        className={`text-[1.4rem] font-semibold ${data.readAt ? 'text-black-40' : 'text-blue-70'}`}
-                      >
-                        {config.title}
+                      <div className="flex items-center gap-[1rem]">
+                        <span
+                          className={`line-clamp-2 w-[27rem] text-[1.6rem] font-medium ${data.readAt ? 'text-black-40' : 'text-black-100'}`}
+                        >
+                          {config.getMessage(data)}
+                        </span>
+                        {!data.readAt && (
+                          <div className="h-[0.8rem] w-[0.8rem] rounded-full bg-blue-80" />
+                        )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-[1rem]">
+                    <div className="pr-[0.6rem]">
                       <span
-                        className={`line-clamp-2 w-[27rem] text-[1.6rem] font-medium ${data.readAt ? 'text-black-40' : 'text-black-100'}`}
+                        className={`text-[1.4rem] font-medium ${data.readAt ? 'text-black-40' : 'text-black-60'}`}
                       >
-                        {config.getMessage(data)}
+                        {formatPostListCreatedAt(data.createdAt)}
                       </span>
-                      {!data.readAt && (
-                        <div className="h-[0.8rem] w-[0.8rem] rounded-full bg-blue-80" />
-                      )}
                     </div>
-                  </div>
-                  <div className="pr-[0.6rem]">
-                    <span
-                      className={`text-[1.4rem] font-medium ${data.readAt ? 'text-black-40' : 'text-black-60'}`}
-                    >
-                      {formatPostListCreatedAt(data.createdAt)}
-                    </span>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-        {(!mynotificationsData?.data ||
-          mynotificationsData?.data.length === 0) && (
+              );
+            })}
+          </div>
+        )}
+        {mynotificationsData?.data.length === 0 && (
           <div className="flex h-full flex-col justify-center">
             <div className="flex flex-col items-center gap-[1.8rem]">
               <NoNotificaitionIcon />

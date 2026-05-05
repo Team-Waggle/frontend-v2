@@ -12,6 +12,15 @@ import type { ModalProps } from '../../types/modal';
 import ModalOverlay from './ModalOverlay';
 import ModalPortal from './ModalPortal';
 
+const POSITION_ORDER: PositionType[] = [
+  'PM',
+  'DESIGNER',
+  'FRONTEND',
+  'BACKEND',
+  'MARKETER',
+  'OTHER',
+];
+
 interface FormValues {
   position: PositionType;
   detail: string;
@@ -31,6 +40,16 @@ const ApplyModal = ({
   isOpen,
   onClose,
 }: ApplyModalProps) => {
+  const availablePositions = postData.recruitments
+    .map((recruitment) => recruitment.position as PositionType)
+    .sort((a, b) => POSITION_ORDER.indexOf(a) - POSITION_ORDER.indexOf(b));
+
+  const defaultPosition = availablePositions.includes(
+    myData?.position as PositionType,
+  )
+    ? (myData?.position as PositionType)
+    : availablePositions[0];
+
   const {
     register,
     handleSubmit,
@@ -43,7 +62,7 @@ const ApplyModal = ({
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
-      position: myData?.position as PositionType,
+      position: defaultPosition,
       detail: '',
       portfolioUrls: '',
     },
@@ -127,6 +146,7 @@ const ApplyModal = ({
                       positionProps={{
                         value: field.value,
                         onChange: field.onChange,
+                        availablePositions,
                       }}
                     />
                   )}

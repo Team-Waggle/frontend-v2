@@ -14,7 +14,7 @@ import BaseTag from '../common/Tag';
 import IconWrapper from '../common/IconWrapper';
 import { SkillIcon } from '../../utils/SkillIcon';
 import { positionSkillData } from '../../constants/positionSkill';
-import type { PositionKey } from '../../utils/position';
+import { POSITION_CONVERTER, type PositionKey } from '../../utils/position';
 import { getByteLength } from '../../utils/getByteLength';
 import type { TeamResponse } from '../../types/api/team';
 import type { PositionType } from '../../types/api/posts';
@@ -91,6 +91,7 @@ export type RecruitmentsValue = {
 interface FieldPositionProps {
   value?: PositionType | null;
   onChange?: (value: PositionType) => void;
+  availablePositions?: PositionType[];
 }
 
 interface FieldPositionSkillProps {
@@ -539,55 +540,27 @@ export const FieldTeamName = ({
   );
 };
 
-export const FieldPosition = ({ value, onChange }: FieldPositionProps) => {
+export const FieldPosition = ({
+  value,
+  onChange,
+  availablePositions,
+}: FieldPositionProps) => {
   const handleChange = (newValue: PositionType) => {
     onChange?.(newValue);
   };
 
   return (
     <div className="flex gap-[0.6rem]">
-      <BaseChip
-        isSelected={value === 'PM'}
-        onClick={() => handleChange('PM')}
-        className="w-[9.2rem]"
-      >
-        기획
-      </BaseChip>
-      <BaseChip
-        isSelected={value === 'DESIGNER'}
-        onClick={() => handleChange('DESIGNER')}
-        className="w-[9.2rem]"
-      >
-        디자인
-      </BaseChip>
-      <BaseChip
-        isSelected={value === 'FRONTEND'}
-        onClick={() => handleChange('FRONTEND')}
-        className="w-[9.2rem]"
-      >
-        프론트엔드
-      </BaseChip>
-      <BaseChip
-        isSelected={value === 'BACKEND'}
-        onClick={() => handleChange('BACKEND')}
-        className="w-[9.2rem]"
-      >
-        백엔드
-      </BaseChip>
-      <BaseChip
-        isSelected={value === 'MARKETER'}
-        onClick={() => handleChange('MARKETER')}
-        className="w-[9.2rem]"
-      >
-        마케팅
-      </BaseChip>
-      <BaseChip
-        isSelected={value === 'OTHER'}
-        onClick={() => handleChange('OTHER')}
-        className="w-[9.2rem]"
-      >
-        기타
-      </BaseChip>
+      {availablePositions?.map((pos) => (
+        <BaseChip
+          key={pos}
+          isSelected={value === pos}
+          onClick={() => handleChange(pos)}
+          className="w-[9.2rem]"
+        >
+          {POSITION_CONVERTER[pos]}
+        </BaseChip>
+      ))}
     </div>
   );
 };

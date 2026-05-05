@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams } from 'react-router';
+import { useParams, useSearchParams } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   useGetTeamApplications,
@@ -26,9 +26,12 @@ import NoApplicantIcon from '../assets/icons/ic_character_main_page.svg?react';
 
 const TeamApplicantPage = () => {
   const queryClient = useQueryClient();
-  const [selectedPostId, setSelectedPostId] = useState<number | undefined>(
-    undefined,
-  );
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const selectedPostId = searchParams.get('postId')
+    ? Number(searchParams.get('postId'))
+    : undefined;
+
   const [selectedApplicantId, setSelectedApplicantId] = useState<number | null>(
     null,
   );
@@ -38,6 +41,7 @@ const TeamApplicantPage = () => {
 
   const { teamId } = useParams<{ teamId: string }>();
   const numericTeamId = Number(teamId);
+
   const { data: postData } = useGetTeamPosts(Number(teamId));
   const { data: applicantData } = useGetTeamApplications({
     teamId: numericTeamId,
@@ -71,7 +75,7 @@ const TeamApplicantPage = () => {
       },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({
+          queryClient.refetchQueries({
             queryKey: ['my-notifications-count'],
           });
           onClose();
@@ -89,7 +93,7 @@ const TeamApplicantPage = () => {
           <div className="h-full min-h-0 w-full overflow-x-hidden overflow-y-auto rounded-[0.8rem] border border-black-20 p-[1rem]">
             <div
               onClick={() => {
-                setSelectedPostId(undefined);
+                setSearchParams(undefined);
               }}
               className="h-[5.9rem] w-full cursor-pointer py-[1.8rem] pl-[1.1rem]"
             >
@@ -106,7 +110,12 @@ const TeamApplicantPage = () => {
                 <div
                   key={data.postId}
                   onClick={() => {
-                    setSelectedPostId(data?.postId);
+                    setSearchParams((prev) => {
+                      const newParams = new URLSearchParams(prev);
+                      newParams.set('postId', String(data.postId));
+                      newParams.delete('applicationId');
+                      return newParams;
+                    });
                   }}
                   className="flex h-[8.2rem] w-full cursor-pointer items-center gap-[1.6rem] border-t border-black-20 py-[1.8rem] pl-[1.1rem] hover:bg-black-10"
                 >
@@ -178,13 +187,14 @@ const TeamApplicantPage = () => {
                               shape="circle"
                               color="black80"
                               isInverted
-                              className={`${
+                              className={`!h-[2.4rem] ${
                                 applicant.status !== 'PENDING'
                                   ? 'bg-black-20 text-black-40'
                                   : 'bg-black-10 text-black-100'
                               }`}
                             >
-                              {applicant?.user.temperature}°
+                              {(applicant?.user.temperature ?? 36.5).toFixed(1)}
+                              °
                             </BaseTag>
                           </div>
                           <span

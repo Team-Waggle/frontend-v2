@@ -148,7 +148,7 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
       if (mode === 'edit') {
         updateUserProfile(transformedData, {
           onSuccess: async () => {
-            await queryClient.refetchQueries({ queryKey: ['me'] });
+            await queryClient.invalidateQueries({ queryKey: ['user'] });
             onClose();
           },
         });

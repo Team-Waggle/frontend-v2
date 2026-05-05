@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router';
 import {
   useInfiniteQuery,
   useMutation,
@@ -18,6 +19,8 @@ import {
   postTeamApplicationRead,
   patchTeamApplicationStatus,
   putTeamMemberReview,
+  updateTeam,
+  deleteTeam,
 } from '../api/team';
 import type { ApplyRequest } from '../types/api/posts';
 import type {
@@ -34,6 +37,33 @@ export const useCreateTeam = () => {
       queryClient.invalidateQueries({
         queryKey: ['user-me-team'],
       });
+    },
+  });
+};
+
+// 팀 수정
+export const useUpdateTeam = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ teamId, teamData }: { teamId: number; teamData: object }) =>
+      updateTeam(teamId, teamData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['user-me-team'],
+      });
+    },
+  });
+};
+
+// 팀 삭제
+export const useDeleteTeam = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (teamId: number) => deleteTeam(teamId),
+    onSuccess: () => {
+      queryClient.removeQueries({ queryKey: ['user-me-team'] });
+      navigate('/');
     },
   });
 };
@@ -58,17 +88,6 @@ export const useGetTeamDetail = (teamId: number) => {
 };
 
 // 팀 지원 목록 조회
-// export const useGetTeamApplications = (
-//   teamId: number,
-//   postId: number | null,
-// ) => {
-//   return useQuery({
-//     queryKey: ['team-applications', teamId, postId],
-//     queryFn: () => GetTeamApplications(teamId, postId),
-//     enabled: !!teamId,
-//     refetchOnWindowFocus: false,
-//   });
-// };
 export const useGetTeamApplications = (
   params: Omit<GetApplicationsParams, 'cursor' | 'direction'>,
 ) => {
