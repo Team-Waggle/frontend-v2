@@ -191,15 +191,20 @@ const Sidebar = () => {
         </div>
 
         {/* 고객지원 문의 */}
-        {!isFolded && (
-          <div className="flex h-[17.1rem] flex-col gap-[2.4rem] pb-[2.8rem]">
+        <div
+          className={`flex flex-col gap-[2.4rem] overflow-hidden transition-[max-height,opacity,padding-bottom] duration-sidebar ease-sidebar ${
+            isFolded
+              ? 'pointer-events-none max-h-0 pb-0 opacity-0'
+              : 'max-h-[17.1rem] pb-[2.8rem] opacity-100'
+          }`}
+        >
             <div className="h-[0.1rem] bg-black-10" />
             <div className="flex flex-col gap-[0.8rem] px-[2rem]">
               <div className="flex flex-col gap-[0.4rem]">
                 <WaggleWordmark className="h-[3.2rem] w-auto self-start text-black-50" />
                 <a
                   href="mailto:team.waggle.offcial@gmaill.com"
-                  className="text-[1.4rem] font-normal text-black-60"
+                  className="whitespace-nowrap text-[1.4rem] font-normal text-black-60"
                 >
                   team.waggle.offcial@gmaill.com
                 </a>
@@ -209,6 +214,7 @@ const Sidebar = () => {
                   href="https://satin-mint-d68.notion.site/a5520f189e0d4386ab7288f9425d53e6"
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="whitespace-nowrap"
                 >
                   고객지원/문의
                 </a>
@@ -216,16 +222,16 @@ const Sidebar = () => {
                   href="https://satin-mint-d68.notion.site/34738daa31cd80af8a40cfab76a855d0"
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="whitespace-nowrap"
                 >
                   와글 정책 안내
                 </a>
               </div>
-              <span className="text-[1.4rem] font-normal text-black-60">
+              <span className="whitespace-nowrap text-[1.4rem] font-normal text-black-60">
                 © 2026 Waggle Inc. All rights reserved.
               </span>
             </div>
           </div>
-        )}
       </aside>
       <AnimatePresence>
         {isNotificationOpen && (
