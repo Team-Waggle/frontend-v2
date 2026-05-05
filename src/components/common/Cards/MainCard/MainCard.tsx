@@ -42,7 +42,7 @@ const MainCard = ({
   onClick,
 }: MainCardProps) => {
   const baseStyle =
-    'pointer-events-auto flex w-full cursor-pointer flex-col items-start gap-[3.2rem] rounded-[1.2rem] border border-solid border-[#E7E8EA] bg-white px-[2.8rem] py-[2.4rem]';
+    'pointer-events-auto flex w-full min-w-[33.6rem] cursor-pointer flex-col items-start gap-[3.2rem] rounded-[1.2rem] border border-solid border-[#E7E8EA] bg-white px-[2.8rem] py-[2.4rem]';
   const hoverStyle =
     variant === 'main' ? 'hover:shadow-main-card' : 'hover:bg-hover-5';
   const activeStyle = isActive ? 'border-blue-70' : '';
@@ -64,7 +64,7 @@ const MainCard = ({
       onClick={onClick}
     >
       {/** Frame 01 */}
-      <div className="flex h-[9rem] flex-col items-start gap-[1.6rem] self-stretch">
+      <div className="flex h-[9rem] min-w-[28rem] flex-col items-start gap-[1.6rem] self-stretch">
         {/** MainCard Title */}
         <div className="flex h-[4.8rem] max-h-[4.8rem] flex-shrink-0 items-start gap-[1.2rem] self-stretch overflow-hidden overflow-ellipsis">
           <span className="line-clamp-2 leading-[1.5] tracking-[-0.032rem] overflow-hidden text-left text-ellipsis text-[1.6rem] font-[600] text-[#0E0E0E]">

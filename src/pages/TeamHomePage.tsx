@@ -136,7 +136,7 @@ const TeamHomePage = () => {
   return (
     <div
       className={[
-        'flex flex-1 flex-col items-center gap-[6rem] self-stretch px-[2rem]',
+        'flex flex-1 flex-col items-center gap-[6rem] self-stretch',
         isLeaderOrManager ? 'pt-[5.4rem]' : 'pt-[9.2rem]',
       ]
         .filter(Boolean)
@@ -144,68 +144,71 @@ const TeamHomePage = () => {
     >
       {/** pt-[9.2rem] pt-[5.4rem] */}
       {isLeaderOrManager && <TeamNav />}
-      <div className="@container flex w-full max-w-[clamp(98.2rem,70vw,130rem)] flex-col items-start gap-[4rem]">
+      <div className="flex w-full max-w-[clamp(98.2rem,70vw,130rem)] flex-col items-start gap-[4rem]">
         {/** 팀 설명 */}
-        <div className="relative grid grid-cols-[auto_1fr] items-start gap-x-[2.4rem] gap-y-[2.4rem] self-stretch @[60rem]:gap-x-[4rem]">
+        <div className="relative flex items-start gap-[4rem] self-stretch">
           {/** 팀 이미지: default 값 */}
           {teamDetail?.profileImageUrl ? (
-            <div className="flex aspect-square w-[10rem] shrink-0 flex-col items-center justify-center gap-[1rem] overflow-hidden rounded-[1rem] bg-black-10 @[60rem]:w-[22.3rem]">
+            <div className="flex aspect-[1/1] h-[22.3rem] w-[22.3rem] flex-col items-center justify-center gap-[1rem] rounded-[1em] bg-black-10">
               <img
                 alt={'프로필 이미지'}
                 src={teamDetail?.profileImageUrl}
-                className="h-full w-full object-cover"
+                className="h-[22.3rem] w-[22.3rem] rounded-[1rem] object-cover"
               />
             </div>
           ) : (
-            <div className="flex aspect-square w-[10rem] shrink-0 flex-col items-center justify-center gap-[1rem] rounded-[1rem] bg-blue-5 @[60rem]:w-[22.3rem]">
-              <TeamDefaultImg className="h-[80%] w-[80%]" />
+            <div className="flex aspect-[1/1] w-full max-w-[22.3rem] flex-col items-center justify-center gap-[1rem] self-stretch rounded-[1rem] bg-blue-5 py-[1.9rem]">
+              <TeamDefaultImg className="h-[18.5rem] w-[18.5rem]" />
             </div>
           )}
-          {/** 팀명 + 태그 */}
-          <div className="flex min-w-0 flex-col items-start justify-center gap-[1.9rem] pr-[5rem]">
+          {/** 팀 상세 내용 */}
+          <div className="flex flex-1 flex-col items-start gap-[2.4rem]">
+            <div className="flex flex-col items-start justify-center gap-[1.9rem]">
+              {/** 팀명 */}
+              <div>
+                <span className="text-[3.8rem] font-[600] leading-[1.5] tracking-[-0.076rem] text-black">
+                  {teamDetail?.name ?? 'WAGGLE'}
+                </span>
+              </div>
+              {/** 팀원 수, 오프라인/온라인, 날짜 */}
+              <div className="flex items-start gap-[0.8rem]">
+                {[
+                  {
+                    icon: <IcPersons className="h-[2rem] w-[2rem]" />,
+                    label: activeMemberCount,
+                  },
+                  {
+                    icon: <IcDesktop className="h-[2rem] w-[2rem]" />,
+                    label: toWorkModeLabel(teamDetail?.workMode),
+                  },
+                  {
+                    icon: <IcCompany className="h-[2rem] w-[2rem]" />,
+                    label: teamDetail?.createdAt
+                      ? formatTeamCardCreatedAt(teamDetail.createdAt)
+                      : '',
+                  },
+                ].map(({ icon, label }, i) => (
+                  <BaseTag
+                    key={i}
+                    size="xl"
+                    shape="circle"
+                    color="black80"
+                    isInverted
+                    leftIcon={icon}
+                  >
+                    {label}
+                  </BaseTag>
+                ))}
+              </div>
+            </div>
             <div>
-              <span className="text-[3.8rem] font-[600] leading-[1.5] tracking-[-0.076rem] text-black">
-                {teamDetail?.name ?? 'WAGGLE'}
+              <span className="break-all text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black">
+                {teamDetail?.description ?? '팀 소개가 들어가는 자리입니다.'}
               </span>
             </div>
-            <div className="flex flex-wrap items-start gap-[0.8rem]">
-              {[
-                {
-                  icon: <IcPersons className="h-[2rem] w-[2rem]" />,
-                  label: activeMemberCount,
-                },
-                {
-                  icon: <IcDesktop className="h-[2rem] w-[2rem]" />,
-                  label: toWorkModeLabel(teamDetail?.workMode),
-                },
-                {
-                  icon: <IcCompany className="h-[2rem] w-[2rem]" />,
-                  label: teamDetail?.createdAt
-                    ? formatTeamCardCreatedAt(teamDetail.createdAt)
-                    : '',
-                },
-              ].map(({ icon, label }, i) => (
-                <BaseTag
-                  key={i}
-                  size="xl"
-                  shape="circle"
-                  color="black80"
-                  isInverted
-                  leftIcon={icon}
-                >
-                  {label}
-                </BaseTag>
-              ))}
-            </div>
           </div>
-          {/** 설명: 항상 두 칸 span (full-width) */}
-          <div className="col-span-2 min-w-0">
-            <span className="break-all text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black">
-              {teamDetail?.description ?? '팀 소개가 들어가는 자리입니다.'}
-            </span>
-          </div>
-          {/** 팀 수정 */}
-          <div className="absolute right-0 top-0 flex aspect-square h-[4.4rem] w-[4.4rem] flex-col items-center justify-center">
+          {/** 팀 수정: 경로만 추가해뒀습니다.  */}
+          <div className="absolute right-0 flex aspect-square h-[4.4rem] w-[4.4rem] flex-col items-center justify-center">
             <IcEdit
               onClick={() => navigate(`/team/edit`)}
               className="right-4 top-4 flex aspect-square h-[2.4rem] w-[2.4rem] cursor-pointer flex-col items-center justify-center text-black-50"
@@ -278,7 +281,7 @@ const TeamHomePage = () => {
                   );
                   return (
                     <MainCard
-                      className="!w-[36.8rem] shrink-0"
+                      className="!w-[36.8rem]"
                       key={application.postId}
                       variant="team"
                       mainCardTitle={application.title}

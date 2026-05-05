@@ -39,7 +39,7 @@ const MyPageCard = ({
 
   return (
     <article
-      className={`@container flex w-full max-w-[49.4rem] cursor-pointer items-start gap-[1.6rem] rounded-[1.6rem] border border-solid border-black-30 bg-black-5 p-[2.4rem] ${isVisible === false ? 'opacity-60' : ''}`}
+      className={`flex w-full max-w-[49.4rem] cursor-pointer items-start gap-[1.6rem] rounded-[1.6rem] border border-solid border-black-30 bg-black-5 p-[2.4rem] ${isVisible === false ? 'opacity-60' : ''}`}
       onClick={handleCardClick}
     >
       {/** 팀 이미지 */}
@@ -47,10 +47,10 @@ const MyPageCard = ({
         <img
           src={profileImageUrl}
           alt={title ?? '팀 프로필 이미지'}
-          className="h-[10rem] w-[10rem] flex-shrink-0 rounded-[0.8rem] object-cover @[35rem]:h-[12.4rem] @[35rem]:w-[12.4rem]"
+          className="h-[12.4rem] w-[12.4rem] flex-shrink-0 rounded-[0.8rem] object-cover"
         />
       ) : (
-        <div className="h-[10rem] w-[10rem] flex-shrink-0 rounded-[0.8rem] bg-black-20 @[35rem]:h-[12.4rem] @[35rem]:w-[12.4rem]" />
+        <div className="h-[12.4rem] w-[12.4rem] flex-shrink-0 rounded-[0.8rem] bg-black-20" />
       )}
       {/** 팀 상세 설명 */}
       <div className="flex min-w-0 flex-1 flex-col items-start gap-[1.6rem]">
