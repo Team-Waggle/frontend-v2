@@ -36,28 +36,35 @@ interface SideTeamCardProps {
   disabled?: boolean;
   onClick?: () => void;
   onAssignManager?: (memberId: number) => void;
+  onDemoteManager?: (memberId: number) => void;
   onKickMember?: (memberId: number) => void;
 }
 
 type SelectBoxProps = {
+  isManager?: boolean;
   onAssignManager?: () => void;
+  onDemoteManager?: () => void;
   onKickMember?: () => void;
 };
 
 // 따로 컴포넌트 제작해야함. 임시.
-const SelectBox = ({ onAssignManager, onKickMember }: SelectBoxProps) => {
+const SelectBox = ({ isManager, onAssignManager, onDemoteManager, onKickMember }: SelectBoxProps) => {
   return (
     <div className="flex cursor-pointer flex-col items-end rounded-[0.8rem] bg-black-5 shadow-search-select-box">
       <div
         className="flex h-[4.4rem] items-center gap-[0.4rem] rounded-[0.8rem] bg-black-5 px-[1.2rem] hover:bg-hover-5 hover:text-black-80"
         onClick={(e) => {
           e.stopPropagation();
-          onAssignManager?.();
+          if (isManager) {
+            onDemoteManager?.();
+          } else {
+            onAssignManager?.();
+          }
         }}
       >
         <IcSelectBoxShield className="h-[1.6rem] w-[1.6rem] text-black-60" />
         <span className="text-[1.4rem] font-[500] leading-[1.5] tracking-[-0.028rem] text-black-60">
-          관리자 지정
+          {isManager ? '관리자 취소' : '관리자 지정'}
         </span>
       </div>
       <div
@@ -117,6 +124,7 @@ const SideTeamCard = ({
   status = 'ACTIVE',
   onClick,
   onAssignManager,
+  onDemoteManager,
   onKickMember,
 }: SideTeamCardProps) => {
   const navigate = useNavigate();
@@ -217,8 +225,13 @@ const SideTeamCard = ({
                     }}
                   >
                     <SelectBox
+                      isManager={isManager}
                       onAssignManager={() => {
                         onAssignManager?.(Number(memberId!));
+                        setIsSelectBoxOpen(false);
+                      }}
+                      onDemoteManager={() => {
+                        onDemoteManager?.(Number(memberId!));
                         setIsSelectBoxOpen(false);
                       }}
                       onKickMember={() => {

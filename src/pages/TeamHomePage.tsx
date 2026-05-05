@@ -54,6 +54,7 @@ const TeamHomePage = () => {
 
   const [activeCard, setActiveCard] = useState<number | null>(null);
   const [activeTeamMember, setActiveTeamMember] = useState<number | null>(null);
+  const [imgError, setImgError] = useState(false);
 
   const applications = teamApplications ?? [];
 
@@ -93,6 +94,13 @@ const TeamHomePage = () => {
     });
   };
 
+  const handleDemoteManager = (memberId: number) => {
+    patchTeamMemberRoleMutation.mutate({
+      memberId,
+      role: 'MEMBER',
+    });
+  };
+
   const activeMemberCount = members.filter((m) => !m.deletedAt).length;
 
   const handleKickMember = (memberId: number) => {
@@ -122,7 +130,7 @@ const TeamHomePage = () => {
     }
 
     if (workMode === 'HYBRID') {
-      return '혼합';
+      return '온라인 + 오프라인';
     }
 
     return workMode ?? '온라인';
@@ -150,12 +158,13 @@ const TeamHomePage = () => {
         {/** 팀 설명 */}
         <div className="relative flex items-start gap-[4rem] self-stretch">
           {/** 팀 이미지: default 값 */}
-          {teamDetail?.profileImageUrl ? (
+          {teamDetail?.profileImageUrl && !imgError ? (
             <div className="flex aspect-[1/1] h-[22.3rem] w-[22.3rem] flex-col items-center justify-center gap-[1rem] rounded-[1em] bg-black-10">
               <img
                 alt={'프로필 이미지'}
                 src={teamDetail?.profileImageUrl}
                 className="h-[22.3rem] w-[22.3rem] rounded-[1rem] object-cover"
+                onError={() => setImgError(true)}
               />
             </div>
           ) : (
@@ -209,13 +218,15 @@ const TeamHomePage = () => {
               </span>
             </div>
           </div>
-          {/** 팀 수정: 경로만 추가해뒀습니다.  */}
-          <div className="absolute right-0 flex aspect-square h-[4.4rem] w-[4.4rem] flex-col items-center justify-center">
-            <IcEdit
-              onClick={() => navigate(`/team/edit`)}
-              className="right-4 top-4 flex aspect-square h-[2.4rem] w-[2.4rem] cursor-pointer flex-col items-center justify-center text-black-50"
-            />
-          </div>
+          {/** 팀 수정: 리더/관리자 노출 */}
+          {isLeaderOrManager && (
+            <div className="absolute right-0 flex aspect-square h-[4.4rem] w-[4.4rem] flex-col items-center justify-center">
+              <IcEdit
+                onClick={() => navigate(`/team/${teamId}/edit`)}
+                className="right-4 top-4 flex aspect-square h-[2.4rem] w-[2.4rem] cursor-pointer flex-col items-center justify-center text-black-50"
+              />
+            </div>
+          )}
         </div>
         {/** 팀 모집글 / 팀원 관리 */}
         <div className="flex flex-col items-start gap-[3.6rem] self-stretch">
@@ -341,6 +352,7 @@ const TeamHomePage = () => {
                     setActiveTeamMember(member.memberId);
                   }}
                   onAssignManager={handleAssignManager}
+                  onDemoteManager={handleDemoteManager}
                   onKickMember={handleKickMember}
                 />
               ))}
