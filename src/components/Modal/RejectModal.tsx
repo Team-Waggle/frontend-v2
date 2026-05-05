@@ -15,14 +15,15 @@ const RejectModal = ({ isOpen, onClose, handleDone }: ModalProps) => {
         aria-modal="true"
       >
         <ModalOverlay onClose={onClose} />
-        <div className="relative h-[24.4rem] w-[44.6rem] rounded-[2rem] bg-black-5 px-[4rem] pt-[4rem]">
+        <div className="relative h-[26.8rem] w-[44.6rem] rounded-[2rem] bg-black-5 px-[4rem] pt-[4rem]">
           <div className="flex flex-col gap-[4rem]">
             <div className="flex flex-col gap-[1.2rem]">
               <span className="text-[2.4rem] font-bold text-black-100">
                 정말 거절하시겠습니까?
               </span>
-              <span className="w-[27.9rem] text-[1.6rem] font-medium text-black-80">
-                거절하면 해당 지원자는 더 이상 이 프로젝트에 참여할 수 없습니다.
+              <span className="w-[27.9rem] whitespace-nowrap text-[1.6rem] font-medium text-black-80">
+                거절하면 해당 지원자는 대기 목록에서 처리됨으로 이동하며, <br />
+                이후 되돌릴 수 없습니다.
               </span>
             </div>
             <div className="flex gap-[1rem] pb-[3.8rem]">
@@ -39,7 +40,7 @@ const RejectModal = ({ isOpen, onClose, handleDone }: ModalProps) => {
                 onClick={handleDone}
                 className="w-full whitespace-nowrap"
               >
-                승인 확정
+                거절 확정
               </BaseButton>
             </div>
           </div>
