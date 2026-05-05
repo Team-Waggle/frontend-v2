@@ -20,7 +20,7 @@ const SidebarLogo = ({
       <div className="absolute inset-0 overflow-hidden">
         <Link
           to="/"
-          className="absolute left-[1.6rem] top-1/2 flex h-[5.6rem] -translate-y-1/2 items-center gap-[0.4rem]"
+          className="absolute left-[1.6rem] top-1/2 flex h-[5.6rem] -translate-y-1/2 items-center gap-[1rem]"
         >
           <img
             src={WaggleLogoMark}
@@ -32,7 +32,7 @@ const SidebarLogo = ({
               isFolded ? 'opacity-0' : 'opacity-100'
             }`}
           >
-            <WaggleWordmark className="h-[5.6rem] w-auto" />
+            <WaggleWordmark className="h-[5.6rem] w-auto text-blue-80" />
           </span>
         </Link>
       </div>

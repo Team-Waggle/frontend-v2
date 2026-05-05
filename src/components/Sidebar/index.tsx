@@ -23,7 +23,7 @@ import SidebarMenu from './SidebarMenu';
 // Icons
 import PencilIcon from '../../assets/icons/normal/ic_pencil.svg?react';
 import LogInIcon from '../../assets/icons/normal/ic_login.svg?react';
-import LogoIcon from '../../assets/icons/ic_logo.svg?react';
+import WaggleWordmark from '../../assets/icons/waggle-wordmark.svg?react';
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -177,7 +177,7 @@ const Sidebar = () => {
             <div className="h-[0.1rem] bg-black-10" />
             <div className="flex flex-col gap-[0.8rem] px-[2rem]">
               <div className="flex flex-col gap-[0.4rem]">
-                <LogoIcon className="text-black-50" />
+                <WaggleWordmark className="h-[3.2rem] w-auto self-start text-black-50" />
                 <a
                   href="mailto:team.waggle.offcial@gmaill.com"
                   className="text-[1.4rem] font-normal text-black-60"
