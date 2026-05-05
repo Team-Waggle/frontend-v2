@@ -1,5 +1,6 @@
 import type { Config } from 'tailwindcss';
 import scrollbarHide from 'tailwind-scrollbar-hide';
+import containerQueries from '@tailwindcss/container-queries';
 
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
@@ -76,9 +77,16 @@ export default {
           'linear-gradient(270deg, #FFF 0%, rgba(255, 255, 255, 0) 100%)',
       },
       screens: {
+        '3xl': '1920px',
         'max-1440': { max: '1440px' },
+      },
+      transitionDuration: {
+        sidebar: '300ms',
+      },
+      transitionTimingFunction: {
+        sidebar: 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
     },
   },
-  plugins: [scrollbarHide],
+  plugins: [scrollbarHide, containerQueries],
 } satisfies Config;
