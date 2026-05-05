@@ -274,6 +274,7 @@ const SideTeamCard = ({
           <BaseButton
             size="md"
             color="secondary"
+            disabled={isMe}
             onClick={(e) => {
               e.stopPropagation();
               if (!accessToken) {

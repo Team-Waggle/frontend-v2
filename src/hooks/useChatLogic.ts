@@ -51,7 +51,7 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
 
   const [inputValue, setInputValue] = useState('');
 
-  const { realtimeMessages, failedTempIds, appendRealtimeMessage, markTempFailed, queueRetry, publish } =
+  const { realtimeMessages, failedTempIds, appendRealtimeMessage, markTempFailed, queueRetry, publish, removeFailedTemps, requestReconnect } =
     useMessageStore();
   const { mutate: readConversation } = useReadConversation();
 
@@ -94,13 +94,24 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
     return pages.flatMap((page) => page.data);
   }, [highlightAfterMessages]);
 
-  // historyData 또는 afterData 갱신 시 임시 메시지 제거 — 서버 데이터로 대체됨
+  // historyData 또는 afterData 갱신 시 임시 메시지 제거 — 서버에서 확인된 메시지만 제거
   useEffect(() => {
     if (historyMessages.length === 0 && afterMessages.length === 0) return;
-    const hasTempMessages = useMessageStore
+    const tempMsgs = useMessageStore
       .getState()
-      .realtimeMessages.some((m) => m.messageId >= TEMP_ID_BASE);
-    if (hasTempMessages) useMessageStore.getState().clearTempMessages();
+      .realtimeMessages.filter((m) => m.messageId >= TEMP_ID_BASE);
+    if (tempMsgs.length === 0) return;
+    const combined = [...historyMessages, ...afterMessages];
+    const allConfirmed = tempMsgs.every((temp) => {
+      const tempTime = new Date(temp.createdAt).getTime();
+      return combined.some(
+        (h) =>
+          h.content === temp.content &&
+          String(h.sender.userId) === String(temp.sender.userId) &&
+          Math.abs(new Date(h.createdAt).getTime() - tempTime) < 30_000,
+      );
+    });
+    if (allConfirmed) useMessageStore.getState().clearTempMessages();
   }, [historyMessages, afterMessages]);
 
   // messageId 기준 deduplication + 현재 파트너 메시지만 포함
@@ -278,6 +289,9 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
     const content = inputValue.trim();
     if (!content) return;
 
+    setInputValue('');
+    removeFailedTemps();
+
     const tempId = TEMP_ID_BASE + (++tempIdCounterRef.current);
     const now = new Date().toISOString();
 
@@ -353,10 +367,10 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
     if (!sent) {
       markTempFailed(tempId);
       queueRetry(partnerId, content, tempId);
+      requestReconnect();
       return;
     }
 
-    setInputValue('');
     prevScrollHeightRef.current = 0;
 
     // 서버 저장 완료 후 히스토리 및 대화 목록 갱신
@@ -366,7 +380,7 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
     }, HISTORY_REFETCH_DELAY_MS);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
