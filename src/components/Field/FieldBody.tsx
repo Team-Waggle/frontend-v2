@@ -1,4 +1,12 @@
-import React, { forwardRef, memo, useEffect, useRef, useState } from 'react';
+import React, {
+  forwardRef,
+  memo,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import type { DropzoneInputProps, DropzoneRootProps } from 'react-dropzone';
 import BaseChip from '../common/Chip/BaseChip';
 import BaseButton from '../common/Button';
@@ -141,6 +149,21 @@ export const FieldTextarea = memo(
     ({ id, error, maxLength = 100, className, onChange, ...props }, ref) => {
       const isEmpty = !props.value;
       const byteLength = getByteLength(String(props.value ?? ''));
+      const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+      useImperativeHandle(
+        ref,
+        () => textareaRef.current as HTMLTextAreaElement,
+      );
+
+      // 콘텐츠 길이에 맞춰 자동 grow, 단 max-h에서 내부 스크롤로 전환
+      const MAX_HEIGHT_PX = 200; // = 20rem (1rem = 10px)
+      useLayoutEffect(() => {
+        const ta = textareaRef.current;
+        if (!ta) return;
+        ta.style.height = 'auto';
+        ta.style.height = `${Math.min(ta.scrollHeight, MAX_HEIGHT_PX)}px`;
+      }, [props.value]);
 
       const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         // Enter 키인지 확인 (Shift + Enter도 막으려면 e.shiftKey 조건 제외)
@@ -162,9 +185,9 @@ export const FieldTextarea = memo(
           <textarea
             onKeyDown={handleKeyDown}
             onChange={onChange}
-            ref={ref}
+            ref={textareaRef}
             id={id}
-            className={`h-[6rem] w-full text-[1.6rem] font-medium`}
+            className="min-h-[6rem] w-full overflow-y-auto text-[1.6rem] font-medium"
             {...props}
           />
           <span className="text-[1.4rem] font-medium text-black-60">
@@ -185,7 +208,7 @@ export const FieldThumbnail = memo(
           id={id}
           type="button"
           {...rootProps}
-          className={`relative flex h-[17.4rem] flex-col items-center gap-[1.2rem] rounded-[0.8rem] border border-solid border-black-30 px-[1.8rem] py-[4rem]`}
+          className={`relative flex h-[12rem] flex-col items-center justify-center gap-[1rem] rounded-[0.8rem] border border-solid border-black-30 px-[1.8rem] py-[2rem]`}
         >
           <input {...inputProps} />
           {preview ? (
@@ -369,7 +392,7 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
   };
 
   return (
-    <div className="relative h-[47.1rem] w-full">
+    <div className="relative h-[36rem] w-full">
       <div className="flex h-[6.4rem] items-center gap-[2.4rem] rounded-tl-[0.8rem] rounded-tr-[0.8rem] border-x border-t border-black-30 bg-black-10 px-[1.8rem] py-[1.4rem]">
         <div className="flex gap-[0.2rem]">
           <IconWrapper
@@ -455,7 +478,7 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
           </IconWrapper>
         </div>
       </div>
-      <div className="h-[39.9rem] w-full rounded-bl-[0.8rem] rounded-br-[0.8rem] border-x border-b border-black-30 bg-black-5 px-[1.8rem] py-[1.7rem] text-[1.6rem] font-medium">
+      <div className="h-[28.8rem] w-full rounded-bl-[0.8rem] rounded-br-[0.8rem] border-x border-b border-black-30 bg-black-5 px-[1.8rem] py-[1.7rem] text-[1.6rem] font-medium">
         <EditorContent editor={editor} className="prose-list h-full" />
       </div>
       {isLinkModalOpen && (
@@ -508,8 +531,9 @@ export const FieldTeamName = ({
           mainIcon={team?.profileImageUrl || <ProfileBasicIcon />}
           isSelected={value === team.teamId}
           onClick={() => onChange?.(team.teamId)}
+          className="min-w-0 overflow-hidden"
         >
-          {team.name}
+          <span className="min-w-0 flex-1 truncate text-left">{team.name}</span>
         </BaseChip>
       ))}
     </div>
@@ -660,16 +684,17 @@ export const FieldPositionSkill = ({
 
   return (
     <>
-      <div className="relative flex gap-[1.2rem]">
+      <div className="@container relative flex gap-[1.2rem]">
+        <div className="flex min-w-0 flex-1 flex-col gap-[1.2rem] @[60rem]:flex-row">
         <div
           ref={positionRef}
           onClick={() => setPositionDropdownOpen((prev) => !prev)}
-          className={`relative flex h-[6rem] w-[31.8rem] cursor-pointer items-center gap-[1rem] rounded-[0.8rem] border px-[1.8rem] ${
+          className={`relative flex h-[6rem] min-w-[16rem] flex-1 cursor-pointer items-center gap-[1rem] rounded-[0.8rem] border px-[1.8rem] ${
             selectedPosition ? 'border-blue-70' : 'border-black-30'
           }`}
         >
           <div
-            className={`h-[2.6rem] w-[24.8rem] text-[1.6rem] font-medium ${selectedPosition ? 'text-blue-100' : 'text-black-60'}`}
+            className={`flex h-[2.6rem] min-w-0 flex-1 items-center truncate text-[1.6rem] font-medium ${selectedPosition ? 'text-blue-100' : 'text-black-60'}`}
           >
             {selectedPosition || '모집 직무'}
           </div>
@@ -678,7 +703,7 @@ export const FieldPositionSkill = ({
           />
 
           {positionDropdownOpen && (
-            <div className="absolute left-0 top-[7rem] grid h-[6rem] w-[61.8rem] grid-cols-6 items-center gap-[0.6rem] rounded-[0.8rem] border border-black-30 bg-black-5 px-[1.8rem]">
+            <div className="absolute left-0 top-[calc(100%+0.4rem)] z-10 grid h-[6rem] w-[61.8rem] max-w-[calc(100vw-4rem)] grid-cols-6 items-center gap-[0.6rem] rounded-[0.8rem] border border-black-30 bg-black-5 px-[1.8rem]">
               <div onClick={(e) => handlePositionSelect(e, '기획')}>
                 <BaseChip
                   isSelected={selectedPosition === '기획'}
@@ -732,13 +757,20 @@ export const FieldPositionSkill = ({
         </div>
         <div
           ref={skillRef}
-          onClick={() => setSkillDropdownOpen((prev) => !prev)}
-          className={`flex h-[6rem] w-[31.8rem] items-center gap-[1rem] rounded-[0.8rem] border px-[1.8rem] ${
-            selectedSkill.length !== 0 ? 'border-blue-70' : 'border-black-30'
-          } ${selectedPosition && 'cursor-pointer'}`}
+          onClick={() => {
+            if (!selectedPosition) return;
+            setSkillDropdownOpen((prev) => !prev);
+          }}
+          className={`relative flex h-[6rem] min-w-[16rem] flex-1 items-center gap-[1rem] rounded-[0.8rem] border px-[1.8rem] ${
+            !selectedPosition
+              ? 'cursor-not-allowed border-black-20 bg-black-10 opacity-60'
+              : selectedSkill.length !== 0
+                ? 'cursor-pointer border-blue-70'
+                : 'cursor-pointer border-black-30'
+          }`}
         >
           <div
-            className={`h-[2.6rem] w-[24.8rem] truncate text-[1.6rem] font-medium ${selectedSkill.length !== 0 ? 'text-blue-100' : 'text-black-60'}`}
+            className={`flex h-[2.6rem] min-w-0 flex-1 items-center truncate text-[1.6rem] font-medium ${selectedSkill.length !== 0 ? 'text-blue-100' : 'text-black-60'}`}
           >
             {selectedSkill.length
               ? `사용 스킬(${selectedSkill.length}) ${selectedSkill.join(', ')}`
@@ -749,8 +781,8 @@ export const FieldPositionSkill = ({
           />
 
           {skillDropdownOpen && selectedPosition && (
-            <div className="absolute left-[9.5rem] top-[7rem] z-10 rounded-[0.8rem] border border-black-30 bg-black-5 p-[1.8rem]">
-              <div className="flex flex-wrap gap-x-[0.6rem] gap-y-[1rem] overflow-y-auto pl-[0.1rem] pr-[2rem] pt-[0.1rem]">
+            <div className="absolute left-0 top-[calc(100%+0.4rem)] z-10 w-[28rem] max-w-[calc(100vw-4rem)] rounded-[0.8rem] border border-black-30 bg-black-5 p-[1.8rem] @[60rem]:left-1/2 @[60rem]:w-[44rem] @[60rem]:-translate-x-1/2">
+              <div className="flex flex-wrap gap-x-[0.6rem] gap-y-[1rem] overflow-y-auto">
                 {positionSkillData[selectedPosition as PositionKey]?.map(
                   (skill) => {
                     const isSelected = selectedSkill.includes(skill);
@@ -773,8 +805,9 @@ export const FieldPositionSkill = ({
             </div>
           )}
         </div>
+        </div>
 
-        <div className="flex items-center gap-[3.6rem]">
+        <div className="flex shrink-0 items-center gap-[1.6rem] self-center">
           <div className="flex items-center gap-[0.8rem] py-[0.8rem]">
             <IconWrapper
               color="outline"
@@ -800,11 +833,9 @@ export const FieldPositionSkill = ({
               <PlusIcon className="h-[2.182rem] w-[2.182rem]" />
             </IconWrapper>
           </div>
-          <div className="flex gap-[0.8rem]">
-            <BaseButton size="sm" className="w-[6.8rem]" onClick={handleAdd}>
-              추가
-            </BaseButton>
-          </div>
+          <BaseButton size="sm" className="w-[6.8rem]" onClick={handleAdd}>
+            추가
+          </BaseButton>
         </div>
       </div>
 
@@ -812,14 +843,14 @@ export const FieldPositionSkill = ({
         {items.map((item, itemIdx) => (
           <div
             key={`item-${itemIdx}`}
-            className="flex gap-[1rem] py-[1.6rem] pl-[1.6rem]"
+            className="flex flex-wrap items-start gap-[1rem] py-[1.6rem] pl-[1.6rem]"
           >
-            <div className="flex w-[63.4rem] gap-[1rem]">
+            <div className="flex min-w-0 flex-1 flex-wrap gap-[1rem]">
               <BaseTag
                 size="lg"
                 shape="circle"
                 color="black80"
-                className="w-[8.4rem]"
+                className="shrink-0 whitespace-nowrap"
               >
                 {item.position}
               </BaseTag>

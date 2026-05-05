@@ -9,6 +9,9 @@ import { SKILL_MAP } from '../../../constants/skillMap';
 import IcBusinessBag from '../../../../src/assets/icons/normal/ic_businessBag.svg?react';
 import IcFolder from '../../../../src/assets/icons/normal/ic_folder.svg?react';
 import IcRefresh from '../../../../src/assets/icons/normal/ic_refresh.svg?react';
+import IcSearch from '../../../../src/assets/icons/normal/ic_normal_search.svg?react';
+import IcChevronDown from '../../../../src/assets/icons/normal/chevron/ic_chevronDown_small.svg?react';
+import IcChevronUp from '../../../../src/assets/icons/normal/chevron/ic_chevronUp_small.svg?react';
 import ChevronLeft from '../../../assets/icons/normal/chevron/ic_chevronLeft.svg?react';
 import ChevronRight from '../../../assets/icons/normal/chevron/ic_chevronRight.svg?react';
 
@@ -67,16 +70,17 @@ const MainSearch = ({
   const [debouncedKeyword, setDebouncedKeyword] = useState('');
 
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const narrowContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const onPointerDown = (e: PointerEvent) => {
-      const el = containerRef.current;
-      if (!el) return;
-
       const target = e.target as Node | null;
       if (!target) return;
 
-      if (!el.contains(target)) {
+      const insideWide = containerRef.current?.contains(target) ?? false;
+      const insideNarrow = narrowContainerRef.current?.contains(target) ?? false;
+
+      if (!insideWide && !insideNarrow) {
         setOpenMenu(null);
       }
     };
@@ -241,10 +245,11 @@ const MainSearch = ({
     });
 
   return (
-    <div className="flex w-full max-w-[152.6rem] flex-col items-start gap-[2rem]">
-      <div className="flex h-[5rem] items-center gap-[2.4rem] self-stretch max-1440:w-full">
-        <div className="flex min-w-0 flex-1 items-center self-stretch">
-          <div ref={containerRef} className="relative min-w-0 flex-1">
+    <div className="@container flex w-full max-w-[152.6rem] flex-col items-start gap-[2rem]">
+      {/* Wide 레이아웃: 컨테이너 폭 ≥ 800px일 때 단일 row 융합 디자인 */}
+      <div className="hidden h-[5rem] items-center gap-[0.8rem] self-stretch @[800px]:flex">
+        <div className="flex h-[5rem] flex-1 items-center">
+          <div ref={containerRef} className="relative min-w-0 flex-1 self-stretch">
             <div className="flex h-[5rem] w-full items-center rounded-[0.8rem] rounded-r-none border border-x-0 border-solid border-[#B7B9C0] bg-white">
               <MainSearchSelectField
                 variant="job"
@@ -300,7 +305,7 @@ const MainSearch = ({
           <button
             type="button"
             onClick={applyFilters}
-            className="flex w-[16rem] items-center justify-center gap-[1rem] self-stretch rounded-r-[0.8rem] bg-blue-80 px-[2rem] hover:bg-hover-80"
+            className="flex w-[16rem] flex-shrink-0 items-center justify-center gap-[1rem] self-stretch rounded-r-[0.8rem] bg-blue-80 px-[2rem] hover:bg-hover-80"
           >
             <span className="text-[1.6rem] font-[700] text-white">확인</span>
           </button>
@@ -318,9 +323,164 @@ const MainSearch = ({
             void icon.getBoundingClientRect();
             icon.classList.add('spin-once');
           }}
-          className="flex w-[5rem] items-center justify-center gap-[1rem] self-stretch rounded-[0.6rem] border border-solid border-[#CFD1D5]"
+          className="flex w-[5rem] flex-shrink-0 items-center justify-center gap-[1rem] self-stretch rounded-[0.6rem] border border-solid border-[#CFD1D5]"
         >
-          <IcRefresh className="text-[#878B96] transition-none" />
+          <IcRefresh
+            className="text-[#878B96] transition-none"
+            onAnimationEnd={(e) =>
+              (e.currentTarget as unknown as SVGElement).classList.remove(
+                'spin-once',
+              )
+            }
+          />
+        </button>
+      </div>
+
+      {/* Narrow 레이아웃: 컨테이너 폭 < 800px일 때 4행 stack */}
+      <div
+        ref={narrowContainerRef}
+        className="flex flex-col gap-[1.2rem] self-stretch @[800px]:hidden"
+      >
+        {/* Row 1: 키워드 + 필터 적용 + 리셋 */}
+        <div className="flex h-[5rem] items-center gap-[0.8rem] self-stretch">
+          <div
+            className={`relative flex h-[5rem] min-w-0 flex-1 items-center gap-[1rem] rounded-[0.8rem] border border-solid bg-white px-[2rem] focus-within:border-[#237BFF] ${
+              hasKeyword ? 'border-[#237BFF]' : 'border-[#B7B9C0]'
+            }`}
+          >
+            <div className="flex h-[2rem] w-[2rem] flex-shrink-0 items-center justify-center">
+              <IcSearch className="text-[#878B96]" />
+            </div>
+            <input
+              type="text"
+              className={`w-full text-[1.6rem] font-[600] outline-none ${
+                hasKeyword
+                  ? 'text-[#023075]'
+                  : 'text-[#878B96] focus:text-[#51535A] focus:placeholder:text-[#51535A]'
+              }`}
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') applyFilters();
+              }}
+              placeholder="검색어를 입력해주세요."
+            />
+          </div>
+          <button
+            type="button"
+            onClick={(e) => {
+              onReset();
+
+              const icon = e.currentTarget.querySelector('svg');
+              if (!icon) return;
+
+              icon.classList.remove('spin-once');
+              void icon.getBoundingClientRect();
+              icon.classList.add('spin-once');
+            }}
+            className="flex h-[5rem] w-[5rem] flex-shrink-0 items-center justify-center rounded-[0.8rem] border border-solid border-[#CFD1D5] bg-white"
+            aria-label="초기화"
+          >
+            <IcRefresh
+              className="text-[#878B96] transition-none"
+              onAnimationEnd={(e) =>
+                (e.currentTarget as unknown as SVGElement).classList.remove(
+                  'spin-once',
+                )
+              }
+            />
+          </button>
+        </div>
+
+        {/* Row 2: 직무 dropdown */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => toggleMenu('job')}
+            className={`flex h-[5rem] w-full items-center gap-[1rem] rounded-[0.8rem] border border-solid bg-white px-[2rem] ${
+              openMenu === 'job' || selectedJobs.length > 0
+                ? 'border-[#237BFF]'
+                : 'border-[#B7B9C0]'
+            }`}
+          >
+            <div className="flex h-[2rem] w-[2rem] flex-shrink-0 items-center justify-center">
+              <IcBusinessBag />
+            </div>
+            <span
+              className={`min-w-0 truncate text-[1.6rem] font-[600] ${
+                openMenu === 'job'
+                  ? 'text-[#51535A]'
+                  : selectedJobs.length > 0
+                    ? 'text-[#023075]'
+                    : 'text-[#878B96]'
+              }`}
+            >
+              {jobLabel}
+            </span>
+            <span className="ml-auto flex-shrink-0">
+              {openMenu === 'job' ? (
+                <IcChevronUp className="h-[2rem] w-[2rem]" />
+              ) : (
+                <IcChevronDown className="h-[2rem] w-[2rem]" />
+              )}
+            </span>
+          </button>
+          {openMenu === 'job' && (
+            <SearchJobSelectBox
+              values={selectedJobs.map((j) => j.label)}
+              onToggle={onToggleJob}
+            />
+          )}
+        </div>
+
+        {/* Row 3: 사용스킬 dropdown */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => toggleMenu('skill')}
+            className={`flex h-[5rem] w-full items-center gap-[1rem] rounded-[0.8rem] border border-solid bg-white px-[2rem] ${
+              openMenu === 'skill' || selectedSkills.length > 0
+                ? 'border-[#237BFF]'
+                : 'border-[#B7B9C0]'
+            }`}
+          >
+            <div className="flex h-[2rem] w-[2rem] flex-shrink-0 items-center justify-center">
+              <IcFolder />
+            </div>
+            <span
+              className={`min-w-0 truncate text-[1.6rem] font-[600] ${
+                openMenu === 'skill'
+                  ? 'text-[#51535A]'
+                  : selectedSkills.length > 0
+                    ? 'text-[#023075]'
+                    : 'text-[#878B96]'
+              }`}
+            >
+              {skillLabel}
+            </span>
+            <span className="ml-auto flex-shrink-0">
+              {openMenu === 'skill' ? (
+                <IcChevronUp className="h-[2rem] w-[2rem]" />
+              ) : (
+                <IcChevronDown className="h-[2rem] w-[2rem]" />
+              )}
+            </span>
+          </button>
+          {openMenu === 'skill' && (
+            <SearchSkillSelectBox
+              selectedSkills={selectedSkills}
+              onToggleSkill={onToggleSkill}
+            />
+          )}
+        </div>
+
+        {/* Row 4: 필터 적용 버튼 */}
+        <button
+          type="button"
+          onClick={applyFilters}
+          className="flex h-[5rem] w-full items-center justify-center rounded-[0.8rem] bg-blue-80 hover:bg-hover-80"
+        >
+          <span className="text-[1.6rem] font-[700] text-white">확인</span>
         </button>
       </div>
 
