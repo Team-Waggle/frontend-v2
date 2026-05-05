@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { AnimatePresence } from 'framer-motion';
 import Notifications from '../Notifications';
 import { useAuthStore } from '../../stores/authStore';
 import LoginModal from '../Modal/LoginModal';
@@ -75,7 +76,7 @@ const Sidebar = () => {
           isOverlay
             ? 'fixed left-0 top-0 z-50 h-screen'
             : 'sticky top-0 z-50 h-screen'
-        } flex flex-col gap-[1.6rem] border-r border-black-20 bg-black-5 pt-[2.8rem] ${
+        } flex flex-col gap-[1.6rem] border-r border-black-20 bg-black-5 pt-[2.8rem] transition-[width] duration-sidebar ease-sidebar ${
           isFolded ? 'w-[8.8rem]' : 'w-[29.8rem]'
         }`}
       >
@@ -96,51 +97,66 @@ const Sidebar = () => {
               setIsNotificationOpen={setIsNotificationOpen}
             />
 
-            {isFolded ? (
-              <IconWrapper
-                onClick={() => {
-                  if (!isLoggedIn) setIsLoginModalOpen(true);
-                  if (myteamData?.length === 0) {
-                    navigate('/team/new');
-                  }
-                  if (myteamData && myteamData?.length >= 1) {
-                    navigate('/post/new');
-                  }
-                }}
+            <div className="relative h-[4.4rem]">
+              {/* Folded state: pencil/login icon */}
+              <div
+                className={`absolute left-0 top-0 transition-opacity duration-sidebar ease-sidebar ${
+                  isFolded ? 'opacity-100' : 'pointer-events-none opacity-0'
+                }`}
               >
-                {isLoggedIn ? <PencilIcon /> : <LogInIcon />}
-              </IconWrapper>
-            ) : isProfileComplete ? (
-              myteamData?.length === 0 ? (
-                <BaseButton onClick={() => navigate('/team/new')}>
-                  새 팀 만들기
-                </BaseButton>
-              ) : myteamData && myteamData?.length >= 1 ? (
-                <div className="flex gap-[1.2rem]">
-                  <BaseButton
-                    color="secondary"
-                    onClick={() => navigate('/team/new')}
-                    className="w-[12.3rem] whitespace-nowrap"
-                  >
-                    새 팀 만들기
+                <IconWrapper
+                  onClick={() => {
+                    if (!isLoggedIn) setIsLoginModalOpen(true);
+                    if (myteamData?.length === 0) {
+                      navigate('/team/new');
+                    }
+                    if (myteamData && myteamData?.length >= 1) {
+                      navigate('/post/new');
+                    }
+                  }}
+                >
+                  {isLoggedIn ? <PencilIcon /> : <LogInIcon />}
+                </IconWrapper>
+              </div>
+              {/* Unfolded state: full buttons */}
+              <div
+                className={`absolute left-0 top-0 w-full overflow-hidden transition-opacity duration-sidebar ease-sidebar ${
+                  isFolded ? 'pointer-events-none opacity-0' : 'opacity-100'
+                }`}
+              >
+                {isProfileComplete ? (
+                  myteamData?.length === 0 ? (
+                    <BaseButton onClick={() => navigate('/team/new')}>
+                      새 팀 만들기
+                    </BaseButton>
+                  ) : myteamData && myteamData?.length >= 1 ? (
+                    <div className="flex gap-[1.2rem]">
+                      <BaseButton
+                        color="secondary"
+                        onClick={() => navigate('/team/new')}
+                        className="w-[12.3rem] whitespace-nowrap"
+                      >
+                        새 팀 만들기
+                      </BaseButton>
+                      <BaseButton
+                        onClick={() => navigate('/post/new')}
+                        className="w-[12.3rem] whitespace-nowrap"
+                      >
+                        모집글 작성
+                      </BaseButton>
+                    </div>
+                  ) : (
+                    <BaseButton onClick={() => navigate('/post/new')}>
+                      모집글 작성
+                    </BaseButton>
+                  )
+                ) : (
+                  <BaseButton onClick={() => setIsLoginModalOpen(true)}>
+                    로그인
                   </BaseButton>
-                  <BaseButton
-                    onClick={() => navigate('/post/new')}
-                    className="w-[12.3rem] whitespace-nowrap"
-                  >
-                    모집글 작성
-                  </BaseButton>
-                </div>
-              ) : (
-                <BaseButton onClick={() => navigate('/post/new')}>
-                  모집글 작성
-                </BaseButton>
-              )
-            ) : (
-              <BaseButton onClick={() => setIsLoginModalOpen(true)}>
-                로그인
-              </BaseButton>
-            )}
+                )}
+              </div>
+            </div>
           </div>
 
           <SidebarMenu
@@ -192,13 +208,15 @@ const Sidebar = () => {
           </div>
         )}
       </aside>
-      {isNotificationOpen && (
-        <Notifications
-          isFolded={isFolded}
-          onClose={() => setIsNotificationOpen(false)}
-          notificationCountData={notificationCountData}
-        />
-      )}
+      <AnimatePresence>
+        {isNotificationOpen && (
+          <Notifications
+            isFolded={isFolded}
+            onClose={() => setIsNotificationOpen(false)}
+            notificationCountData={notificationCountData}
+          />
+        )}
+      </AnimatePresence>
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}

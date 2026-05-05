@@ -77,6 +77,12 @@ export default {
         '3xl': '1920px',
         'max-1440': { max: '1440px' },
       },
+      transitionDuration: {
+        sidebar: '300ms',
+      },
+      transitionTimingFunction: {
+        sidebar: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      },
     },
   },
   plugins: [scrollbarHide, containerQueries],

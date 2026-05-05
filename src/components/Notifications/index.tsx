@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router';
+import { motion } from 'framer-motion';
 import BaseButton from '../common/Button';
 import {
   useGetNotifications,
@@ -118,9 +119,20 @@ const Notifications = ({
 
   return (
     <>
-      <div className="fixed inset-0 z-30 bg-[#12141A40]" onClick={onClose} />
-      <div
-        className={`fixed top-0 z-40 flex h-full w-[38rem] flex-col gap-[1.6rem] bg-black-5 py-[2.8rem] pl-[2.2rem] pr-[0.8rem] ${
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 z-30 bg-[#12141A40]"
+        onClick={onClose}
+      />
+      <motion.div
+        initial={{ x: '-100%' }}
+        animate={{ x: 0 }}
+        exit={{ x: '-100%' }}
+        transition={{ type: 'spring', stiffness: 320, damping: 36, mass: 0.8 }}
+        className={`fixed top-0 z-40 flex h-full w-[38rem] flex-col gap-[1.6rem] bg-black-5 py-[2.8rem] pl-[2.2rem] pr-[0.8rem] transition-[left] duration-sidebar ease-sidebar ${
           isFolded ? 'left-[8.8rem]' : 'left-[29.8rem]'
         }`}
       >
@@ -224,7 +236,7 @@ const Notifications = ({
             </div>
           </div>
         )}
-      </div>
+      </motion.div>
     </>
   );
 };

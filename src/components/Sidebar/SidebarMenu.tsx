@@ -1,7 +1,6 @@
 import { useLocation, useNavigate } from 'react-router';
 import type { TeamResponse } from '../../types/api/team';
-import SidebarIcon from './SidebarIcon';
-import SidebarItem from './SidebarItem';
+import SidebarMenuItem from './SidebarMenuItem';
 
 // Icons
 import FaceSmileIcon from '../../assets/icons/normal/ic_faceSmile.svg?react';
@@ -92,7 +91,7 @@ const SidebarMenu = ({
 
   return (
     <div
-      className={`flex flex-col gap-[0.4rem] ${isFolded ? 'w-[4.8rem]' : 'w-[25.8rem]'}`}
+      className={`flex flex-col gap-[0.4rem] transition-[width] duration-sidebar ease-sidebar ${isFolded ? 'w-[4.8rem]' : 'w-[25.8rem]'}`}
     >
       {visibleMenus.map(({ key, icon, label, getPath }) => {
         const path = getPath({ teamData, userId });
@@ -118,25 +117,15 @@ const SidebarMenu = ({
           navigate(path);
         };
 
-        return isFolded ? (
-          <SidebarIcon
+        return (
+          <SidebarMenuItem
             key={key}
             icon={icon}
             label={label}
             isActive={isActive}
+            isFolded={isFolded}
             onClick={handleClick}
             subItems={key === 'team' ? teamSubItems : undefined}
-            setIsNotificationOpen={setIsNotificationOpen}
-            unreadNotificationCount={notificationCountData?.unreadCount}
-          />
-        ) : (
-          <SidebarItem
-            key={key}
-            icon={icon}
-            label={label}
-            isActive={isActive}
-            subItems={key === 'team' ? teamSubItems : undefined}
-            onClick={handleClick}
             unreadNotificationCount={notificationCountData?.unreadCount}
             setIsNotificationOpen={setIsNotificationOpen}
           />
