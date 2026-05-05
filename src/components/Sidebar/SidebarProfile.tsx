@@ -25,36 +25,30 @@ const SidebarProfile = ({
     <img
       src={data.profileImageUrl}
       alt=""
-      className="h-[4.4rem] w-[4.4rem] shrink-0 rounded-[0.6rem] object-cover"
+      className="h-[4.4rem] w-[4.4rem] rounded-[0.6rem] object-cover"
     />
   ) : (
-    <BaicProfileIcon className="shrink-0" />
+    <BaicProfileIcon />
   );
 
+  if (isFolded) return profileImage;
+
   return (
-    <div className="flex items-center">
+    <div className="flex w-[25.8rem] items-center gap-[1rem] pr-[1rem]">
       {profileImage}
-      <div
-        className={`overflow-hidden transition-[max-width,opacity,margin-left] duration-sidebar ease-sidebar ${
-          isFolded
-            ? 'ml-0 max-w-0 opacity-0'
-            : 'ml-[1rem] max-w-[15.2rem] opacity-100'
-        }`}
-      >
-        <div className="flex w-[15.2rem] flex-col justify-center">
-          <span className="overflow-hidden text-ellipsis whitespace-nowrap text-[1.6rem] font-semibold text-black-100">
-            {hasToken ? data?.username || '게스트' : '게스트'}
-          </span>
-          <span
-            className={`h-[2rem] whitespace-nowrap text-[1.3rem] font-medium ${isLoggedIn ? 'text-black-60' : 'text-blue-60'}`}
-          >
-            {isLoggedIn && data?.position
-              ? POSITION_CONVERTER[data?.position]
-              : hasToken
-                ? '프로필을 완성해주세요'
-                : '로그인해주세요'}
-          </span>
-        </div>
+      <div className="flex w-[15.2rem] flex-col justify-center">
+        <span className="text-[1.6rem] font-semibold text-black-100">
+          {hasToken ? data?.username || '게스트' : '게스트'}
+        </span>
+        <span
+          className={`h-[2rem] text-[1.3rem] font-medium ${isLoggedIn ? 'text-black-60' : 'text-blue-60'}`}
+        >
+          {isLoggedIn && data?.position
+            ? POSITION_CONVERTER[data?.position]
+            : hasToken
+              ? '프로필을 완성해주세요'
+              : '로그인해주세요'}
+        </span>
       </div>
       {isLoggedIn && (
         <button
@@ -62,13 +56,9 @@ const SidebarProfile = ({
             setIsNotificationOpen(false);
             logout();
           }}
-          className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full transition-[max-width,opacity] duration-sidebar ease-sidebar hover:bg-black-10 ${
-            isFolded
-              ? 'max-w-0 opacity-0'
-              : 'max-w-[3.6rem] px-[0.8rem] py-[0.8rem] opacity-100'
-          } h-[3.6rem]`}
+          className="h-[3.2rem] w-[3.2rem] rounded-full px-[0.8rem] py-[0.8rem] hover:bg-black-10"
         >
-          <LogoutIcon className="h-[2rem] w-[2rem] shrink-0 text-black-40" />
+          <LogoutIcon className="h-[1.6rem] w-[1.6rem] text-black-40" />
         </button>
       )}
     </div>

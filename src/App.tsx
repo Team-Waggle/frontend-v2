@@ -43,9 +43,9 @@ function App() {
   }
 
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex min-h-screen w-full min-w-[144rem]">
       <Sidebar />
-      <main className="flex min-w-0 flex-1 flex-col">
+      <main className="mx-auto flex h-full w-full min-w-0 flex-col">
         <Outlet />
       </main>
       <FloatingMessageButton />

@@ -91,29 +91,25 @@ const TeamStatusPage = () => {
 
   return (
     <>
-      <div className="@container flex flex-col items-center gap-[6rem] px-[2rem] pt-[5.4rem]">
+      <div className="flex flex-col items-center gap-[6rem] pt-[5.4rem]">
         <TeamNav />
         <div className="flex w-full max-w-[clamp(98.2rem,70vw,130rem)] flex-col gap-[2.8rem]">
           <div className="flex flex-col gap-[2.8rem]">
-            <div className="-mx-[2rem] flex snap-x snap-mandatory gap-[1.6rem] overflow-x-auto px-[2rem] pb-[1rem] @[100rem]:mx-0 @[100rem]:snap-none @[100rem]:justify-between @[100rem]:gap-[clamp(2.6rem,calc(-7.3rem+6.875vw),5.9rem)] @[100rem]:overflow-visible @[100rem]:px-0 @[100rem]:pb-0">
+            <div className="flex justify-between gap-[clamp(2.6rem,calc(-7.3rem+6.875vw),5.9rem)]">
               {STATUS_CONFIG.map((item) => (
-                <div
+                <TeamStatusCard
                   key={item.type}
-                  className="flex shrink-0 snap-center justify-center"
-                >
-                  <TeamStatusCard
-                    type={item.type}
-                    currentStatus={currentTeam?.status ?? 'PREPARING'}
-                    title={item.title}
-                    description={item.description}
-                    ActiveIcon={item.ActiveIcon}
-                    InactiveIcon={item.InactiveIcon}
-                    buttonText={item.buttonText}
-                    onClick={() => {
-                      handleClick();
-                    }}
-                  />
-                </div>
+                  type={item.type}
+                  currentStatus={currentTeam?.status ?? 'PREPARING'}
+                  title={item.title}
+                  description={item.description}
+                  ActiveIcon={item.ActiveIcon}
+                  InactiveIcon={item.InactiveIcon}
+                  buttonText={item.buttonText}
+                  onClick={() => {
+                    handleClick();
+                  }}
+                />
               ))}
             </div>
             <div className="flex gap-[1.6rem] rounded-[1.2rem] bg-blue-5 p-[2rem]">
