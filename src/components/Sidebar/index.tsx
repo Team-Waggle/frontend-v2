@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { AnimatePresence } from 'framer-motion';
 import Notifications from '../Notifications';
-import MessagesPanel from '../Message/MessagesPanel';
 import { useAuthStore } from '../../stores/authStore';
 import LoginModal from '../Modal/LoginModal';
 import BaseButton from '../common/Button';
@@ -14,7 +12,6 @@ import {
   useGetUserMeTeam,
 } from '../../hooks/useUser';
 import { useModal } from '../../hooks/useModal';
-import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 // Sidebar Components
 import SidebarLogo from './SidebarLogo';
@@ -23,9 +20,8 @@ import SidebarMenu from './SidebarMenu';
 
 // Icons
 import PencilIcon from '../../assets/icons/normal/ic_pencil.svg?react';
-import PlusIcon from '../../assets/icons/normal/ic_plus.svg?react';
 import LogInIcon from '../../assets/icons/normal/ic_login.svg?react';
-import WaggleWordmark from '../../assets/icons/waggle-wordmark.svg?react';
+import LogoIcon from '../../assets/icons/ic_logo.svg?react';
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -34,18 +30,9 @@ const Sidebar = () => {
   const { data: myteamData } = useGetUserMeTeam();
   const { data: notificationCountData } = useGetNotificationsCount();
 
-  const isWide = useMediaQuery('(min-width: 1440px)');
-  const isNarrow = useMediaQuery('(max-width: 1024px)');
-  const [isFolded, setIsFolded] = useState(!isWide);
+  const [isFolded, setIsFolded] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
-
-  useEffect(() => {
-    setIsFolded(!isWide);
-  }, [isWide]);
-
-  const isOverlay = isNarrow && !isFolded;
 
   const accessToken = useAuthStore((state) => state.accessToken);
   const isLoggedIn = !!accessToken;
@@ -54,28 +41,14 @@ const Sidebar = () => {
     isLoggedIn && isProfileCompleteData?.isComplete === true;
 
   useModal({
-    isOpen: isOverlay,
-    onClose: () => setIsFolded(true),
+    isOpen: isNotificationOpen,
+    onClose: () => setIsNotificationOpen(false),
   });
 
   return (
     <>
-      {/* 오버레이 모드일 때 레이아웃 자리 보존용 placeholder (접힌 너비 유지) */}
-      {isOverlay && <div className="w-[8.8rem] shrink-0" aria-hidden="true" />}
-      {/* 오버레이 모드 backdrop */}
-      {isOverlay && (
-        <div
-          className="fixed inset-0 z-40 bg-black-100/40"
-          onClick={() => setIsFolded(true)}
-          aria-hidden="true"
-        />
-      )}
       <aside
-        className={`${
-          isOverlay
-            ? 'fixed left-0 top-0 z-50 h-screen'
-            : 'sticky top-0 z-50 h-screen'
-        } flex flex-col gap-[1.6rem] border-r border-black-20 bg-black-5 pt-[2.8rem] transition-[width] duration-sidebar ease-sidebar ${
+        className={`z-50 flex flex-col gap-[1.6rem] border-r border-black-20 bg-black-5 pt-[2.8rem] ${
           isFolded ? 'w-[8.8rem]' : 'w-[29.8rem]'
         }`}
       >
@@ -96,91 +69,47 @@ const Sidebar = () => {
               setIsNotificationOpen={setIsNotificationOpen}
             />
 
-            <div
-              className={`relative transition-[height] duration-sidebar ease-sidebar ${
-                isFolded && isProfileComplete && myteamData && myteamData.length >= 1
-                  ? 'h-[9.2rem]'
-                  : 'h-[4.4rem]'
-              }`}
-            >
-              {/* Folded state: 컨텍스트별 아이콘 */}
-              <div
-                className={`absolute left-0 top-0 flex flex-col gap-[0.4rem] transition-opacity duration-sidebar ease-sidebar ${
-                  isFolded ? 'opacity-100' : 'pointer-events-none opacity-0'
-                }`}
+            {isFolded ? (
+              <IconWrapper
+                onClick={() => {
+                  if (!isLoggedIn) return setIsLoginModalOpen(true);
+                  if (myteamData?.length === 0) navigate('/team/new');
+                  else navigate('/post/new');
+                }}
               >
-                {!isProfileComplete ? (
-                  <IconWrapper
-                    title={isLoggedIn ? '모집글 작성' : '로그인'}
-                    onClick={() =>
-                      isLoggedIn
-                        ? navigate('/post/new')
-                        : setIsLoginModalOpen(true)
-                    }
-                  >
-                    {isLoggedIn ? <PencilIcon /> : <LogInIcon />}
-                  </IconWrapper>
-                ) : (
-                  <>
-                    <IconWrapper
-                      color="outline"
-                      title="새 팀 만들기"
-                      onClick={() => navigate('/team/new')}
-                    >
-                      <PlusIcon />
-                    </IconWrapper>
-                    {myteamData && myteamData.length >= 1 && (
-                      <IconWrapper
-                        title="모집글 작성"
-                        onClick={() => navigate('/post/new')}
-                      >
-                        <PencilIcon />
-                      </IconWrapper>
-                    )}
-                  </>
-                )}
-              </div>
-              {/* Unfolded state: full buttons */}
-              <div
-                className={`absolute left-0 top-0 w-full overflow-hidden transition-opacity duration-sidebar ease-sidebar ${
-                  isFolded ? 'pointer-events-none opacity-0' : 'opacity-100'
-                }`}
-              >
-                {isProfileComplete ? (
-                  myteamData?.length === 0 ? (
-                    <BaseButton onClick={() => navigate('/team/new')}>
-                      새 팀 만들기
-                    </BaseButton>
-                  ) : (
-                    <div className="flex gap-[1.2rem]">
-                      <BaseButton
-                        color="secondary"
-                        onClick={() => navigate('/team/new')}
-                        className="w-[12.3rem] whitespace-nowrap"
-                      >
-                        새 팀 만들기
-                      </BaseButton>
-                      <BaseButton
-                        onClick={() => navigate('/post/new')}
-                        className="w-[12.3rem] whitespace-nowrap"
-                      >
-                        모집글 작성
-                      </BaseButton>
-                    </div>
-                  )
-                ) : (
+                {isLoggedIn ? <PencilIcon /> : <LogInIcon />}
+              </IconWrapper>
+            ) : isProfileComplete ? (
+              myteamData?.length === 0 ? (
+                <BaseButton onClick={() => navigate('/team/new')}>
+                  새 팀 만들기
+                </BaseButton>
+              ) : (
+                <div className="flex gap-[1.2rem]">
                   <BaseButton
-                    onClick={() =>
-                      isLoggedIn
-                        ? navigate('/post/new')
-                        : setIsLoginModalOpen(true)
-                    }
+                    color="secondary"
+                    onClick={() => navigate('/team/new')}
+                    className="w-[12.3rem] whitespace-nowrap"
                   >
-                    {isLoggedIn ? '모집글 작성' : '로그인'}
+                    새 팀 만들기
                   </BaseButton>
-                )}
-              </div>
-            </div>
+                  <BaseButton
+                    onClick={() => navigate('/post/new')}
+                    className="w-[12.3rem] whitespace-nowrap"
+                  >
+                    모집글 작성
+                  </BaseButton>
+                </div>
+              )
+            ) : (
+              <BaseButton
+                onClick={() =>
+                  isLoggedIn ? navigate('/post/new') : setIsLoginModalOpen(true)
+                }
+              >
+                {isLoggedIn ? '모집글 작성' : '로그인'}
+              </BaseButton>
+            )}
           </div>
 
           <SidebarMenu
@@ -192,26 +121,19 @@ const Sidebar = () => {
             notificationCountData={notificationCountData}
             isNotificationOpen={isNotificationOpen}
             setIsNotificationOpen={setIsNotificationOpen}
-            isMessagesOpen={isMessagesOpen}
-            setIsMessagesOpen={setIsMessagesOpen}
           />
         </div>
 
         {/* 고객지원 문의 */}
-        <div
-          className={`flex flex-col gap-[2.4rem] overflow-hidden transition-[max-height,opacity,padding-bottom] duration-sidebar ease-sidebar ${
-            isFolded
-              ? 'pointer-events-none max-h-0 pb-0 opacity-0'
-              : 'max-h-[17.1rem] pb-[2.8rem] opacity-100'
-          }`}
-        >
+        {!isFolded && (
+          <div className="flex h-[17.1rem] flex-col gap-[2.4rem] pb-[2.8rem]">
             <div className="h-[0.1rem] bg-black-10" />
             <div className="flex flex-col gap-[0.8rem] px-[2rem]">
               <div className="flex flex-col gap-[0.4rem]">
-                <WaggleWordmark className="h-[3.2rem] w-auto self-start text-black-50" />
+                <LogoIcon className="text-black-50" />
                 <a
                   href="mailto:team.waggle.offcial@gmaill.com"
-                  className="whitespace-nowrap text-[1.4rem] font-normal text-black-60"
+                  className="text-[1.4rem] font-normal text-black-60"
                 >
                   team.waggle.offcial@gmaill.com
                 </a>
@@ -221,7 +143,6 @@ const Sidebar = () => {
                   href="https://satin-mint-d68.notion.site/a5520f189e0d4386ab7288f9425d53e6"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="whitespace-nowrap"
                 >
                   고객지원/문의
                 </a>
@@ -229,34 +150,24 @@ const Sidebar = () => {
                   href="https://satin-mint-d68.notion.site/34738daa31cd80af8a40cfab76a855d0"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="whitespace-nowrap"
                 >
                   와글 정책 안내
                 </a>
               </div>
-              <span className="whitespace-nowrap text-[1.4rem] font-normal text-black-60">
+              <span className="text-[1.4rem] font-normal text-black-60">
                 © 2026 Waggle Inc. All rights reserved.
               </span>
             </div>
           </div>
+        )}
       </aside>
-      <AnimatePresence>
-        {isNotificationOpen && (
-          <Notifications
-            isFolded={isFolded}
-            onClose={() => setIsNotificationOpen(false)}
-            notificationCountData={notificationCountData}
-          />
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {isMessagesOpen && (
-          <MessagesPanel
-            isFolded={isFolded}
-            onClose={() => setIsMessagesOpen(false)}
-          />
-        )}
-      </AnimatePresence>
+      {isNotificationOpen && (
+        <Notifications
+          isFolded={isFolded}
+          onClose={() => setIsNotificationOpen(false)}
+          notificationCountData={notificationCountData}
+        />
+      )}
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}

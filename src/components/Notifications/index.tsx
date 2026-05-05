@@ -1,6 +1,4 @@
-import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { motion } from 'framer-motion';
 import BaseButton from '../common/Button';
 import {
   useGetNotifications,
@@ -118,22 +116,11 @@ const Notifications = ({
   const { mutate: patchRead } = usePatchNotificationsRead();
   const { mutate: patchReadAll } = usePatchNotificationsReadAll();
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
   return (
     <>
-      <motion.div
-        initial={{ x: '-100%' }}
-        animate={{ x: 0 }}
-        exit={{ x: '-100%' }}
-        transition={{ type: 'spring', stiffness: 320, damping: 36, mass: 0.8 }}
-        className={`fixed top-0 z-40 flex h-full w-[38rem] flex-col gap-[1.6rem] border-r border-black-20 bg-black-5 py-[2.8rem] pl-[2.2rem] pr-[0.8rem] shadow-[8px_0_24px_rgba(0,0,0,0.08)] transition-[left] duration-sidebar ease-sidebar ${
+      <div className="fixed inset-0 z-30 bg-[#12141A40]" onClick={onClose} />
+      <div
+        className={`fixed top-0 z-40 flex h-full w-[38rem] flex-col gap-[1.6rem] bg-black-5 py-[2.8rem] pl-[2.2rem] pr-[0.8rem] ${
           isFolded ? 'left-[8.8rem]' : 'left-[29.8rem]'
         }`}
       >
@@ -238,7 +225,7 @@ const Notifications = ({
             </div>
           </div>
         )}
-      </motion.div>
+      </div>
     </>
   );
 };

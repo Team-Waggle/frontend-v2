@@ -6,11 +6,7 @@ import { useGetConversations } from '../../hooks/useMessage';
 import MessageListItem from './MessageListItem';
 import MessageSearchBox from './MessageSearchBox';
 
-interface MessageListProps {
-  onConversationClick?: () => void;
-}
-
-const MessageList = ({ onConversationClick }: MessageListProps = {}) => {
+const MessageList = () => {
   const navigate = useNavigate();
   const { partnerId } = useParams<{ partnerId: string }>();
   const [query, setQuery] = useState('');
@@ -40,7 +36,6 @@ const MessageList = ({ onConversationClick }: MessageListProps = {}) => {
     } else {
       navigate(`/message/${userId}`);
     }
-    onConversationClick?.();
   };
 
   const handleScroll = () => {

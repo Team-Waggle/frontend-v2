@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from 'react-router';
 import type { TeamResponse } from '../../types/api/team';
-import SidebarMenuItem from './SidebarMenuItem';
+import SidebarIcon from './SidebarIcon';
+import SidebarItem from './SidebarItem';
 
 // Icons
 import FaceSmileIcon from '../../assets/icons/normal/ic_faceSmile.svg?react';
@@ -62,8 +63,6 @@ interface SidebarMenuProps {
   notificationCountData: NotificationCountDataType;
   isNotificationOpen?: boolean;
   setIsNotificationOpen: (v: boolean) => void;
-  isMessagesOpen?: boolean;
-  setIsMessagesOpen: (v: boolean) => void;
 }
 
 const SidebarMenu = ({
@@ -75,8 +74,6 @@ const SidebarMenu = ({
   notificationCountData,
   isNotificationOpen,
   setIsNotificationOpen,
-  isMessagesOpen,
-  setIsMessagesOpen,
 }: SidebarMenuProps) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -95,17 +92,15 @@ const SidebarMenu = ({
 
   return (
     <div
-      className={`flex flex-col gap-[0.4rem] transition-[width] duration-sidebar ease-sidebar ${isFolded ? 'w-[4.8rem]' : 'w-[25.8rem]'}`}
+      className={`flex flex-col gap-[0.4rem] ${isFolded ? 'w-[4.8rem]' : 'w-[25.8rem]'}`}
     >
       {visibleMenus.map(({ key, icon, label, getPath }) => {
         const path = getPath({ teamData, userId });
 
         const isActive = isNotificationOpen
           ? key === 'notification'
-          : isMessagesOpen
-            ? key === 'message'
-            : pathname.includes(key) &&
-              !(key === 'team' && pathname === '/team/new');
+          : pathname.includes(key) &&
+            !(key === 'team' && pathname === '/team/new');
 
         const handleClick = () => {
           if (!isLoggedIn && key === 'team') {
@@ -114,32 +109,32 @@ const SidebarMenu = ({
           }
 
           if (key === 'notification') {
-            setIsMessagesOpen(false);
             setIsNotificationOpen(!isNotificationOpen);
-            return;
-          }
-
-          if (key === 'message') {
-            setIsNotificationOpen(false);
-            setIsMessagesOpen(!isMessagesOpen);
             return;
           }
 
           if (!path) return;
           setIsNotificationOpen(false);
-          setIsMessagesOpen(false);
           navigate(path);
         };
 
-        return (
-          <SidebarMenuItem
+        return isFolded ? (
+          <SidebarIcon
             key={key}
             icon={icon}
             label={label}
             isActive={isActive}
-            isFolded={isFolded}
             onClick={handleClick}
+            unreadNotificationCount={notificationCountData?.unreadCount}
+          />
+        ) : (
+          <SidebarItem
+            key={key}
+            icon={icon}
+            label={label}
+            isActive={isActive}
             subItems={key === 'team' ? teamSubItems : undefined}
+            onClick={handleClick}
             unreadNotificationCount={notificationCountData?.unreadCount}
             setIsNotificationOpen={setIsNotificationOpen}
           />

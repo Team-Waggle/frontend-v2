@@ -38,25 +38,25 @@ const TeamPostItem = ({
     .filter(Boolean);
 
   return (
-    <div className="@container flex items-start justify-between gap-[2rem] self-stretch border-b border-solid border-black-30 py-[2.8rem] @[80rem]:gap-[6rem]">
+    <div className="flex items-start justify-between gap-[clamp(12rem,_calc(11.667vw_-_4.8rem),_17.6rem)] self-stretch border-b border-solid border-black-30 py-[2.8rem]">
       {/** 토글을 제외한 모든 내용 */}
-      <div className="flex min-w-0 flex-1 flex-col gap-[1.6rem] @[80rem]:flex-row @[80rem]:items-start @[80rem]:gap-[5.2rem]">
+      <div className="flex min-w-0 flex-1 items-start gap-[5.2rem]">
         {/** 날짜 */}
-        <div className="flex items-center gap-[1rem] py-[0.3rem]">
+        <div className="flex items-center justify-center gap-[1rem] py-[0.3rem]">
           <span
             className={`text-[1.4rem] font-[500] leading-[1.5] tracking-[-0.028rem] ${isClosed ? 'text-black-40' : 'text-black-70'}`}
           >
             {createdAt ? formatKstYyMmDd(createdAt) : ''}
           </span>
         </div>
-        {/** 제목/직무 + 스킬/지원자 */}
-        <div className="flex min-w-0 flex-1 flex-col gap-[1.6rem] @[80rem]:flex-row @[80rem]:items-start @[80rem]:gap-[6rem]">
+        {/** 그외 */}
+        <div className="flex min-w-0 flex-1 items-start gap-[clamp(8rem,_calc(4.167vw_+_2rem),_10rem)]">
           <div
             className="flex min-w-0 flex-1 cursor-pointer flex-col items-start gap-[1rem]"
             onClick={onClick}
           >
             <span
-              className={`w-full overflow-hidden text-ellipsis whitespace-nowrap text-[1.8rem] font-[600] ${isClosed ? 'text-black-40' : 'text-black-100'}`}
+              className={`w-[clamp(35rem,_calc(39.583vw_-_22rem),_54rem)] overflow-hidden text-ellipsis whitespace-nowrap text-[1.8rem] font-[600] ${isClosed ? 'text-black-40' : 'text-black-100'}`}
             >
               {title}
             </span>
@@ -74,9 +74,9 @@ const TeamPostItem = ({
               </span>
             </div>
           </div>
-          <div className="flex shrink-0 items-start justify-between gap-[4rem] @[80rem]:w-[28rem] @[80rem]:justify-start @[80rem]:gap-[6rem]">
+          <div className="flex w-[28rem] items-start gap-[clamp(6rem,_calc(6.25vw_-_3rem),_9rem)]">
             <div className="flex flex-shrink-0 content-start items-start pt-[0.1rem]">
-              <div className="flex flex-shrink-0 content-center items-center gap-[0.8rem]">
+              <div className="flex w-[clamp(12rem,_calc(2.5vw_+_8.4rem),_13.2rem)] flex-shrink-0 content-center items-center gap-[0.8rem]">
                 {skills.slice(0, 3).map((skill, index) => (
                   <SkillIconLarge
                     key={index}
@@ -104,20 +104,18 @@ const TeamPostItem = ({
           </div>
         </div>
       </div>
-      <div className="shrink-0">
-        <TeamPostStatusToggle
-          isClosed={isClosed}
-          onClick={() => {
-            if (isPending) return;
-            const newStatus = isClosed ? 'RECRUITING' : 'CLOSED';
-            setIsClosed(!isClosed);
-            patchClose(
-              { postId, status: newStatus },
-              { onError: () => setIsClosed((prev) => !prev) },
-            );
-          }}
-        />
-      </div>
+      <TeamPostStatusToggle
+        isClosed={isClosed}
+        onClick={() => {
+          if (isPending) return;
+          const newStatus = isClosed ? 'RECRUITING' : 'CLOSED';
+          setIsClosed(!isClosed);
+          patchClose(
+            { postId, status: newStatus },
+            { onError: () => setIsClosed((prev) => !prev) },
+          );
+        }}
+      />
     </div>
   );
 };

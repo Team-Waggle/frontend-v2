@@ -103,7 +103,7 @@ const MainPage = () => {
   return (
     <>
       <div className="flex w-full justify-center">
-        <div className="@container flex w-full max-w-[152.6rem] flex-col gap-[5.6rem] px-[4.8rem] pt-[5.4rem]">
+        <div className="flex w-full max-w-[152.6rem] flex-col gap-[5.6rem] px-[4.8rem] pt-[5.4rem]">
           <div className="relative h-[35.4rem] max-w-[152.6rem] self-stretch overflow-hidden rounded-[2.4rem] bg-blue-60">
             {/** 문구 */}
             <div className="pl-[6.4rem] pt-[6.4rem]">
@@ -139,7 +139,7 @@ const MainPage = () => {
               }
             />
           ) : (
-            <div className="inline-grid w-full auto-rows-max grid-cols-1 gap-x-[1.8rem] gap-y-[1.8rem] @[50rem]:grid-cols-2 @[75rem]:grid-cols-3 @[130rem]:grid-cols-4">
+            <div className="inline-grid w-full max-w-[152.6rem] auto-rows-max grid-cols-[repeat(auto-fill,minmax(33.6rem,1fr))] gap-x-[1.8rem] gap-y-[1.8rem] max-1440:max-w-full">
               {posts.map((post: PostDetailResponse) => {
                 const positionList: string[] = Array.from(
                   new Set(
