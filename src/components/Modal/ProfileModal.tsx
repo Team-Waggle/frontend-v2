@@ -202,14 +202,14 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
   return (
     <ModalPortal>
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center"
+        className="fixed inset-0 z-50 flex items-center justify-center px-[2rem]"
         role="dialog"
         aria-modal="true"
       >
         <ModalOverlay onClose={onClose} isOnboarding={mode === 'onboarding'} />
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="relative flex max-h-[90vh] w-[73.8rem] flex-col rounded-[2rem] bg-white"
+          className="relative flex max-h-[90vh] w-full max-w-[73.8rem] flex-col rounded-[2rem] bg-white"
         >
           <div className="flex flex-1 flex-col gap-[3.4rem] overflow-y-auto px-[4rem] pb-[2.4rem] pt-[4.4rem] scrollbar-hide">
             {mode === 'onboarding' && (
