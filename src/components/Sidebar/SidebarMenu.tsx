@@ -125,6 +125,8 @@ const SidebarMenu = ({
             label={label}
             isActive={isActive}
             onClick={handleClick}
+            subItems={key === 'team' ? teamSubItems : undefined}
+            setIsNotificationOpen={setIsNotificationOpen}
             unreadNotificationCount={notificationCountData?.unreadCount}
           />
         ) : (
