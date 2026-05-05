@@ -50,11 +50,6 @@ const Sidebar = () => {
   const isProfileComplete = isLoggedIn && isProfileCompleteData?.isComplete;
 
   useModal({
-    isOpen: isNotificationOpen,
-    onClose: () => setIsNotificationOpen(false),
-  });
-
-  useModal({
     isOpen: isOverlay,
     onClose: () => setIsFolded(true),
   });
