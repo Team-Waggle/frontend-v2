@@ -62,6 +62,8 @@ interface SidebarMenuProps {
   notificationCountData: NotificationCountDataType;
   isNotificationOpen?: boolean;
   setIsNotificationOpen: (v: boolean) => void;
+  isMessagesOpen?: boolean;
+  setIsMessagesOpen: (v: boolean) => void;
 }
 
 const SidebarMenu = ({
@@ -73,6 +75,8 @@ const SidebarMenu = ({
   notificationCountData,
   isNotificationOpen,
   setIsNotificationOpen,
+  isMessagesOpen,
+  setIsMessagesOpen,
 }: SidebarMenuProps) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -98,8 +102,10 @@ const SidebarMenu = ({
 
         const isActive = isNotificationOpen
           ? key === 'notification'
-          : pathname.includes(key) &&
-            !(key === 'team' && pathname === '/team/new');
+          : isMessagesOpen
+            ? key === 'message'
+            : pathname.includes(key) &&
+              !(key === 'team' && pathname === '/team/new');
 
         const handleClick = () => {
           if (!isLoggedIn && key === 'team') {
@@ -108,12 +114,20 @@ const SidebarMenu = ({
           }
 
           if (key === 'notification') {
+            setIsMessagesOpen(false);
             setIsNotificationOpen(!isNotificationOpen);
+            return;
+          }
+
+          if (key === 'message') {
+            setIsNotificationOpen(false);
+            setIsMessagesOpen(!isMessagesOpen);
             return;
           }
 
           if (!path) return;
           setIsNotificationOpen(false);
+          setIsMessagesOpen(false);
           navigate(path);
         };
 

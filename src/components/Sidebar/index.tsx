@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { AnimatePresence } from 'framer-motion';
 import Notifications from '../Notifications';
+import MessagesPanel from '../Message/MessagesPanel';
 import { useAuthStore } from '../../stores/authStore';
 import LoginModal from '../Modal/LoginModal';
 import BaseButton from '../common/Button';
@@ -37,6 +38,7 @@ const Sidebar = () => {
   const [isFolded, setIsFolded] = useState(!isWide);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
 
   useEffect(() => {
     setIsFolded(!isWide);
@@ -163,6 +165,8 @@ const Sidebar = () => {
             notificationCountData={notificationCountData}
             isNotificationOpen={isNotificationOpen}
             setIsNotificationOpen={setIsNotificationOpen}
+            isMessagesOpen={isMessagesOpen}
+            setIsMessagesOpen={setIsMessagesOpen}
           />
         </div>
 
@@ -209,6 +213,14 @@ const Sidebar = () => {
             isFolded={isFolded}
             onClose={() => setIsNotificationOpen(false)}
             notificationCountData={notificationCountData}
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isMessagesOpen && (
+          <MessagesPanel
+            isFolded={isFolded}
+            onClose={() => setIsMessagesOpen(false)}
           />
         )}
       </AnimatePresence>
