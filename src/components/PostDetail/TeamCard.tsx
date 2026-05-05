@@ -8,6 +8,8 @@ import IcPersons from '../../assets/icons/normal/ic_persons.svg?react';
 import IcDesktop from '../../assets/icons/normal/ic_desktop.svg?react';
 import IcCompany from '../../assets/icons/normal/ic_company.svg?react';
 
+import BaseTag from '../common/Tag';
+
 import IcChevronRight from '../../assets/icons/normal/chevron/ic_chevronRight.svg?react';
 
 interface TeamCardProps {
@@ -29,6 +31,10 @@ const toWorkModeLabel = (workMode?: string): string => {
     return '오프라인';
   }
 
+  if (workMode === 'HYBRID') {
+    return '온라인 + 오프라인';
+  }
+
   return workMode ?? '';
 };
 
@@ -44,6 +50,12 @@ const TeamCard = ({
   const [imageError, setImageError] = useState(false);
   const workModeLabel = toWorkModeLabel(workMode);
   const createdAtLabel = createdAt ? formatTeamCardCreatedAt(createdAt) : '';
+
+  const metaTags = [
+    { icon: <IcPersons className="h-[1.2rem] w-[1.2rem]" />, label: memberCount },
+    { icon: <IcDesktop className="h-[1.2rem] w-[1.2rem]" />, label: workModeLabel },
+    { icon: <IcCompany className="h-[1.2rem] w-[1.2rem]" />, label: createdAtLabel },
+  ];
 
   return (
     <div
@@ -70,28 +82,15 @@ const TeamCard = ({
             {title}
           </h2>
           <div className="flex items-start gap-[0.4rem]">
-            <div className="flex h-[2rem] min-w-[2.8rem] items-center justify-center gap-[0.2rem] rounded-[9.9rem] bg-black-10 px-[0.8rem]">
-              <IcPersons className="h-[1.2rem] w-[1.2rem]" />
-              <span className="flex-1 text-[1rem] font-[500] leading-[1.5] tracking-[-0.02rem] text-black-100">
-                {memberCount}
-              </span>
-            </div>
-            <div className="flex h-[2rem] min-w-[2.8rem] items-center justify-center gap-[0.2rem] rounded-[9.9rem] bg-black-10 px-[0.8rem]">
-              <IcDesktop className="h-[1.2rem] w-[1.2rem]" />
-              <span className="flex-1 text-[1rem] font-[500] leading-[1.5] tracking-[-0.02rem] text-black-100">
-                {workModeLabel}
-              </span>
-            </div>
-            <div className="flex h-[2rem] min-w-[2.8rem] items-center justify-center gap-[0.2rem] rounded-[9.9rem] bg-black-10 px-[0.8rem]">
-              <IcCompany className="h-[1.2rem] w-[1.2rem]" />
-              <span className="flex-1 text-[1rem] font-[500] leading-[1.5] tracking-[-0.02rem] text-black-100">
-                {createdAtLabel}
-              </span>
-            </div>
+            {metaTags.map(({ icon, label }, i) => (
+              <BaseTag key={i} size="xs" shape="circle" color="black80" isInverted leftIcon={icon} className="min-w-[2.8rem]">
+                {label}
+              </BaseTag>
+            ))}
           </div>
         </div>
         <div className="self-stretch overflow-hidden">
-          <p className="line-clamp-3 block h-[5.4rem] break-words overflow-hidden text-ellipsis text-[1.2rem] font-[500] leading-[1.5] tracking-[-0.024rem] text-black">
+          <p className="line-clamp-3 block h-[5.4rem] overflow-hidden text-ellipsis break-words text-[1.2rem] font-[500] leading-[1.5] tracking-[-0.024rem] text-black">
             {description}
           </p>
         </div>
