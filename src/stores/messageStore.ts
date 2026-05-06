@@ -16,15 +16,19 @@ interface MessageStore {
   realtimeMessages: MessageResponse[];
   failedTempIds: number[];
   pendingRetry: PendingRetry[];
+  reconnectPending: boolean;
 
   setStompClient: (client: Client | null) => void;
   appendRealtimeMessage: (msg: MessageResponse) => void;
   clearRealtimeMessages: () => void;
   clearTempMessages: () => void;
+  removeFailedTemps: () => void;
   markTempFailed: (tempId: number) => void;
   unmarkTempFailed: (tempId: number) => void;
   queueRetry: (receiverId: string, content: string, tempId: number) => void;
   clearPendingRetry: () => void;
+  requestReconnect: () => void;
+  clearReconnectPending: () => void;
   publish: (receiverId: string, content: string) => boolean;
 }
 
@@ -33,6 +37,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
   realtimeMessages: [],
   failedTempIds: [],
   pendingRetry: [],
+  reconnectPending: false,
 
   setStompClient: (client) => set({ stompClient: client }),
 
@@ -54,6 +59,15 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
       failedTempIds: [],
     })),
 
+  removeFailedTemps: () =>
+    set((state) => {
+      const failed = new Set(state.failedTempIds);
+      return {
+        realtimeMessages: state.realtimeMessages.filter((m) => !failed.has(m.messageId)),
+        failedTempIds: [],
+      };
+    }),
+
   markTempFailed: (tempId) =>
     set((state) => ({
       failedTempIds: state.failedTempIds.includes(tempId)
@@ -72,6 +86,9 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     })),
 
   clearPendingRetry: () => set({ pendingRetry: [] }),
+
+  requestReconnect: () => set({ reconnectPending: true }),
+  clearReconnectPending: () => set({ reconnectPending: false }),
 
   // 전송 성공 여부를 반환 — false면 호출부에서 임시 메시지를 failed로 표시
   publish: (receiverId, content) => {
