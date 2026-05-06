@@ -67,10 +67,10 @@ const MyBubble = ({
                     </div>
                   )}
                   <div
-                    className={`flex ${maxW} items-center gap-[1rem] rounded-[1rem] p-[1rem] ${isFailed ? 'bg-red-50' : 'bg-blue-10'}`}
+                    className={`flex ${maxW} min-w-0 items-center gap-[1rem] rounded-[1rem] p-[1rem] ${isFailed ? 'bg-red-50' : 'bg-blue-10'}`}
                   >
                     <span
-                      className={`${textSize} font-[500] leading-[1.5] tracking-[-0.032rem] text-black-100`}
+                      className={`${textSize} min-w-0 w-full font-[500] leading-[1.5] tracking-[-0.032rem] text-black-100 break-all whitespace-pre-wrap`}
                     >
                       {message}
                     </span>
@@ -136,10 +136,10 @@ const OpponentBubble = ({
               >
                 <div className={`flex items-end gap-[1rem] ${isLast ? 'self-stretch' : ''}`}>
                   <div
-                    className={`flex ${maxW} items-center gap-[1rem] rounded-[1rem] bg-black-10 p-[1rem]`}
+                    className={`flex ${maxW} min-w-0 items-center gap-[1rem] rounded-[1rem] bg-black-10 p-[1rem]`}
                   >
                     <span
-                      className={`${textSize} font-[500] leading-[1.5] tracking-[-0.032rem] text-black-100`}
+                      className={`${textSize} min-w-0 w-full font-[500] leading-[1.5] tracking-[-0.032rem] text-black-100 break-all whitespace-pre-wrap`}
                     >
                       {message}
                     </span>

@@ -79,14 +79,14 @@ const ModalChatView = ({ partnerId }: { partnerId: string }) => {
         style={{ boxShadow: '0 -2px 10px 0 rgba(0, 0, 0, 0.10)' }}
       >
         <div className="flex w-full items-center gap-[2rem] self-stretch">
-          <input
-            type="text"
+          <textarea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="메시지 입력..."
             aria-label="메시지 입력"
-            className="flex h-[4.4rem] flex-1 items-center gap-[1rem] rounded-[9.9rem] bg-black-10 py-[0.8rem] pl-[2.8rem] pr-[2.4rem] text-[1.4rem] font-[500] leading-[1.5] text-black-100 outline-none placeholder:text-black-50"
+            rows={1}
+            className="flex min-h-[4.4rem] max-h-[9rem] flex-1 resize-none items-center gap-[1rem] rounded-[1.2rem] bg-black-10 py-[1.2rem] pl-[2.8rem] pr-[2.4rem] text-[1.4rem] font-[500] leading-[1.5] text-black-100 outline-none placeholder:text-black-50 overflow-y-auto"
           />
           <IconWrapper onClick={handleSend} aria-label="메시지 전송">
             <IcSend />

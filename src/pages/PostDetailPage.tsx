@@ -310,6 +310,7 @@ const PostDetailPage = () => {
               profileImageUrl={postDetail?.user?.profileImageUrl}
               skills={postDetail?.user?.skills}
               variant="post"
+              isMe={isMyPost}
             />
           </div>
         </div>

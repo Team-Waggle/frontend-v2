@@ -72,14 +72,14 @@ const ChatArea = ({ partnerId }: { partnerId: string }) => {
         className="absolute bottom-0 right-0 flex w-full flex-col items-start gap-[1rem] bg-black-5 px-[1.2rem] py-[2.4rem] shadow-chat-input-box [clip-path:inset(-20px_-20px_-20px_0)]"
       >
         <div className="flex items-center gap-[2rem] self-stretch">
-          <input
-            type="text"
+          <textarea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="메시지 입력..."
             aria-label="메시지 입력"
-            className="flex h-[4.4rem] flex-1 items-center gap-[1rem] rounded-[9.9rem] bg-black-10 py-[0.8rem] pl-[2.8rem] pr-[2.4rem] text-[1.4rem] font-[500] leading-[1.5] text-black-100 outline-none placeholder:text-black-50"
+            rows={1}
+            className="flex min-h-[4.4rem] max-h-[12rem] flex-1 resize-none items-center gap-[1rem] rounded-[1.2rem] bg-black-10 py-[1.2rem] pl-[2.8rem] pr-[2.4rem] text-[1.4rem] font-[500] leading-[1.5] text-black-100 outline-none placeholder:text-black-50 overflow-y-auto"
           />
           <MsgSendBtn onClick={handleSend} aria-label="메시지 전송">
             <IcSend />

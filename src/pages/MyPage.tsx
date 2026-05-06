@@ -9,6 +9,7 @@ import IcVerticalBar from '../assets/icons/ic_mypage_vertical_bar.svg?react';
 import IcCamera from '../assets/icons/normal/ic_camera_fill.svg?react';
 import IcProfileImg from '../assets/icons/image/ic_character_circle_gray_40.svg?react';
 import IcCharacterNoReviews from '../assets/icons/ic_character_main_page.svg?react';
+import IcLink from '../assets/icons/normal/ic_link.svg?react';
 
 import Tag from '../components/common/Tag/index';
 import MyPageCard from '../components/common/Cards/MyPageCard/MyPageCard';
@@ -139,19 +140,45 @@ const MyPage = () => {
 
               {/** 프로필 상세설명 */}
               <div className="flex flex-col items-center gap-[1.4rem] self-stretch">
-                {/** 프로필 이름 / 직무 / 연차 */}
+                {/** 프로필 이름 / 직무 */}
                 <div className="flex flex-col items-center gap-[0.3rem] self-stretch">
+                  {/** 프로필 이름 */}
                   <h1 className="self-stretch text-[2rem] font-[700] leading-[1.5] tracking-[-0.04rem] text-black-100">
                     {userDetail?.username}
                   </h1>
-                  <span className="self-stretch text-[1.6rem] font-[600] leading-[1.5] tracking-[-0.032rem] text-black-90">
-                    {userDetail?.position
-                      ? POSITION_CONVERTER[userDetail.position]
-                      : ''}
-                  </span>
+                  {/** 직무 */}
+                  <div className="flex flex-col items-start justify-center gap-[0.7rem] self-stretch">
+                    <span className="self-stretch text-[1.6rem] font-[600] leading-[1.5] tracking-[-0.032rem] text-black-90">
+                      {userDetail?.position
+                        ? POSITION_CONVERTER[userDetail.position]
+                        : ''}
+                    </span>
+                    {/** 포트폴리오 */}
+                    {userDetail?.portfolioUrls && userDetail.portfolioUrls.length > 0 && (
+                      <div className="flex items-center gap-[0.4rem] self-stretch pr-[0.8rem]">
+                        <div className="flex items-center gap-[0.2rem]">
+                          <IcLink className="text-black-90 w-[1.2rem] h-[1.2rem] aspect-square" />
+                          <span className="overflow-hidden text-black-90 text-ellipsis text-[1.3rem] font-[500] leading-[1.5]"> 포트폴리오 </span>
+                        </div>
+                        <div className="flex flex-col gap-[0.2rem] overflow-hidden">
+                          {userDetail.portfolioUrls.map((url) => (
+                            <a
+                              key={url}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="overflow-hidden text-ellipsis text-[1.3rem] font-[500] tracking-[-0.026rem] text-blue-60 underline"
+                            >
+                              {url}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 {/** 스킬 / 한 줄 소개 */}
-                <div className="flex flex-col items-center gap-[3rem] self-stretch">
+                <div className="flex flex-col items-center gap-[4.5rem] self-stretch">
                   {/** 스킬 */}
                   <div className="flex items-start gap-[0.8rem] self-stretch">
                     {userDetail?.skills?.slice(0, 3).map((skill: string) => (
@@ -187,7 +214,7 @@ const MyPage = () => {
                 <div
                   className="absolute bottom-[2.4rem] flex flex-col items-center justify-center pl-[1.0835rem] pr-[1.0165rem]"
                   style={{
-                    left: `${userDetail?.temperature}%`,
+                    left: `36.5%`,
                     transform: 'translateX(-50%)',
                   }}
                 >
