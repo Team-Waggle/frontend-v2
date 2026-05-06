@@ -55,7 +55,6 @@ export const useStompClient = (partnerId?: string) => {
 
           onConnect: () => {
             reconnectAttemptsRef.current = 0;
-            isReconnecting = false;
             setStompClient(client);
 
             // 연결 시 대기 중인 실패 메시지 재전송
@@ -163,6 +162,7 @@ export const useStompClient = (partnerId?: string) => {
               const newToken = await getWsToken();
               if (cancelled) { isReconnecting = false; return; }
               client.configure({ brokerURL: buildBrokerURL(newToken) });
+              isReconnecting = false;
               client.activate();
             } catch {
               isReconnecting = false;
