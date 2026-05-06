@@ -68,7 +68,7 @@ export default {
         'message-btn':
           '0 6px 12px 0 rgba(0, 0, 0, 0.12), 0 4px 8px 0 rgba(0, 0, 0, 0.08), 0 0 4px 0 rgba(0, 0, 0, 0.08)',
         'chat-input-box': '0 -2px 10px 0 rgba(0, 0, 0, 0.10)',
-        floatingBtn:
+        'floating-button':
           '0px 0px 4px 0px rgba(0, 0, 0, 0.08),0px 4px 8px 0px rgba(0, 0, 0, 0.08), 0px 6px 12px 0px rgba(0, 0, 0, 0.12)',
       },
       backgroundImage: {
