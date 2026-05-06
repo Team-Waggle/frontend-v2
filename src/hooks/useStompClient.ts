@@ -39,6 +39,7 @@ export const useStompClient = (partnerId?: string) => {
     if (!accessToken) return;
 
     let cancelled = false;
+    let isReconnecting = false;
     reconnectAttemptsRef.current = 0;
 
     const connect = async () => {
@@ -49,11 +50,12 @@ export const useStompClient = (partnerId?: string) => {
         const client = new Client({
           brokerURL: buildBrokerURL(ottToken),
           reconnectDelay: 0,
-          heartbeatIncoming: 10000,
-          heartbeatOutgoing: 10000,
+          heartbeatIncoming: 4000,
+          heartbeatOutgoing: 4000,
 
           onConnect: () => {
             reconnectAttemptsRef.current = 0;
+            isReconnecting = false;
             setStompClient(client);
 
             // 연결 시 대기 중인 실패 메시지 재전송
@@ -139,11 +141,13 @@ export const useStompClient = (partnerId?: string) => {
           },
 
           onWebSocketClose: async () => {
-            if (cancelled) return;
+            if (cancelled || isReconnecting) return;
+            isReconnecting = true;
 
             // 최대 재시도 초과 시 로그아웃 처리 (서버 장기 다운 등)
             if (reconnectAttemptsRef.current >= MAX_RECONNECT_ATTEMPTS) {
               console.error('WebSocket 재연결 한도 초과 — 로그아웃 처리');
+              isReconnecting = false;
               useAuthStore.getState().logout();
               window.location.replace('/login');
               return;
@@ -155,12 +159,13 @@ export const useStompClient = (partnerId?: string) => {
 
             try {
               await new Promise((resolve) => setTimeout(resolve, delay));
-              if (cancelled) return;
+              if (cancelled) { isReconnecting = false; return; }
               const newToken = await getWsToken();
-              if (cancelled) return;
+              if (cancelled) { isReconnecting = false; return; }
               client.configure({ brokerURL: buildBrokerURL(newToken) });
               client.activate();
             } catch {
+              isReconnecting = false;
               useAuthStore.getState().logout();
               window.location.replace('/login');
             }
@@ -208,6 +213,23 @@ export const useStompClient = (partnerId?: string) => {
       clearRealtimeMessages();
     }
   }, [partnerId, clearRealtimeMessages]);
+
+  // 탭 포커스 복귀 시 연결 상태 확인 → 끊겨 있으면 재연결
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== 'visible') return;
+      if (clientRef.current?.connected) return;
+      reconnectAttemptsRef.current = 0;
+      if (clientRef.current) {
+        // 기존 클라이언트 deactivate → onWebSocketClose가 재연결 처리
+        clientRef.current.deactivate();
+      } else {
+        connectRef.current?.();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
 
   useEffect(() => {
     if (!reconnectPending) return;
