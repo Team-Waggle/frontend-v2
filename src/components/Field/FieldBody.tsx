@@ -558,8 +558,18 @@ export const FieldPositionSkill = ({
   const positionRef = useRef<HTMLDivElement>(null);
   const skillRef = useRef<HTMLDivElement>(null);
 
+  const positions: PositionKey[] = [
+    '기획',
+    '디자인',
+    '프론트엔드',
+    '백엔드',
+    '마케팅',
+    '기타',
+  ];
+
   const handlePositionSelect = (e: React.MouseEvent, pos: PositionKey) => {
     e.stopPropagation();
+    if (items.some((item) => item.position === pos)) return;
     setSelectedPosition(pos);
     setSelectedSkill([]);
     setPositionDropdownOpen(false);
@@ -658,6 +668,8 @@ export const FieldPositionSkill = ({
     };
   }, []);
 
+  const isAddEnabled = selectedPosition !== null && selectedSkill.length > 0;
+
   return (
     <>
       <div className="relative flex gap-[1.2rem]">
@@ -679,61 +691,29 @@ export const FieldPositionSkill = ({
 
           {positionDropdownOpen && (
             <div className="absolute left-0 top-[7rem] grid h-[6rem] w-[61.8rem] grid-cols-6 items-center gap-[0.6rem] rounded-[0.8rem] border border-black-30 bg-black-5 px-[1.8rem]">
-              <div onClick={(e) => handlePositionSelect(e, '기획')}>
-                <BaseChip
-                  isSelected={selectedPosition === '기획'}
-                  className="w-full"
-                >
-                  기획
-                </BaseChip>
-              </div>
-              <div onClick={(e) => handlePositionSelect(e, '디자인')}>
-                <BaseChip
-                  isSelected={selectedPosition === '디자인'}
-                  className="w-full"
-                >
-                  디자인
-                </BaseChip>
-              </div>
-              <div onClick={(e) => handlePositionSelect(e, '프론트엔드')}>
-                <BaseChip
-                  isSelected={selectedPosition === '프론트엔드'}
-                  className="w-full"
-                >
-                  프론트엔드
-                </BaseChip>
-              </div>
-              <div onClick={(e) => handlePositionSelect(e, '백엔드')}>
-                <BaseChip
-                  isSelected={selectedPosition === '백엔드'}
-                  className="w-full"
-                >
-                  백엔드
-                </BaseChip>
-              </div>
-              <div onClick={(e) => handlePositionSelect(e, '마케팅')}>
-                <BaseChip
-                  isSelected={selectedPosition === '마케팅'}
-                  className="w-full"
-                >
-                  마케팅
-                </BaseChip>
-              </div>
-              <div onClick={(e) => handlePositionSelect(e, '기타')}>
-                <BaseChip
-                  isSelected={selectedPosition === '기타'}
-                  className="w-full"
-                >
-                  기타
-                </BaseChip>
-              </div>
+              {positions.map((pos) => {
+                const isAlreadyAdded = items.some(
+                  (item) => item.position === pos,
+                );
+                return (
+                  <div key={pos} onClick={(e) => handlePositionSelect(e, pos)}>
+                    <BaseChip
+                      isSelected={selectedPosition === pos}
+                      disabled={isAlreadyAdded}
+                      className="w-full"
+                    >
+                      {pos}
+                    </BaseChip>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
         <div
           ref={skillRef}
           onClick={() => setSkillDropdownOpen((prev) => !prev)}
-          className={`flex h-[6rem] w-[31.8rem] items-center gap-[1rem] rounded-[0.8rem] border px-[1.8rem] ${
+          className={`relative flex h-[6rem] w-[31.8rem] items-center gap-[1rem] rounded-[0.8rem] border px-[1.8rem] ${
             selectedSkill.length !== 0 ? 'border-blue-70' : 'border-black-30'
           } ${selectedPosition && 'cursor-pointer'}`}
         >
@@ -749,8 +729,8 @@ export const FieldPositionSkill = ({
           />
 
           {skillDropdownOpen && selectedPosition && (
-            <div className="absolute left-[9.5rem] top-[7rem] z-10 rounded-[0.8rem] border border-black-30 bg-black-5 p-[1.8rem]">
-              <div className="flex flex-wrap gap-x-[0.6rem] gap-y-[1rem] overflow-y-auto pl-[0.1rem] pr-[2rem] pt-[0.1rem]">
+            <div className="absolute left-1/2 top-[7rem] z-10 w-max max-w-[78.8rem] -translate-x-1/2 rounded-[0.8rem] border border-black-30 bg-black-5 p-[1.8rem]">
+              <div className="flex flex-wrap gap-x-[0.6rem] gap-y-[1rem] pl-[0.1rem] pr-[2rem] pt-[0.1rem]">
                 {positionSkillData[selectedPosition as PositionKey]?.map(
                   (skill) => {
                     const isSelected = selectedSkill.includes(skill);
@@ -801,7 +781,12 @@ export const FieldPositionSkill = ({
             </IconWrapper>
           </div>
           <div className="flex gap-[0.8rem]">
-            <BaseButton size="sm" className="w-[6.8rem]" onClick={handleAdd}>
+            <BaseButton
+              size="sm"
+              className="w-[6.8rem]"
+              onClick={handleAdd}
+              disabled={!isAddEnabled}
+            >
               추가
             </BaseButton>
           </div>

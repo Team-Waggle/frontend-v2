@@ -1,5 +1,10 @@
 import { useNavigate } from 'react-router';
-import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useQuery,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import {
   createPosts,
   getPostDetail,
@@ -123,7 +128,7 @@ export const useUpdatePosts = () => {
     mutationFn: ({ postId, postData }: { postId: number; postData: object }) =>
       updatePosts(postId, postData),
     onSuccess: (data) => {
-      navigate(`/post/${data.team.teamId}`);
+      navigate(`/post/${data.postId}`);
     },
   });
 };
