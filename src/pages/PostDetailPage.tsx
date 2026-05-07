@@ -18,7 +18,7 @@ import ButtonBlur from '../assets/blur/RecruitmentDetail_Button_Blur.svg?react';
 import TeamCard from '../components/PostDetail/TeamCard';
 import SideTeamCard from '../components/common/Cards/SideTeamCard';
 import BaseButton from '../components/common/Button/index';
-import { FieldViewer } from '../components/FieldViewer';
+import { FieldViewer } from '../components/Field/FieldViewer';
 import ApplyModal from '../components/Modal/ApplyModal';
 import WaitingModal from '../components/Modal/WaitingModal';
 import LoginModal from '../components/Modal/LoginModal';
