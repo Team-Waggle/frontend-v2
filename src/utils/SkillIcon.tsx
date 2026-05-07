@@ -37,9 +37,18 @@ const SKILL_ICON_LARGE_BY_FILENAME: Record<string, SVGComponent> =
     ),
   );
 
+const SKILL_NAME_MAP: Record<string, string> = {
+  SNS마케팅: 'SNSMarketing',
+  콘텐츠제작: 'ContentCreation',
+};
+
 // 스킬명 파일명 규칙에 맞게 정규화
-const formatSkillName = (str: string) =>
-  str.replace(/\+/g, 'p').replace(/#/g, 'sharp').replace(/\s+/g, '');
+const formatSkillName = (str: string) => {
+  if (SKILL_NAME_MAP[str]) {
+    return SKILL_NAME_MAP[str];
+  }
+  return str.replace(/\+/g, 'p').replace(/#/g, 'sharp').replace(/\s+/g, '');
+};
 
 // small 스킬 아이콘 렌더링
 export const SkillIcon = ({ name, className }: SkillIconProps) => {
@@ -65,5 +74,7 @@ export const SkillIconLarge = ({ name, className }: SkillIconProps) => {
 
   if (!IconComponent) return null;
 
-  return <IconComponent className={`h-[2.8rem] w-[2.8rem] ${className}`.trim()} />;
+  return (
+    <IconComponent className={`h-[2.8rem] w-[2.8rem] ${className}`.trim()} />
+  );
 };
