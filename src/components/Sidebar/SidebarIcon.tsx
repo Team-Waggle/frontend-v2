@@ -77,7 +77,7 @@ const SidebarIcon = ({
       {isTeamMenu && isOpen && (
         <div
           ref={menuRef}
-          className="absolute left-[8.4rem] top-0 rounded-[0.8rem] bg-black-5 shadow-floatingBtn"
+          className="absolute left-[8.4rem] top-0 rounded-[0.8rem] bg-black-5 shadow-floating-button"
         >
           {subItems?.map((team) => (
             <button
