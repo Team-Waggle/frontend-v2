@@ -90,9 +90,12 @@ export const useGetTeamDetail = (teamId: number) => {
 // 팀 지원 목록 조회
 export const useGetTeamApplications = (
   params: Omit<GetApplicationsParams, 'cursor' | 'direction'>,
+  options?: { enabled?: boolean },
 ) => {
+  const isValidTeamId = !!params.teamId;
+
   return useInfiniteQuery({
-    queryKey: ['team-applications', params.teamId, params.postId],
+    queryKey: ['team-applications', params.teamId, params.postId, params.size],
     queryFn: ({ pageParam }) =>
       GetTeamApplications({
         ...params,
@@ -104,7 +107,7 @@ export const useGetTeamApplications = (
       if (!lastPage.hasNext) return undefined;
       return lastPage.nextCursor;
     },
-    enabled: !!params.teamId,
+    enabled: isValidTeamId && (options?.enabled ?? true),
     refetchOnWindowFocus: false,
   });
 };
