@@ -17,12 +17,14 @@ import Link from '@tiptap/extension-link';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Markdown } from '@tiptap/markdown';
+import { MarkdownImage } from './markdownExtensions';
 
 // Icons
 import ImageIcon from '../../assets/icons/normal/ic_image.svg?react';
 import BoldIcon from '../../assets/icons/normal/ic_bold.svg?react';
 import ItalicIcon from '../../assets/icons/normal/ic_italic.svg?react';
 import List1Icon from '../../assets/icons/normal/ic_list1.svg?react';
+import ListOrderedIcon from '../../assets/icons/normal/ic_listOrdered.svg?react';
 import LinkIcon from '../../assets/icons/normal/ic_link.svg?react';
 import DesktopIcon from '../../assets/icons/normal/ic_desktop.svg?react';
 import LocationIcon from '../../assets/icons/normal/ic_location.svg?react';
@@ -256,8 +258,13 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
   const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
   const [urlInput, setUrlInput] = useState('');
   const [isLinkActiveUI, setIsLinkActiveUI] = useState(false);
+  const [savedSelection, setSavedSelection] = useState<{
+    from: number;
+    to: number;
+  } | null>(null);
 
   const linkModalRef = useRef<HTMLDivElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -283,10 +290,9 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        orderedList: false,
-      }),
+      StarterKit,
       Markdown,
+      MarkdownImage,
       Link.configure({
         openOnClick: false, // 에디터 안에서 클릭 시 바로 이동 방지
         HTMLAttributes: {
@@ -298,6 +304,7 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
       }),
     ],
     content: value,
+    contentType: 'markdown',
     editorProps: {
       attributes: {
         class: 'focus:outline-none h-full overflow-y-auto',
@@ -321,7 +328,10 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
 
       // 값이 다를 때만 업데이트하여, 타이핑 중 커서가 튀는 현상 방지
       if (value !== currentContent) {
-        editor.commands.setContent(value);
+        editor.commands.setContent(value, {
+          contentType: 'markdown',
+          emitUpdate: false,
+        });
       }
     }
   }, [value, editor]);
@@ -329,43 +339,120 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
   if (!editor) return null;
 
   const openLinkModal = () => {
-    // 이미 링크가 활성화된 상태라면 링크 해제
-    if (editor.isActive('link')) {
-      editor.chain().focus().unsetLink().run();
-      return;
-    }
+    const { from, to } = editor.state.selection;
+    const previousHref = editor.getAttributes('link').href as
+      | string
+      | undefined;
 
-    // 링크가 없다면 입력 모달 열기
+    setSavedSelection({ from, to });
     setIsLinkActiveUI(true);
-    setUrlInput(''); // 이전 입력값 초기화
+    setUrlInput(previousHref ?? '');
     setIsLinkModalOpen(true);
   };
 
-  // 2. 모달에서 '확인' 버튼을 눌렀을 때 호출
+  const normalizeUrl = (url: string) => {
+    const trimmedUrl = url.trim();
+
+    if (
+      trimmedUrl === '' ||
+      /^(https?:\/\/|mailto:|tel:|#|\/)/i.test(trimmedUrl)
+    ) {
+      return trimmedUrl;
+    }
+
+    return `https://${trimmedUrl}`;
+  };
+
   const applyLink = () => {
-    if (urlInput.trim() === '') {
+    const href = normalizeUrl(urlInput);
+    const selection = savedSelection ?? editor.state.selection;
+
+    if (href === '') {
+      editor.chain().focus().extendMarkRange('link').unsetLink().run();
       setIsLinkModalOpen(false);
       setIsLinkActiveUI(false);
+      setSavedSelection(null);
       return;
     }
 
-    const from = editor.state.selection.from;
-    const to = from + urlInput.length;
+    if (selection.from === selection.to) {
+      const from = selection.from;
+      const to = from + href.length;
 
-    editor
-      .chain()
-      .focus()
-      .insertContent(urlInput)
-      .setTextSelection({ from, to }) // 방금 삽입한 텍스트 선택
-      .setLink({ href: urlInput }) // 링크 적용
-      .setTextSelection(to) // 커서를 링크 끝으로 이동
-      .run();
-
-    editor.commands.unsetMark('link');
+      editor
+        .chain()
+        .focus()
+        .setTextSelection(selection)
+        .insertContent(href)
+        .setTextSelection({ from, to })
+        .setLink({ href })
+        .setTextSelection(to)
+        .unsetMark('link')
+        .run();
+    } else {
+      editor
+        .chain()
+        .focus()
+        .setTextSelection(selection)
+        .extendMarkRange('link')
+        .setLink({ href })
+        .setTextSelection(selection.to)
+        .unsetMark('link')
+        .run();
+    }
 
     setIsLinkModalOpen(false);
     setIsLinkActiveUI(false);
+    setSavedSelection(null);
     setUrlInput('');
+  };
+
+  const insertImage = (src: string, alt?: string) => {
+    editor
+      .chain()
+      .focus()
+      .insertContent({
+        type: 'image',
+        attrs: {
+          src,
+          alt: alt || '첨부 이미지',
+        },
+      })
+      .insertContent(' ')
+      .run();
+  };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+
+    if (!file) return;
+
+    const allowedImageTypes = [
+      'image/png',
+      'image/jpeg',
+      'image/jpg',
+      'image/webp',
+      'image/gif',
+    ];
+
+    if (!allowedImageTypes.includes(file.type)) {
+      window.alert('PNG, JPG, WEBP, GIF 이미지만 첨부할 수 있어요.');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      window.alert('이미지는 2MB 이하만 첨부할 수 있어요.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        insertImage(reader.result, file.name);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -440,6 +527,14 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
           </IconWrapper>
           <IconWrapper
             color="transparent"
+            onClick={() => editor.chain().focus().toggleOrderedList().run()}
+            isSelected={editor.isActive('orderedList')}
+            className="h-[3.6rem] w-[3.6rem]"
+          >
+            <ListOrderedIcon />
+          </IconWrapper>
+          <IconWrapper
+            color="transparent"
             onClick={openLinkModal}
             isSelected={isLinkActiveUI}
             className="h-[3.6rem] w-[3.6rem]"
@@ -448,11 +543,18 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
           </IconWrapper>
           <IconWrapper
             color="transparent"
-            // isSelected={editor.isActive('')}
+            onClick={() => imageInputRef.current?.click()}
             className="h-[3.6rem] w-[3.6rem]"
           >
             <ImageIcon />
           </IconWrapper>
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+            className="hidden"
+            onChange={handleImageChange}
+          />
         </div>
       </div>
       <div className="h-[39.9rem] w-full rounded-bl-[0.8rem] rounded-br-[0.8rem] border-x border-b border-black-30 bg-black-5 px-[1.8rem] py-[1.7rem] text-[1.6rem] font-medium">
@@ -474,6 +576,7 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
               if (e.key === 'Escape') {
                 setIsLinkModalOpen(false);
                 setIsLinkActiveUI(false);
+                setSavedSelection(null);
               }
             }}
           />

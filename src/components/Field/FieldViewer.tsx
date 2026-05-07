@@ -3,6 +3,7 @@ import StarterKit from '@tiptap/starter-kit';
 import { Markdown } from '@tiptap/markdown';
 import Link from '@tiptap/extension-link';
 import { memo, useEffect } from 'react';
+import { MarkdownImage } from './markdownExtensions';
 
 interface FieldViewerProps {
   content?: string;
@@ -13,14 +14,18 @@ export const FieldViewer = memo(({ content }: FieldViewerProps) => {
     extensions: [
       StarterKit,
       Markdown,
+      MarkdownImage,
       Link.configure({
         openOnClick: true,
         HTMLAttributes: {
           class: 'text-blue-500 underline',
+          target: '_blank',
+          rel: 'noopener noreferrer',
         },
       }),
     ],
     content: content || '',
+    contentType: 'markdown',
     editable: false,
     immediatelyRender: true,
   });
