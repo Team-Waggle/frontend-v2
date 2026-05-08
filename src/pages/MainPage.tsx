@@ -62,7 +62,7 @@ const MainPage = () => {
   const { data: profileData, isSuccess } = useGetIsUserProfileComplete();
 
   const isOnboardingModalOpen =
-    isLoggedIn && isSuccess && profileData?.isComplete === false;
+    isLoggedIn && isSuccess && profileData?.complete === false;
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
@@ -161,13 +161,13 @@ const MainPage = () => {
 
                 return (
                   <MainCard
-                    key={post.postId}
+                    key={post.id}
                     mainCardTitle={post.title}
                     mainCardPositions={positionList}
                     mainCardSkills={skillsList}
                     mainCardCreatedAt={createdAtText}
-                    isClosed={!post.isRecruiting}
-                    onClick={() => navigate(`/post/${post.postId}`)}
+                    isClosed={!post.recruiting}
+                    onClick={() => navigate(`/post/${post.id}`)}
                   />
                 );
               })}

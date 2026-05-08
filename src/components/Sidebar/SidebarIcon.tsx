@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 interface SubItem {
-  teamId: number | string;
+  id: number | string;
   name: string;
   profileImageUrl?: string;
 }
@@ -81,12 +81,12 @@ const SidebarIcon = ({
         >
           {subItems?.map((team) => (
             <button
-              key={team.teamId}
+              key={team.id}
               onClick={(e) => {
                 e.stopPropagation();
                 setIsNotificationOpen(false);
                 setIsOpen(false);
-                navigate(`/team/${team.teamId}`);
+                navigate(`/team/${team.id}`);
               }}
               className="group flex h-[4.4rem] w-[17.2rem] items-center gap-[0.4rem] rounded-[0.8rem] bg-black-5 px-[2.4rem] hover:bg-hover-5"
             >
@@ -99,7 +99,7 @@ const SidebarIcon = ({
               )}
               <span
                 className={`text-[1.4rem] ${
-                  Number(team.teamId) === Number(teamId)
+                  Number(team.id) === Number(teamId)
                     ? 'font-bold text-blue-100'
                     : 'font-medium text-black-60 group-hover:text-black-80'
                 }`}

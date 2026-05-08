@@ -95,7 +95,7 @@ export const useStompClient = (partnerId?: string) => {
               }
 
               const currentPartnerId = partnerIdRef.current;
-              const senderIdStr = String(msg.sender.userId);
+              const senderIdStr = String(msg.sender.id);
               const currentPartnerIdStr = currentPartnerId ? String(currentPartnerId) : null;
 
               // 현재 열린 채팅 상대의 메시지만 realtimeMessages에 추가
@@ -113,11 +113,11 @@ export const useStompClient = (partnerId?: string) => {
                     pages: old.pages.map((page) => ({
                       ...page,
                       data: page.data.map((conv) => {
-                        if (String(conv.partner.userId) === senderIdStr) {
+                        if (String(conv.partner.id) === senderIdStr) {
                           return {
                             ...conv,
                             lastMessage: {
-                              messageId: msg.messageId,
+                              id: msg.id,
                               content: msg.content,
                               createdAt: msg.createdAt,
                             },
@@ -134,7 +134,7 @@ export const useStompClient = (partnerId?: string) => {
                 },
               );
 
-              queryClient.invalidateQueries({ queryKey: ['messages', msg.sender.userId] });
+              queryClient.invalidateQueries({ queryKey: ['messages', msg.sender.id] });
               queryClient.invalidateQueries({ queryKey: ['conversations'] });
             });
           },

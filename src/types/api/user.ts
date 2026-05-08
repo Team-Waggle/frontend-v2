@@ -2,7 +2,7 @@ import type { PositionType } from './posts';
 import type { UserReviewTag } from './team';
 
 export type MyApplicationResponse = {
-  applicationId: number;
+  id: number;
   position: PositionType;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   teamId: number;
@@ -14,9 +14,8 @@ export type MyApplicationResponse = {
 };
 
 export type UserMeResponse = {
-  userId: string;
+  id: string;
   username: string;
-  email: string;
   temperature: number;
   profileImageUrl: string;
   position: PositionType;

@@ -41,9 +41,8 @@ export type PositionType =
   | 'OTHER';
 
 export type PostUser = {
-  userId: string;
+  id: string;
   username: string;
-  email: string;
   temperature: number;
   profileImageUrl: string;
   position: PositionType;
@@ -55,7 +54,7 @@ export type PostUser = {
 export type RecruitmentStatusType = 'RECRUITING' | 'CLOSED';
 
 export type RecruitmentResponse = {
-  recruitmentId: number;
+  id: number;
   position: PositionType;
   count: number;
   status: RecruitmentStatusType;
@@ -65,16 +64,16 @@ export type RecruitmentResponse = {
 };
 
 export type PostDetailResponse = {
-  postId: number;
+  id: number;
   title: string;
   content: string;
   team: TeamResponse;
   user: PostUser;
-  isRecruiting: boolean;
+  recruiting: boolean;
   recruitments: RecruitmentResponse[];
+  applicationStatus?: 'PENDING' | 'APPROVED' | 'REJECTED';
   applicantCount: number;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
 };
 
 export type CursorResponsePostDetailResponse = {

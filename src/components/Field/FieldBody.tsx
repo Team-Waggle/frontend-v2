@@ -606,11 +606,11 @@ export const FieldTeamName = ({
     <div className="grid grid-cols-4 gap-[1rem]">
       {data?.map((team) => (
         <BaseChip
-          key={team.teamId}
+          key={team.id}
           variant="teamOutline"
           mainIcon={team?.profileImageUrl || <ProfileBasicIcon />}
-          isSelected={value === team.teamId}
-          onClick={() => onChange?.(team.teamId)}
+          isSelected={value === team.id}
+          onClick={() => onChange?.(team.id)}
         >
           {team.name}
         </BaseChip>

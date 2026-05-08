@@ -104,11 +104,11 @@ export const putUserMe = async (profileData: object) => {
 // 팀 공개 여부 변경
 export const patchTeamVisibility = async (
   teamId: number,
-  isVisible: boolean,
+  visible: boolean,
 ) => {
   const { data } = await axiosInstance.patch(
     USERS_ME_TEAMS_VISIBILITY_URL(teamId),
-    { isVisible },
+    { visible },
   );
   return data;
 };

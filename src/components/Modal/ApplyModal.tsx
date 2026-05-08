@@ -75,12 +75,12 @@ const ApplyModal = ({
   const onSubmit = (data: FormValues) => {
     const formattedData = {
       ...data,
-      postId: postData?.postId,
+      postId: postData?.id,
       portfolioUrls: data.portfolioUrls ? [data.portfolioUrls] : [],
     };
 
     createApply(
-      { teamId: postData.team.teamId, postData: formattedData },
+      { teamId: postData.team.id, postData: formattedData },
       {
         onSuccess: () => {
           onSuccessApply();

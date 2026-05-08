@@ -59,7 +59,7 @@ const MyPage = () => {
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
   const { data: me, isPending: isMePending } = useGetUserMe();
-  const isMyProfile = !isMePending && !!me?.userId && me.userId === userId;
+  const isMyProfile = !isMePending && !!me?.id && me.id === userId;
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const { data: userDetail } = useGetUserDetail(userId!);
@@ -329,7 +329,7 @@ const MyPage = () => {
                 {isMyProfile
                   ? myTeams?.map((team) => (
                       <MyPageCard
-                        key={team.teamId}
+                        key={team.id}
                         title={team.name}
                         position={
                           POSITION_CONVERTER[team.position] ?? team.position
@@ -339,18 +339,18 @@ const MyPage = () => {
                         profileImageUrl={team.profileImageUrl}
                         status={team.status}
                         isMyProfile
-                        isVisible={team.isVisible}
-                        teamId={team.teamId}
-                        onVisibilityToggle={(teamId, isVisible) => {
-                          patchVisibility({ teamId, isVisible });
-                          if (!isVisible)
+                        visible={team.visible}
+                        teamId={team.id}
+                        onVisibilityToggle={(teamId, visible) => {
+                          patchVisibility({ teamId, visible });
+                          if (!visible)
                             toast('프로젝트가 숨김처리 되었습니다.');
                         }}
                       />
                     ))
                   : otherTeams?.map((team) => (
                       <MyPageCard
-                        key={team.teamId}
+                        key={team.id}
                         title={team.name}
                         position={
                           POSITION_CONVERTER[team.position] ?? team.position
@@ -359,7 +359,7 @@ const MyPage = () => {
                         isLeader={team.role === 'LEADER'}
                         profileImageUrl={team.profileImageUrl}
                         status={team.status}
-                        teamId={team.teamId}
+                        teamId={team.id}
                       />
                     ))}
               </div>

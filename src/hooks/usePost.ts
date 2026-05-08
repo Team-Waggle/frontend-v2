@@ -112,8 +112,8 @@ export const useCreatePosts = () => {
   return useMutation({
     mutationFn: (postData: object) => createPosts(postData),
     onSuccess: (data) => {
-      mutate({ teamId: data.team.teamId, status: 'ACTIVE' });
-      navigate(`/team/${data.team.teamId}`);
+      mutate({ teamId: data.team.id, status: 'ACTIVE' });
+      navigate(`/team/${data.team.id}`);
     },
     onError: (err) => {
       console.error(err);
@@ -128,7 +128,7 @@ export const useUpdatePosts = () => {
     mutationFn: ({ postId, postData }: { postId: number; postData: object }) =>
       updatePosts(postId, postData),
     onSuccess: (data) => {
-      navigate(`/post/${data.postId}`);
+      navigate(`/post/${data.id}`);
     },
   });
 };
