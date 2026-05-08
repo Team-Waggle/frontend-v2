@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router';
 import { usePostLogout } from '../../hooks/useAuth';
 import { POSITION_CONVERTER } from '../../utils/position';
 import type { UserMeResponse } from '../../types/api/user';
@@ -17,6 +18,7 @@ const SidebarProfile = ({
   isLoggedIn: boolean;
   setIsNotificationOpen: (v: boolean) => void;
 }) => {
+  const navigate = useNavigate();
   const { mutate: logout } = usePostLogout();
 
   const hasToken = !!data;
@@ -35,20 +37,25 @@ const SidebarProfile = ({
 
   return (
     <div className="flex w-[25.8rem] items-center gap-[1rem] pr-[1rem]">
-      {profileImage}
-      <div className="flex w-[15.2rem] flex-col justify-center">
-        <span className="text-[1.6rem] font-semibold text-black-100">
-          {hasToken ? data?.username || '게스트' : '게스트'}
-        </span>
-        <span
-          className={`h-[2rem] text-[1.3rem] font-medium ${isLoggedIn ? 'text-black-60' : 'text-blue-60'}`}
-        >
-          {isLoggedIn && data?.position
-            ? POSITION_CONVERTER[data?.position]
-            : hasToken
-              ? '프로필을 완성해주세요'
-              : '로그인해주세요'}
-        </span>
+      <div
+        onClick={() => navigate(`/profile/${data.userId}`)}
+        className="flex cursor-pointer gap-[1rem]"
+      >
+        {profileImage}
+        <div className="flex w-[15.2rem] flex-col justify-center">
+          <span className="text-[1.6rem] font-semibold text-black-100">
+            {hasToken ? data?.username || '게스트' : '게스트'}
+          </span>
+          <span
+            className={`h-[2rem] text-[1.3rem] font-medium ${isLoggedIn ? 'text-black-60' : 'text-blue-60'}`}
+          >
+            {isLoggedIn && data?.position
+              ? POSITION_CONVERTER[data?.position]
+              : hasToken
+                ? '프로필을 완성해주세요'
+                : '로그인해주세요'}
+          </span>
+        </div>
       </div>
       {isLoggedIn && (
         <button
