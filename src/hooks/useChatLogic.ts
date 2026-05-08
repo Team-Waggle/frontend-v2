@@ -99,7 +99,7 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
     if (historyMessages.length === 0 && afterMessages.length === 0) return;
     const tempMsgs = useMessageStore
       .getState()
-      .realtimeMessages.filter((m) => m.messageId >= TEMP_ID_BASE);
+      .realtimeMessages.filter((m) => m.id >= TEMP_ID_BASE);
     if (tempMsgs.length === 0) return;
     const combined = [...historyMessages, ...afterMessages];
     const allConfirmed = tempMsgs.every((temp) => {
@@ -107,7 +107,7 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
       return combined.some(
         (h) =>
           h.content === temp.content &&
-          String(h.sender.userId) === String(temp.sender.userId) &&
+          String(h.sender.id) === String(temp.sender.id) &&
           Math.abs(new Date(h.createdAt).getTime() - tempTime) < 30_000,
       );
     });
@@ -120,32 +120,32 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
     const partnerIdStr = String(partnerId);
     const relevantRealtime = realtimeMessages.filter(
       (m) =>
-        String(m.sender.userId) === partnerIdStr ||
-        String(m.receiver.userId) === partnerIdStr,
+        String(m.sender.id) === partnerIdStr ||
+        String(m.receiver.id) === partnerIdStr,
     );
     const realtimeToInclude = hasNextAfterPage
-      ? relevantRealtime.filter((m) => m.messageId >= TEMP_ID_BASE)
+      ? relevantRealtime.filter((m) => m.id >= TEMP_ID_BASE)
       : relevantRealtime;
     [...historyMessages, ...afterMessages, ...realtimeToInclude].forEach((m) =>
-      map.set(m.messageId, m),
+      map.set(m.id, m),
     );
-    return [...map.values()].sort((a, b) => a.messageId - b.messageId);
+    return [...map.values()].sort((a, b) => a.id - b.id);
   }, [historyMessages, afterMessages, realtimeMessages, partnerId, hasNextAfterPage]);
 
   // 파트너 정보
   const partnerInfo = useMemo(() => {
     const fromConversations = conversationsData?.pages
       .flatMap((p) => p.data)
-      .find((c) => c.partner.userId === partnerId)?.partner;
+      .find((c) => c.partner.id === partnerId)?.partner;
     if (fromConversations) return fromConversations;
     const fromMessages =
-      allMessages.find((m) => m.sender.userId === partnerId && m.sender.username)?.sender ??
-      allMessages.find((m) => m.receiver.userId === partnerId && m.receiver.username)?.receiver ??
+      allMessages.find((m) => m.sender.id === partnerId && m.sender.username)?.sender ??
+      allMessages.find((m) => m.receiver.id === partnerId && m.receiver.username)?.receiver ??
       null;
     if (fromMessages) return fromMessages;
     if (locationState?.username) {
       return {
-        userId: partnerId,
+        id: partnerId,
         username: locationState.username,
         position: locationState.position ?? null,
         profileImageUrl: locationState.profileImageUrl ?? null,
@@ -153,7 +153,7 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
     }
     if (partnerDetail) {
       return {
-        userId: partnerDetail.userId,
+        id: partnerDetail.id,
         username: partnerDetail.username,
         position: partnerDetail.position ?? null,
         profileImageUrl: partnerDetail.profileImageUrl ?? null,
@@ -178,13 +178,13 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
     return dateGroups.map(({ date, messages }) => {
       const bubbleGroups: BubbleGroup[] = [];
       messages.forEach((msg) => {
-        const isMine = msg.sender.userId === me?.userId;
+        const isMine = msg.sender.id === me?.id;
         const time = formatKstHhMm(msg.createdAt);
-        const isTemp = msg.messageId >= TEMP_ID_BASE;
+        const isTemp = msg.id >= TEMP_ID_BASE;
         const last = bubbleGroups[bubbleGroups.length - 1];
         if (last && last.isMine === isMine && last.time === time) {
           last.contents.push(msg.content);
-          last.messageIds.push(msg.messageId);
+          last.messageIds.push(msg.id);
           if (isTemp) last.isTemp = true;
         } else {
           bubbleGroups.push({
@@ -192,15 +192,15 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
             contents: [msg.content],
             time,
             profileImageUrl: msg.sender.profileImageUrl,
-            key: msg.messageId,
-            messageIds: [msg.messageId],
+            key: msg.id,
+            messageIds: [msg.id],
             isTemp,
           });
         }
       });
       return { date, bubbleGroups };
     });
-  }, [allMessages, me?.userId]);
+  }, [allMessages, me?.id]);
 
   // 스크롤 감지 → 바닥 여부 기록 + 위로 올리면 과거 로드 + 내리면 이후 로드
   const handleScroll = () => {
@@ -240,7 +240,7 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
     prevScrollHeightRef.current = 0;
   }, [historyData]);
 
-  const lastMessageId = allMessages[allMessages.length - 1]?.messageId;
+  const lastMessageId = allMessages[allMessages.length - 1]?.id;
 
   // 첫 로드 / 새 메시지 수신·전송 시 최하단 스크롤 (highlight 있으면 해당 메시지로 이동)
   useLayoutEffect(() => {
@@ -298,24 +298,24 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
     // 전송 즉시 임시 메시지로 화면에 표시
     if (me) {
       appendRealtimeMessage({
-        messageId: tempId,
+        id: tempId,
         sender: {
-          userId: me.userId,
+          id: me.id,
           username: me.username,
           profileImageUrl: me.profileImageUrl,
           position: me.position,
         },
-        receiver: { userId: partnerId, username: null, profileImageUrl: null, position: '' },
+        receiver: { id: partnerId, username: null, profileImageUrl: null, position: '' },
         content,
         createdAt: now,
         readAt: null,
       });
 
       // 대화 목록 낙관적 업데이트
-      const updatedLastMessage = { messageId: tempId, content, createdAt: now };
+      const updatedLastMessage = { id: tempId, content, createdAt: now };
       const conversationsCache = queryClient.getQueryData<InfiniteData<CursorResponse<ConversationResponse>>>(['conversations', undefined]);
       const exists = conversationsCache?.pages.some((page) =>
-        page.data.some((conv) => String(conv.partner.userId) === String(partnerId)),
+        page.data.some((conv) => String(conv.partner.id) === String(partnerId)),
       );
 
       if (exists) {
@@ -328,7 +328,7 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
               pages: old.pages.map((page) => ({
                 ...page,
                 data: page.data.map((conv) =>
-                  String(conv.partner.userId) === String(partnerId)
+                  String(conv.partner.id) === String(partnerId)
                     ? { ...conv, lastMessage: updatedLastMessage }
                     : conv,
                 ),
@@ -339,7 +339,7 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
       } else if (partnerInfo && conversationsCache) {
         const newConversation: ConversationResponse = {
           partner: {
-            userId: partnerInfo.userId,
+            id: partnerInfo.id,
             username: partnerInfo.username,
             profileImageUrl: partnerInfo.profileImageUrl,
             position: partnerInfo.position ?? '',

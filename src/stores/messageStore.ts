@@ -55,7 +55,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 
   clearTempMessages: () =>
     set((state) => ({
-      realtimeMessages: state.realtimeMessages.filter((m) => m.messageId < TEMP_ID_BASE),
+      realtimeMessages: state.realtimeMessages.filter((m) => m.id < TEMP_ID_BASE),
       failedTempIds: [],
     })),
 
@@ -63,7 +63,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     set((state) => {
       const failed = new Set(state.failedTempIds);
       return {
-        realtimeMessages: state.realtimeMessages.filter((m) => !failed.has(m.messageId)),
+        realtimeMessages: state.realtimeMessages.filter((m) => !failed.has(m.id)),
         failedTempIds: [],
       };
     }),

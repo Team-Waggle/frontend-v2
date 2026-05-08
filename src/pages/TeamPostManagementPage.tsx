@@ -28,9 +28,9 @@ const TeamPostManagementPage = () => {
           ) : (
             posts.map((post) => (
               <TeamPostItem
-                key={post.postId}
+                key={post.id}
                 {...post}
-                onClick={() => navigate(`/post/${post.postId}`)}
+                onClick={() => navigate(`/post/${post.id}`)}
               />
             ))
           )}

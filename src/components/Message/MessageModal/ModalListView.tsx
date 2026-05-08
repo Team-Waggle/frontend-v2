@@ -78,9 +78,9 @@ const ModalListView = () => {
           <ul className="w-full">
             {conversations.map((conversation) => (
               <MessageListItem
-                key={conversation.partner.userId}
+                key={conversation.partner.id}
                 conversation={conversation}
-                onClick={() => setPartnerId(conversation.partner.userId)}
+                onClick={() => setPartnerId(conversation.partner.id)}
               />
             ))}
           </ul>

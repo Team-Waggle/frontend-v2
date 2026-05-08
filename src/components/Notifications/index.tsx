@@ -36,7 +36,7 @@ const NOTIFICATION_CONFIG: Record<NotificationType, NotificationConfig> = {
       `${data?.metadata.triggeredBy.username}님이 ${data?.metadata.team.name}의
     ${data?.metadata.post.title}/${POSITION_CONVERTER[data?.metadata.position]}에 지원했어요. 지원서를 확인해 주세요.`,
     getRoute: (data) =>
-      `/team/${data?.metadata.team.teamId}/applicants?postId=${data?.metadata.post.postId}`,
+      `/team/${data?.metadata.team.id}/applicants?postId=${data?.metadata.post.id}`,
   },
   APPLICATION_REJECTED: {
     Icon: CicleCheckIcon,
@@ -50,48 +50,48 @@ const NOTIFICATION_CONFIG: Record<NotificationType, NotificationConfig> = {
     title: '아직 확인하지 않은 지원서가 있어요',
     getMessage: (data) =>
       `${data?.metadata.team.name}에 확인이 필요한 지원서가 ${data?.metadata.unreadApplicationCount}건 있어요.`,
-    getRoute: (data) => `/team/${data?.metadata.team.teamId}/applicants`,
+    getRoute: (data) => `/team/${data?.metadata.team.id}/applicants`,
   },
   TEAM_JOINED: {
     Icon: PersonsPlusIcon,
     title: '팀 합류가 완료됐어요',
     getMessage: (data) =>
       `이제 ${data?.metadata.team.name} 팀원이에요. 팀 공간에서 활동을 시작해 보세요.`,
-    getRoute: (data) => `/team/${data?.metadata.team.teamId}`,
+    getRoute: (data) => `/team/${data?.metadata.team.id}`,
   },
   MEMBER_JOINED: {
     Icon: PersonsPlusIcon,
     title: '팀원 합류',
     getMessage: (data) =>
       `${data?.metadata.triggeredBy.username}님이 ${data?.metadata.team.name}에 합류했습니다. 프로필을 확인해보세요.`,
-    getRoute: (data) => `/team/${data?.metadata.team.teamId}`,
+    getRoute: (data) => `/team/${data?.metadata.team.id}`,
   },
   MEMBER_LEFT: {
     Icon: PersonsPlusIcon,
     title: '팀 상태 변경 안내',
     getMessage: (data) =>
       `${data?.metadata.triggeredBy.username}님이 ${data?.metadata.team.name}에서 나갔어요.`,
-    getRoute: (data) => `/team/${data?.metadata.team.teamId}`,
+    getRoute: (data) => `/team/${data?.metadata.team.id}`,
   },
   MEMBER_REMOVED: {
     Icon: PersonsPlusIcon,
     title: '팀 상태 변경 안내',
     getMessage: (data) => `${data.metadata.team.name}에서 추방됐어요.`,
-    getRoute: (data) => `/team/${data.metadata.team.teamId}`,
+    getRoute: (data) => `/team/${data.metadata.team.id}`,
   },
   REVIEW_REQUESTED: {
     Icon: ReviewIcon,
     title: '리뷰를 작성해 주세요',
     getMessage: () =>
       '프로젝트가 종료되었어요. 팀원들과의 협업 경험을 평가해 주세요.',
-    getRoute: (data) => `/team/${data.metadata.team.teamId}`,
+    getRoute: (data) => `/team/${data.metadata.team.id}`,
   },
   REVIEW_RECEIVED: {
     Icon: ReviewIcon,
     title: '리뷰가 도착했어요',
     getMessage: (data) =>
       `${data?.metadata.team.name}에서 익명의와글님이 리뷰를 남겼어요.`,
-    getRoute: (data) => `/team/${data.metadata.team.teamId}`,
+    getRoute: (data) => `/team/${data.metadata.team.id}`,
   },
 };
 
@@ -160,9 +160,9 @@ const Notifications = ({
               const Icon = config.Icon;
               return (
                 <div
-                  key={data.notificationId}
+                  key={data.id}
                   onClick={() => {
-                    patchRead([data.notificationId], {
+                    patchRead([data.id], {
                       onSuccess: () => {
                         const route = config.getRoute?.(data);
                         if (route) navigate(route);

@@ -7,7 +7,7 @@ import BaseTag from '../common/Tag';
 import ChevronDownIcon from '../../assets/icons/normal/chevron/ic_chevronDown.svg?react';
 
 interface SubItem {
-  teamId: number | string;
+  id: number | string;
   name: string;
   profileImageUrl?: string;
 }
@@ -127,11 +127,11 @@ const SidebarItem = ({
             >
               {subItems.map((team) => (
                 <button
-                  key={team.teamId}
+                  key={team.id}
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsNotificationOpen(false);
-                    navigate(`/team/${team.teamId}`);
+                    navigate(`/team/${team.id}`);
                   }}
                   className="group flex h-[4.4rem] w-full items-center gap-[0.4rem] rounded-[0.8rem] px-[2.4rem] hover:bg-hover-5"
                 >
@@ -144,7 +144,7 @@ const SidebarItem = ({
                   )}
                   <span
                     className={`text-[1.4rem] ${
-                      Number(team.teamId) === Number(teamId)
+                      Number(team.id) === Number(teamId)
                         ? 'font-bold text-blue-100'
                         : 'font-medium text-black-60 group-hover:text-black-80'
                     }`}

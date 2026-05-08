@@ -147,7 +147,7 @@ const TeamFormPage = () => {
 
       createTeam(data, {
         onSuccess: (responseData) => {
-          navigate(`/team/${responseData.teamId}`);
+          navigate(`/team/${responseData.id}`);
         },
         onError: (error) => console.error(error),
       });

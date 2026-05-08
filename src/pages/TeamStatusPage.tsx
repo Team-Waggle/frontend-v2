@@ -73,7 +73,7 @@ const TeamStatusPage = () => {
   const navigate = useNavigate();
   const { data } = useGetUserMeTeam();
   const { teamId } = useParams<{ teamId: string }>();
-  const currentTeam = data?.find((team) => team.teamId === Number(teamId));
+  const currentTeam = data?.find((team) => team.id === Number(teamId));
   const { mutate } = usePatchTeamStatus();
   const queryClient = useQueryClient();
 
@@ -85,7 +85,7 @@ const TeamStatusPage = () => {
     } else if (currentTeam?.status === 'ACTIVE') {
       setIsOpenModal(true);
     } else if (currentTeam?.status === 'COMPLETED') {
-      navigate(`/team/${currentTeam?.teamId}`);
+      navigate(`/team/${currentTeam?.id}`);
     }
   };
 
@@ -128,7 +128,7 @@ const TeamStatusPage = () => {
         isOpen={isOpenModal}
         onClose={() => setIsOpenModal(false)}
         handleDone={() => {
-          const teamId = currentTeam?.teamId;
+          const teamId = currentTeam?.id;
           if (!teamId) return;
           mutate(
             { teamId, status: 'COMPLETED' },
