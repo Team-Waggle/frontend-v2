@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { useGetPostDetail, usePatchPostClose } from '../hooks/usePost';
-import { useGetMyApplications, useGetUserMe } from '../hooks/useUser';
+import { useGetUserMe } from '../hooks/useUser';
 import usePostDetailApplyButtonPosition from '../hooks/usePostDetailApplyButtonPosition';
 import usePostDetailFloatingSideCard from '../hooks/usePostDetailFloatingSideCard';
 
@@ -83,7 +83,6 @@ const PostDetailPage = () => {
 
   const { data: postDetail } = useGetPostDetail(parsedPostId);
   const { data: me } = useGetUserMe();
-  const { data: myApplications } = useGetMyApplications();
   const { mutate: patchPostClose, isPending: isClosing } = usePatchPostClose();
 
   const leftColRef = useRef<HTMLDivElement | null>(null);
@@ -93,11 +92,10 @@ const PostDetailPage = () => {
 
   usePostDetailFloatingSideCard(leftColRef, sideWrapRef);
 
-  const myApplicationStatus =
-    myApplications?.find((app) => app.postId === parsedPostId)?.status ?? null;
+  const myApplicationStatus = postDetail?.applicationStatus ?? null;
 
-  const myUserId = me?.userId;
-  const postUserId = postDetail?.user?.userId;
+  const myUserId = me?.id;
+  const postUserId = postDetail?.user?.id;
 
   const isMyPost =
     Boolean(myUserId) && Boolean(postUserId) && myUserId === postUserId;
@@ -163,8 +161,8 @@ const PostDetailPage = () => {
                   <div
                     className="flex cursor-pointer items-center gap-[0.8rem]"
                     onClick={() => {
-                      if (postDetail?.user?.userId) {
-                        navigate(`/profile/${postDetail.user.userId}`);
+                      if (postDetail?.user?.id) {
+                        navigate(`/profile/${postDetail.user.id}`);
                       }
                     }}
                   >
@@ -263,11 +261,11 @@ const PostDetailPage = () => {
               createdAt={postDetail?.team?.createdAt}
               description={postDetail?.team?.description}
               onClick={() => {
-                if (!postDetail?.team?.teamId) {
+                if (!postDetail?.team?.id) {
                   return;
                 }
 
-                navigate(`/team/${postDetail.team.teamId}`);
+                navigate(`/team/${postDetail.team.id}`);
               }}
             />
             <div className="w-[68.8rem]">
@@ -281,7 +279,7 @@ const PostDetailPage = () => {
               <BaseButton
                 size="lg"
                 color="secondary"
-                disabled={!postDetail?.isRecruiting || isClosing}
+                disabled={!postDetail?.recruiting || isClosing}
                 onClick={() =>
                   patchPostClose({ postId: parsedPostId, status: 'CLOSED' })
                 }
@@ -291,7 +289,7 @@ const PostDetailPage = () => {
               <BaseButton
                 size="lg"
                 color="primary"
-                disabled={!postDetail?.isRecruiting}
+                disabled={!postDetail?.recruiting}
                 onClick={() => navigate(`/post/${parsedPostId}/edit`)}
               >
                 수정하기
@@ -304,7 +302,7 @@ const PostDetailPage = () => {
         <div className="flex self-start pt-[12.7rem]">
           <div ref={sideWrapRef} className="self-start will-change-transform">
             <SideTeamCard
-              memberId={postDetail?.user?.userId}
+              memberId={postDetail?.user?.id}
               title={postDetail?.user?.username}
               position={postDetail?.user?.position}
               profileImageUrl={postDetail?.user?.profileImageUrl}
@@ -319,7 +317,7 @@ const PostDetailPage = () => {
         {/** 추후 기획에 따라 변경 될 예정 */}
         {!isMyPost &&
           applyButtonPx !== null &&
-          postDetail?.isRecruiting &&
+          postDetail?.recruiting &&
           myApplicationStatus !== 'APPROVED' &&
           myApplicationStatus !== 'REJECTED' && (
             <div
