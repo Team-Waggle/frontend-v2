@@ -27,7 +27,7 @@ const SIDEBAR_MENUS: SidebarMenu[] = [
     label: '내팀',
     icon: <FaceSmileIcon />,
     getPath: ({ teamData }) =>
-      teamData?.[0]?.teamId ? `/team/${teamData[0].teamId}` : '/team/new',
+      teamData?.[0]?.id ? `/team/${teamData[0].id}` : '/team/new',
   },
   {
     key: 'notification',
@@ -50,8 +50,8 @@ const SIDEBAR_MENUS: SidebarMenu[] = [
 ];
 
 type NotificationCountDataType = {
-  totalCount: number;
-  unreadCount: number;
+  total: number;
+  unread: number;
 };
 
 interface SidebarMenuProps {
@@ -84,7 +84,7 @@ const SidebarMenu = ({
 
   const teamSubItems = isLoggedIn
     ? teamData.map((team) => ({
-        teamId: team.teamId,
+        id: team.id,
         name: team.name,
         profileImageUrl: team.profileImageUrl,
       }))
@@ -126,7 +126,7 @@ const SidebarMenu = ({
             isActive={isActive}
             subItems={key === 'team' ? teamSubItems : undefined}
             onClick={handleClick}
-            unreadNotificationCount={notificationCountData?.unreadCount}
+            unreadNotificationCount={notificationCountData?.unread}
             setIsNotificationOpen={setIsNotificationOpen}
           />
         ) : (
@@ -137,7 +137,7 @@ const SidebarMenu = ({
             isActive={isActive}
             subItems={key === 'team' ? teamSubItems : undefined}
             onClick={handleClick}
-            unreadNotificationCount={notificationCountData?.unreadCount}
+            unreadNotificationCount={notificationCountData?.unread}
             setIsNotificationOpen={setIsNotificationOpen}
           />
         );

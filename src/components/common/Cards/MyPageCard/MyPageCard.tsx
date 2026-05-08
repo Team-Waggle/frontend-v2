@@ -13,9 +13,9 @@ interface MyPageCardProps {
   profileImageUrl?: string;
   status?: 'PREPARING' | 'ACTIVE' | 'COMPLETED';
   isMyProfile?: boolean;
-  isVisible?: boolean;
+  visible?: boolean;
   teamId?: number;
-  onVisibilityToggle?: (teamId: number, isVisible: boolean) => void;
+  onVisibilityToggle?: (teamId: number, visible: boolean) => void;
 }
 
 const MyPageCard = ({
@@ -26,7 +26,7 @@ const MyPageCard = ({
   profileImageUrl,
   status,
   isMyProfile,
-  isVisible,
+  visible,
   teamId,
   onVisibilityToggle,
 }: MyPageCardProps) => {
@@ -39,7 +39,7 @@ const MyPageCard = ({
 
   return (
     <article
-      className={`flex w-full max-w-[49.4rem] cursor-pointer items-start gap-[1.6rem] rounded-[1.6rem] border border-solid border-black-30 bg-black-5 p-[2.4rem] ${isVisible === false ? 'opacity-60' : ''}`}
+      className={`flex w-full max-w-[49.4rem] cursor-pointer items-start gap-[1.6rem] rounded-[1.6rem] border border-solid border-black-30 bg-black-5 p-[2.4rem] ${visible === false ? 'opacity-60' : ''}`}
       onClick={handleCardClick}
     >
       {/** 팀 이미지 */}
@@ -70,7 +70,7 @@ const MyPageCard = ({
               </div>
             </div>
             {isMyProfile &&
-              (isVisible ? (
+              (visible ? (
                 <IcUnlock
                   className="h-[2rem] w-[2rem] cursor-pointer text-black-40"
                   onClick={(e) => {

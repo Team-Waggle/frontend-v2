@@ -1,7 +1,7 @@
 import type { PositionType } from './posts';
 
 export type TeamResponse = {
-  teamId: number;
+  id: number;
   name: string;
   description: string;
   status: 'PREPARING' | 'ACTIVE' | 'COMPLETED';
@@ -10,13 +10,13 @@ export type TeamResponse = {
   memberCount: number;
   position: string;
   role: 'LEADER' | 'MANAGER' | 'MEMBER';
-  isVisible: boolean;
+  visible: boolean;
   createdAt?: string;
   updatedAt?: string;
 };
 
 export type MemberResponse = {
-  memberId: number;
+  id: number;
   teamId: number;
   userId: number;
   role: 'LEADER' | 'MANAGER' | 'MEMBER';
@@ -30,18 +30,18 @@ export type MemberResponse = {
 };
 
 export type ApplicantResponse = {
-  applicationId: number;
+  id: number;
   position: PositionType;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   teamId: number;
   postId: number;
   user: {
-    userId: string;
+    id: string;
     username: string;
     temperature: number;
     profileImageUrl: string;
   };
-  isRead: boolean;
+  read: boolean;
   detail: string;
   portfolioUrls: string[];
   createdAt: string;
@@ -66,20 +66,20 @@ export type NotificationType =
   | 'REVIEW_RECEIVED';
 
 export type NotificationResponse = {
-  notificationId: number;
+  id: number;
   type: NotificationType;
   metadata: {
     post: {
-      postId: number;
+      id: number;
       title: string;
     };
     team: {
-      teamId: number;
+      id: number;
       name: string;
       profileImageUrl: string;
     };
     triggeredBy: {
-      userId: string;
+      id: string;
       username: string;
     };
     position: PositionType;

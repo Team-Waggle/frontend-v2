@@ -46,7 +46,7 @@ const TeamHomePage = () => {
 
   const { data: teamDetail } = useGetTeamDetail(parsedTeamId);
   const { data: teamMembers } = useGetTeamMembers(parsedTeamId);
-  const { data: teamApplications } = useGetTeamPosts(parsedTeamId);
+  const { data: teamPosts } = useGetTeamPosts(parsedTeamId);
   const { data: me } = useGetUserMe();
 
   const patchTeamMemberRoleMutation = usePatchTeamMemberRole(parsedTeamId);
@@ -56,11 +56,11 @@ const TeamHomePage = () => {
   const [activeTeamMember, setActiveTeamMember] = useState<number | null>(null);
   const [imgError, setImgError] = useState(false);
 
-  const applications = teamApplications ?? [];
+  const posts = teamPosts ?? [];
 
   const members = teamMembers ?? [];
 
-  const myMember = members.find((member) => member.userId === me?.userId);
+  const myMember = members.find((member) => member.userId === me?.id);
   const isLeaderOrManager =
     !myMember?.deletedAt &&
     (myMember?.role === 'LEADER' || myMember?.role === 'MANAGER');
@@ -68,24 +68,24 @@ const TeamHomePage = () => {
   const sortedMembers = useMemo(() => {
     const visibleMembers = myMember
       ? myMember.deletedAt
-        ? members.filter((m) => !m.deletedAt || m.userId === me?.userId)
+        ? members.filter((m) => !m.deletedAt || m.userId === me?.id)
         : members
       : members.filter((m) => !m.deletedAt);
 
-    if (!me?.userId) {
+    if (!me?.id) {
       return visibleMembers;
     }
 
     return [...visibleMembers].sort((a, b) => {
-      const aIsMe = a.userId === me.userId ? 1 : 0;
-      const bIsMe = b.userId === me.userId ? 1 : 0;
+      const aIsMe = a.userId === me.id ? 1 : 0;
+      const bIsMe = b.userId === me.id ? 1 : 0;
       if (bIsMe !== aIsMe) return bIsMe - aIsMe;
 
       const aIsDeleted = a.deletedAt ? 1 : 0;
       const bIsDeleted = b.deletedAt ? 1 : 0;
       return aIsDeleted - bIsDeleted;
     });
-  }, [members, me?.userId, myMember]);
+  }, [members, me?.id, myMember]);
 
   const handleAssignManager = (memberId: number) => {
     patchTeamMemberRoleMutation.mutate({
@@ -104,7 +104,7 @@ const TeamHomePage = () => {
   const activeMemberCount = members.filter((m) => !m.deletedAt).length;
 
   const handleKickMember = (memberId: number) => {
-    const isSelf = memberId === myMember?.memberId;
+    const isSelf = memberId === myMember?.id;
 
     if (isSelf) {
       if (activeMemberCount === 1) {
@@ -140,7 +140,7 @@ const TeamHomePage = () => {
     useHorizontalScroll({
       itemSelector: '[data-main-card="true"]',
       gapPx: 18,
-      deps: [applications.length],
+      deps: [posts.length],
     });
 
   return (
@@ -276,18 +276,16 @@ const TeamHomePage = () => {
                 ref={trackRef}
                 className="flex items-center gap-[1.8rem] overflow-x-auto scroll-smooth scrollbar-hide"
               >
-                {applications.map((application) => {
+                {posts.map((post) => {
                   const positionList: string[] = Array.from(
                     new Set(
-                      application.recruitments
-                        .map((r) => r.position)
-                        .filter(Boolean),
+                      post.recruitments.map((r) => r.position).filter(Boolean),
                     ),
                   );
 
                   const skillsList: string[] = Array.from(
                     new Set(
-                      application.recruitments.flatMap((r) =>
+                      post.recruitments.flatMap((r) =>
                         (r.skills ?? []).map((s) => s.trim()).filter(Boolean),
                       ),
                     ),
@@ -295,20 +293,20 @@ const TeamHomePage = () => {
                   return (
                     <MainCard
                       className="!w-[36.8rem]"
-                      key={application.postId}
+                      key={post.id}
                       variant="team"
-                      mainCardTitle={application.title}
+                      mainCardTitle={post.title}
                       mainCardPositions={positionList}
                       mainCardSkills={skillsList}
                       mainCardCreatedAt={
-                        application.createdAt
-                          ? formatPostListCreatedAt(application.createdAt)
+                        post.createdAt
+                          ? formatPostListCreatedAt(post.createdAt)
                           : ''
                       }
-                      isActive={activeCard === application.postId}
+                      isActive={activeCard === post.id}
                       onClick={() => {
-                        setActiveCard(application.postId);
-                        navigate(`/post/${application.postId}`);
+                        setActiveCard(post.id);
+                        navigate(`/post/${post.id}`);
                       }}
                     />
                   );
@@ -329,16 +327,16 @@ const TeamHomePage = () => {
             <div className="grid w-full gap-x-[1.8rem] gap-y-[2.4rem] self-stretch [grid-template-columns:repeat(auto-fit,23.4rem)]">
               {sortedMembers.map((member) => (
                 <SideTeamCard
-                  key={member.memberId}
+                  key={member.id}
                   variant="team"
-                  memberId={member.memberId}
+                  memberId={member.id}
                   userId={member.userId}
                   title={member.username}
                   status={teamDetail?.status}
                   profileImageUrl={member.profileImageUrl}
                   position={member.position}
                   skills={member.skills}
-                  isMe={member.userId === me?.userId}
+                  isMe={member.userId === me?.id}
                   isLeader={member.role === 'LEADER'}
                   isManager={member.role === 'MANAGER'}
                   canManage={
@@ -347,9 +345,9 @@ const TeamHomePage = () => {
                     member.role !== 'LEADER'
                   }
                   disabled={!!member.deletedAt}
-                  isActive={activeTeamMember === member.memberId}
+                  isActive={activeTeamMember === member.id}
                   onClick={() => {
-                    setActiveTeamMember(member.memberId);
+                    setActiveTeamMember(member.id);
                   }}
                   onAssignManager={handleAssignManager}
                   onDemoteManager={handleDemoteManager}

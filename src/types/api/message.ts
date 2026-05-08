@@ -1,12 +1,12 @@
 export interface MessagePartnerResponse {
-  userId: string;
+  id: string;
   username: string | null;
   profileImageUrl: string | null;
   position: string;
 }
 
 export interface MessageResponse {
-  messageId: number;
+  id: number;
   sender: MessagePartnerResponse;
   receiver: MessagePartnerResponse;
   content: string;
@@ -15,7 +15,7 @@ export interface MessageResponse {
 }
 
 export interface LastMessage {
-  messageId: number;
+  id: number;
   content: string;
   createdAt: string;
 }

@@ -7,8 +7,8 @@ const ProfileRedirect = () => {
   const { data } = useGetUserMe();
 
   useEffect(() => {
-    if (data?.userId) {
-      navigate(`/profile/${data.userId}`, { replace: true });
+    if (data?.id) {
+      navigate(`/profile/${data.id}`, { replace: true });
     }
   }, [data, navigate]);
 

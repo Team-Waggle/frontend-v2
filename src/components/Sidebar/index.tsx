@@ -38,7 +38,7 @@ const Sidebar = () => {
   const isLoggedIn = !!accessToken;
 
   const isProfileComplete =
-    isLoggedIn && isProfileCompleteData?.isComplete === true;
+    isLoggedIn && isProfileCompleteData?.complete === true;
 
   useModal({
     isOpen: isNotificationOpen,
@@ -117,7 +117,7 @@ const Sidebar = () => {
             setIsLoginModalOpen={() => setIsLoginModalOpen(true)}
             isFolded={isFolded}
             teamData={isProfileComplete ? (myteamData ?? []) : []}
-            userId={myData?.userId}
+            userId={myData?.id}
             notificationCountData={notificationCountData}
             isNotificationOpen={isNotificationOpen}
             setIsNotificationOpen={setIsNotificationOpen}

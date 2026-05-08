@@ -15,20 +15,20 @@ import { toSkillLabel } from '../../utils/skill';
 import { SkillIconLarge } from '../../utils/SkillIcon';
 
 const TeamPostItem = ({
-  postId,
+  id,
   title,
   recruitments,
   applicantCount,
   createdAt,
-  isRecruiting,
+  recruiting,
   onClick,
 }: PostDetailResponse & { onClick?: () => void }) => {
-  const [isClosed, setIsClosed] = useState(!isRecruiting);
+  const [isClosed, setIsClosed] = useState(!recruiting);
   const { mutate: patchClose, isPending } = usePatchPostClose();
 
   useEffect(() => {
-    setIsClosed(!isRecruiting);
-  }, [isRecruiting]);
+    setIsClosed(!recruiting);
+  }, [recruiting]);
 
   const roles = recruitments
     .map((r) => POSITION_CONVERTER[r.position] ?? r.position)
@@ -111,7 +111,7 @@ const TeamPostItem = ({
           const newStatus = isClosed ? 'RECRUITING' : 'CLOSED';
           setIsClosed(!isClosed);
           patchClose(
-            { postId, status: newStatus },
+            { postId: id, status: newStatus },
             { onError: () => setIsClosed((prev) => !prev) },
           );
         }}

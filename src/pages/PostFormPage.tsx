@@ -59,7 +59,7 @@ const PostFormPage = () => {
   useEffect(() => {
     if (isEditMode && myPostData) {
       reset({
-        teamId: myPostData.team.teamId,
+        teamId: myPostData.team.id,
         title: myPostData.title,
         recruitments: myPostData.recruitments.map((item) => ({
           ...item,

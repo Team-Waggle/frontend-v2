@@ -94,7 +94,7 @@ const TeamApplicantPage = () => {
   const hasUnreadApplicantByPost = (postId: number) =>
     applicantsForUnreadIndicator?.pages.some((page) =>
       page.data.some(
-        (applicant) => applicant.postId === postId && !applicant.isRead,
+        (applicant) => applicant.postId === postId && !applicant.read,
       ),
     );
 
@@ -150,11 +150,11 @@ const TeamApplicantPage = () => {
               ) : (
                 postData?.map((data) => (
                   <div
-                    key={data.postId}
+                    key={data.id}
                     onClick={() => {
                       setSearchParams((prev) => {
                         const newParams = new URLSearchParams(prev);
-                        newParams.set('postId', String(data.postId));
+                        newParams.set('postId', String(data.id));
                         newParams.delete('applicationId'); // 같이 초기화 추천
                         return newParams;
                       });
@@ -165,7 +165,7 @@ const TeamApplicantPage = () => {
                     <div className="line-clamp-2 flex h-[4.6rem] w-[30.8rem] items-center text-[1.5rem] font-medium text-black-100">
                       {data.title}
                     </div>
-                    {hasUnreadApplicantByPost(data.postId) && (
+                    {hasUnreadApplicantByPost(data.id) && (
                       <div className="h-[0.8rem] w-[0.8rem] rounded-full bg-blue-80" />
                     )}
                   </div>
@@ -196,11 +196,11 @@ const TeamApplicantPage = () => {
                     applicant.portfolioUrls,
                   );
                   const isExpanded = expandedAppIds.has(
-                    applicant.applicationId,
+                    applicant.id,
                   );
 
                   return (
-                    <div key={applicant.applicationId} className="px-[2.4rem]">
+                    <div key={applicant.id} className="px-[2.4rem]">
                       <div
                         className={`${index === 0 ? '' : 'border-t border-black-10'}`}
                       >
@@ -212,7 +212,7 @@ const TeamApplicantPage = () => {
                                 <div
                                   onClick={() =>
                                     navigate(
-                                      `/profile/${applicant.user.userId}`,
+                                      `/profile/${applicant.user.id}`,
                                     )
                                   }
                                   className="flex cursor-pointer gap-[0.7rem]"
@@ -233,7 +233,7 @@ const TeamApplicantPage = () => {
                                   shape="circle"
                                   onClick={() =>
                                     navigate(
-                                      `/message/${applicant.user.userId}`,
+                                      `/message/${applicant.user.id}`,
                                     )
                                   }
                                   className="!h-[2.8rem] !w-[2.8rem]"
@@ -292,7 +292,7 @@ const TeamApplicantPage = () => {
                                   disabled={applicant.status !== 'PENDING'}
                                   onClick={() => {
                                     setSelectedApplicantId(
-                                      applicant.applicationId,
+                                      applicant.id,
                                     );
                                     setIsApproveModalOpen(true);
                                   }}
@@ -306,7 +306,7 @@ const TeamApplicantPage = () => {
                                   disabled={applicant.status !== 'PENDING'}
                                   onClick={() => {
                                     setSelectedApplicantId(
-                                      applicant.applicationId,
+                                      applicant.id,
                                     );
                                     setIsRejectModalOpen(true);
                                   }}
@@ -317,8 +317,8 @@ const TeamApplicantPage = () => {
                               </div>
                               <ChevronDownIcon
                                 onClick={() => {
-                                  if (!applicant.isRead) {
-                                    markAsRead(applicant.applicationId);
+                                  if (!applicant.read) {
+                                    markAsRead(applicant.id);
                                   }
 
                                   if (!canExpandApplicant) return;
@@ -326,17 +326,17 @@ const TeamApplicantPage = () => {
                                   setExpandedAppIds((prev) => {
                                     const next = new Set(prev);
 
-                                    if (next.has(applicant.applicationId)) {
-                                      next.delete(applicant.applicationId);
+                                    if (next.has(applicant.id)) {
+                                      next.delete(applicant.id);
                                     } else {
-                                      next.add(applicant.applicationId);
+                                      next.add(applicant.id);
                                     }
 
                                     return next;
                                   });
                                 }}
                                 className={`text-black-50 transition-transform ${
-                                  canExpandApplicant || !applicant.isRead
+                                  canExpandApplicant || !applicant.read
                                     ? 'cursor-pointer'
                                     : 'cursor-default'
                                 } ${isExpanded ? 'rotate-180' : ''}`}

@@ -82,7 +82,7 @@ const TeamStatusPage = () => {
   const { data: myTeamData } = useGetUserMeTeam();
   const { teamId } = useParams<{ teamId: string }>();
   const currentTeam = myTeamData?.find(
-    (team) => team.teamId === Number(teamId),
+    (team) => team.id === Number(teamId),
   );
   const { data: teamPosts } = useGetTeamPosts(Number(teamId));
 
@@ -99,7 +99,7 @@ const TeamStatusPage = () => {
     } else if (currentTeam?.status === 'ACTIVE') {
       setIsOpenModal(true);
     } else if (currentTeam?.status === 'COMPLETED') {
-      navigate(`/team/${currentTeam?.teamId}`);
+      navigate(`/team/${currentTeam?.id}`);
     }
   };
 
@@ -156,15 +156,15 @@ const TeamStatusPage = () => {
         isOpen={isOpenModal}
         onClose={() => setIsOpenModal(false)}
         handleDone={async () => {
-          const currentTeamId = currentTeam?.teamId;
+          const currentTeamId = currentTeam?.id;
           if (!currentTeamId) return;
           try {
             if (teamPosts && teamPosts.length > 0) {
-              const activePosts = teamPosts.filter((post) => post.isRecruiting);
+              const activePosts = teamPosts.filter((post) => post.recruiting);
               if (activePosts.length > 0) {
                 const closePromises = activePosts.map((post) =>
                   closePostAsync({
-                    postId: post.postId,
+                    postId: post.id,
                     status: 'CLOSED',
                   }),
                 );
@@ -199,7 +199,7 @@ const TeamStatusPage = () => {
       <TeamDeleteModal
         isOpen={isOpenTeamDeleteModal}
         onClose={() => setIsOpenTeamDeleteModal(false)}
-        handleDone={() => deleteTeam(Number(currentTeam?.teamId))}
+        handleDone={() => deleteTeam(Number(currentTeam?.id))}
       />
     </>
   );

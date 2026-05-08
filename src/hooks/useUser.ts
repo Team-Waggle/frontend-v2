@@ -40,7 +40,7 @@ export const useGetMyApplications = () => {
   return useQuery({
     queryKey: ['my-applications'],
     queryFn: getUserMeApplications,
-    enabled: !!accessToken && !!profileStatus?.isComplete,
+    enabled: !!accessToken && !!profileStatus?.complete,
     refetchOnWindowFocus: false,
   });
 };
@@ -138,19 +138,19 @@ export const usePatchTeamVisibility = () => {
   return useMutation({
     mutationFn: ({
       teamId,
-      isVisible,
+      visible,
     }: {
       teamId: number;
-      isVisible: boolean;
-    }) => patchTeamVisibility(teamId, isVisible),
-    onMutate: async ({ teamId, isVisible }) => {
+      visible: boolean;
+    }) => patchTeamVisibility(teamId, visible),
+    onMutate: async ({ teamId, visible }) => {
       await queryClient.cancelQueries({ queryKey: ['user-me-team'] });
       const previous = queryClient.getQueryData<TeamResponse[]>([
         'user-me-team',
       ]);
       queryClient.setQueryData<TeamResponse[]>(['user-me-team'], (old) =>
         old?.map((team) =>
-          team.teamId === teamId ? { ...team, isVisible } : team,
+          team.id === teamId ? { ...team, visible } : team,
         ),
       );
       return { previous };
@@ -172,7 +172,7 @@ export const useGetUserMeTeam = () => {
   return useQuery({
     queryKey: ['user-me-team'],
     queryFn: () => getUserMeTeam(),
-    enabled: !!accessToken && !!profileStatus?.isComplete,
+    enabled: !!accessToken && !!profileStatus?.complete,
     refetchOnWindowFocus: false,
   });
 };
