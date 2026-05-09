@@ -2,10 +2,17 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useGetUserMeTeam } from '../hooks/useUser';
-import { usePatchTeamStatus } from '../hooks/useTeam';
+import {
+  useDeleteTeam,
+  useGetTeamPosts,
+  usePatchTeamStatus,
+} from '../hooks/useTeam';
+import { usePatchPostClose } from '../hooks/usePost';
+import BaseButton from '../components/common/Button';
 import TeamNav from '../components/Team/TeamNav';
 import TeamStatusCard from '../components/Team/TeamStatusCard';
 import TeamStatusModal from '../components/Modal/TeamStatusModal';
+import TeamDeleteModal from '../components/Modal/TeamDeleteModal';
 
 // Icons
 import PreparingIcon from '../assets/icons/ic_preparing.svg?react';
@@ -71,13 +78,18 @@ const STATUS_INFO = {
 
 const TeamStatusPage = () => {
   const navigate = useNavigate();
-  const { data } = useGetUserMeTeam();
-  const { teamId } = useParams<{ teamId: string }>();
-  const currentTeam = data?.find((team) => team.id === Number(teamId));
-  const { mutate } = usePatchTeamStatus();
   const queryClient = useQueryClient();
+  const { data: myTeamData } = useGetUserMeTeam();
+  const { teamId } = useParams<{ teamId: string }>();
+  const currentTeam = myTeamData?.find((team) => team.id === Number(teamId));
+  const { data: teamPosts } = useGetTeamPosts(Number(teamId));
+
+  const { mutate: updateTeamStatus } = usePatchTeamStatus();
+  const { mutate: deleteTeam } = useDeleteTeam();
+  const { mutateAsync: closePostAsync } = usePatchPostClose();
 
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const [isOpenTeamDeleteModal, setIsOpenTeamDeleteModal] = useState(false);
 
   const handleClick = () => {
     if (currentTeam?.status === 'PREPARING') {
@@ -92,61 +104,100 @@ const TeamStatusPage = () => {
   return (
     <>
       <div className="flex flex-col items-center gap-[6rem] pt-[5.4rem]">
-        <TeamNav />
-        <div className="flex w-full max-w-[clamp(98.2rem,70vw,130rem)] flex-col gap-[2.8rem]">
+        {currentTeam?.role !== 'MEMBER' && <TeamNav />}
+        <div className="flex w-full max-w-[clamp(98.2rem,70vw,130rem)] flex-col gap-[3.5rem]">
           <div className="flex flex-col gap-[2.8rem]">
-            <div className="flex justify-between gap-[clamp(2.6rem,calc(-7.3rem+6.875vw),5.9rem)]">
-              {STATUS_CONFIG.map((item) => (
-                <TeamStatusCard
-                  key={item.type}
-                  type={item.type}
-                  currentStatus={currentTeam?.status ?? 'PREPARING'}
-                  title={item.title}
-                  description={item.description}
-                  ActiveIcon={item.ActiveIcon}
-                  InactiveIcon={item.InactiveIcon}
-                  buttonText={item.buttonText}
-                  onClick={() => {
-                    handleClick();
-                  }}
-                />
-              ))}
-            </div>
-            <div className="flex gap-[1.6rem] rounded-[1.2rem] bg-blue-5 p-[2rem]">
-              <CircleInfoIcon className="text-blue-100" />
-              <div className="flex flex-col gap-[0.8rem]">
-                <span className="text-[1.8rem] font-semibold text-black-100">
-                  현재 상태 안내
-                </span>
-                {STATUS_INFO[currentTeam?.status as keyof typeof STATUS_INFO]}
+            <div className="flex flex-col gap-[2.8rem]">
+              <div className="flex justify-between gap-[clamp(2.6rem,calc(-7.3rem+6.875vw),5.9rem)]">
+                {STATUS_CONFIG.map((item) => (
+                  <TeamStatusCard
+                    key={item.type}
+                    type={item.type}
+                    currentStatus={currentTeam?.status ?? 'PREPARING'}
+                    title={item.title}
+                    description={item.description}
+                    ActiveIcon={item.ActiveIcon}
+                    InactiveIcon={item.InactiveIcon}
+                    buttonText={item.buttonText}
+                    onClick={() => {
+                      handleClick();
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="flex gap-[1.6rem] rounded-[1.2rem] bg-blue-5 p-[2rem]">
+                <CircleInfoIcon className="text-blue-100" />
+                <div className="flex flex-col gap-[0.8rem]">
+                  <span className="text-[1.8rem] font-semibold text-black-100">
+                    현재 상태 안내
+                  </span>
+                  {STATUS_INFO[currentTeam?.status as keyof typeof STATUS_INFO]}
+                </div>
               </div>
             </div>
           </div>
+          {currentTeam?.role === 'LEADER' && (
+            <div className="flex justify-end">
+              <BaseButton
+                size="sm"
+                color="secondary"
+                onClick={() => setIsOpenTeamDeleteModal(true)}
+                className="w-[7.2rem] whitespace-nowrap text-black-60"
+              >
+                팀 삭제
+              </BaseButton>
+            </div>
+          )}
         </div>
       </div>
       <TeamStatusModal
         isOpen={isOpenModal}
         onClose={() => setIsOpenModal(false)}
-        handleDone={() => {
-          const teamId = currentTeam?.id;
-          if (!teamId) return;
-          mutate(
-            { teamId, status: 'COMPLETED' },
-            {
-              onSuccess: () => {
-                queryClient.invalidateQueries({ queryKey: ['user-me-team'] });
-                queryClient.invalidateQueries({
-                  queryKey: ['my-notifications-count'],
-                });
+        handleDone={async () => {
+          const currentTeamId = currentTeam?.id;
+          if (!currentTeamId) return;
+          try {
+            if (teamPosts && teamPosts.length > 0) {
+              const activePosts = teamPosts.filter((post) => post.recruiting);
+              if (activePosts.length > 0) {
+                const closePromises = activePosts.map((post) =>
+                  closePostAsync({
+                    postId: post.id,
+                    status: 'CLOSED',
+                  }),
+                );
+                await Promise.all(closePromises);
+              }
+            }
+            updateTeamStatus(
+              { teamId: currentTeamId, status: 'COMPLETED' },
+              {
+                onSuccess: () => {
+                  queryClient.invalidateQueries({ queryKey: ['user-me-team'] });
+                  queryClient.invalidateQueries({
+                    queryKey: ['my-notifications-count'],
+                  });
+                  queryClient.invalidateQueries({
+                    queryKey: ['team-posts', currentTeamId],
+                  });
 
-                setIsOpenModal(false);
+                  setIsOpenModal(false);
+                },
+                onError: (err) => {
+                  console.log(err);
+                },
               },
-              onError: (err) => {
-                console.log(err);
-              },
-            },
-          );
+            );
+          } catch (error) {
+            console.error(error);
+            alert('모집글 마감 처리 중 오류가 발생했습니다.');
+          }
         }}
+      />
+      <TeamDeleteModal
+        isOpen={isOpenTeamDeleteModal}
+        onClose={() => setIsOpenTeamDeleteModal(false)}
+        handleDone={() => deleteTeam(Number(currentTeam?.id))}
       />
     </>
   );
