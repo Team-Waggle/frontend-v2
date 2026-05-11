@@ -109,7 +109,7 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
     try {
       if (mode === 'onboarding') {
         const response = await getUserCheck(data.username);
-        if (response?.available === false) {
+        if (!response?.available) {
           setError(
             'username',
             {
@@ -165,7 +165,7 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
     if (byteLength > 15) {
       setError('username', {
         type: 'manual',
-        message: '글자수를 초과했어요.',
+        message: '6~15byte 이내로 입력이 가능해요.',
       });
       return;
     }
@@ -184,7 +184,7 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
     if (byteLength > 100) {
       setError('bio', {
         type: 'manual',
-        message: '글자수를 초과했어요.',
+        message: '최대 100byte까지 입력이 가능해요.',
       });
       return;
     }
@@ -194,6 +194,19 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
       shouldValidate: true,
       shouldDirty: true,
     });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      setError('bio', {
+        type: 'manual',
+        message: '줄바꿈은 사용할 수 없어요.',
+      });
+      return;
+    }
+
+    clearErrors('bio');
   };
 
   useModal({ isOpen, isOnboarding: mode === 'onboarding', onClose });
@@ -214,7 +227,7 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
           <div className="flex w-full flex-col gap-[3.4rem]">
             {mode === 'onboarding' && (
               <div className="flex flex-col text-[3rem] font-bold">
-                <span className="">반가워요!</span>
+                <span className="">반가워요.</span>
                 <span className="">어떤 분인지 알려주세요!</span>
               </div>
             )}
@@ -226,20 +239,24 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                 isRequired
                 errorMessage={errors.username?.message}
                 inputProps={{
-                  placeholder:
-                    '한글/영문/숫자만 가능해요. 15byte 이내로 입력해 주세요.',
+                  placeholder: '한글/영문/숫자만 가능해요.',
                   value: usernameValue,
                   ...register('username', {
-                    required: '닉네임은 필수입니다.',
-                    pattern: {
-                      value: /^[a-zA-Z0-9가-힣]*$/,
-                      message:
-                        '한글 자음/모음, 공백, 특수문자는 사용할 수 없어요.',
-                    },
                     validate: (value) => {
+                      const hasEmoji = /[\p{Extended_Pictographic}]/gu.test(
+                        value,
+                      );
+                      if (hasEmoji) {
+                        return '이모지/이모티콘 사용은 불가능 해요.';
+                      }
+
+                      if (!/^[a-zA-Z0-9가-힣]*$/.test(value)) {
+                        return '한글 자음/모음, 공백, 특수문자는 사용할 수 없어요.';
+                      }
+
                       const byteLength = getByteLength(value);
                       if (byteLength > 0 && byteLength < 6) {
-                        return '닉네임은 최소 6byte 이상이어야 합니다.';
+                        return '6~15byte 이내로 입력이 가능해요.';
                       }
                       return true;
                     },
@@ -260,7 +277,7 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                     </div>
                   </div>
                   <span className="text-[1.2rem] font-medium text-error">
-                    최대 3개 선택 가능해요
+                    스킬은 최대 3개까지 선택할 수 있어요.
                   </span>
                 </div>
                 <div className="flex flex-col gap-[2rem]">
@@ -318,12 +335,11 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                   ...register('portfolioUrls', {
                     pattern: {
                       value: /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/\S*)?$/,
-                      message: '올바른 URL 형식을 입력해 주세요.',
+                      message: '올바른 url을 사용해주셔야 해요.',
                     },
                   }),
                   value: portfolioUrlsValue,
-                  placeholder:
-                    '현재 가지고 있는 포트폴리오 사이트가 있다면 URL을 입력해 주세요.',
+                  placeholder: 'URL을 입력해주세요.',
                 }}
               />
               <FieldMaster
@@ -333,10 +349,11 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                 errorMessage={errors.bio?.message}
                 textareaProps={{
                   placeholder:
-                    'React로 MVP 빠르게 만들어요. 주 2회 저녁 참여 가능!',
+                    'ex) 저는 프로젝트를 끝까지 책임지는 빌더와 같은 기획자예요. 주 2회 저녁 시간대에 참석할 수 있어요.',
                   value: introValue,
                   ...register('bio'),
                   onChange: handleBioChange,
+                  onKeyDown: handleKeyDown,
                 }}
                 maxLength={100}
               />

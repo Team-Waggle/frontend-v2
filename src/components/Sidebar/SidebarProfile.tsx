@@ -38,7 +38,7 @@ const SidebarProfile = ({
   return (
     <div className="flex w-[25.8rem] items-center gap-[1rem] pr-[1rem]">
       <div
-        onClick={() => navigate(`/profile/${data.userId}`)}
+        onClick={() => navigate(`/profile/${data.id}`)}
         className="flex cursor-pointer gap-[1rem]"
       >
         {profileImage}
