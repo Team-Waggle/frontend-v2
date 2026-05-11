@@ -64,6 +64,7 @@ interface FiledMasterProps {
     data: TeamResponse[];
     value: number;
     onChange: (teamId: number) => void;
+    isEditMode?: boolean;
   };
   positionProps?: {
     value?: PositionType | null;

@@ -127,13 +127,17 @@ const PostFormPage = () => {
             rules={{ required: true }}
             render={({ field }) => (
               <FieldMaster
-                title="팀 선택"
+                title={isEditMode ? '팀' : '팀 선택'}
                 variant="teamname"
                 isRequired
                 teamnameProps={{
-                  data: myTeamData ?? [],
+                  data:
+                    isEditMode && myPostData
+                      ? [myPostData.team]
+                      : (myTeamData ?? []),
                   value: field.value,
                   onChange: field.onChange,
+                  isEditMode,
                 }}
               />
             )}

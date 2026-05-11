@@ -74,6 +74,7 @@ interface FieldTeamNameProps {
   data: TeamResponse[];
   value: number;
   onChange: (teamId: number) => void;
+  isEditMode?: boolean;
 }
 
 export type RecruitmentsValue = {
@@ -597,10 +598,15 @@ export const FieldTeamName = ({
   data,
   value,
   onChange,
+  isEditMode = false,
 }: FieldTeamNameProps) => {
+  const teamList = isEditMode
+    ? data?.filter((team) => value === team.id)
+    : data;
+
   return (
     <div className="grid grid-cols-4 gap-[1rem]">
-      {data?.map((team) => (
+      {teamList?.map((team) => (
         <BaseChip
           key={team.id}
           variant="teamOutline"
@@ -723,6 +729,8 @@ export const FieldPositionSkill = ({
 
   const handleCountIncrease = (index: number) => {
     const newItems = [...items];
+
+    if (newItems[index].count >= 15) return;
 
     newItems[index] = {
       ...newItems[index],
@@ -873,7 +881,7 @@ export const FieldPositionSkill = ({
               shape="circle"
               className="h-[4rem] w-[4rem]"
               onClick={() => {
-                setSelectedCount(selectedCount + 1);
+                if (selectedCount < 15) setSelectedCount(selectedCount + 1);
               }}
             >
               <PlusIcon className="h-[2.182rem] w-[2.182rem]" />
