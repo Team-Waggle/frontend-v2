@@ -18,7 +18,7 @@ export const USERS_FOLLOW_COUNT_URL = (userId: string) =>
 export const USERS_TEAMS_URL = (userId: string) => `/users/${userId}/teams`; // 사용자 참여 팀 목록 조회
 export const USERS_CHECK_URL = '/users/check'; //사용자명 사용 가능 여부 조회
 export const USERS_ME_URL = '/users/me'; // 본인 프로필 조회, 수정, 회원 탈퇴
-export const USERS_ME_APPLICATIONS_URL = '/users/me/applications'; // 본인 지원 목록 조회
+export const USERS_ME_APPLICATIONS_URL = '/applications'; // 본인 지원 목록 조회
 export const USERS_ME_BOOKMARKS_URL = '/users/me/bookmarks'; // 본인 북마크 목록 조회
 export const USERS_ME_FOLLOWEES_URL = '/users/me/followees'; // 본인이 팔로우 하는 계정 목록 조회
 export const USERS_ME_FOLLOWERS_URL = '/users/me/followers'; // 본인을 팔로우 하는 계정 목록 조회

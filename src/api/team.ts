@@ -7,6 +7,7 @@ import {
   MEMBER_URL,
   TEAMS_APPLICATION_URL,
   TEAMS_STATUS_URL,
+  APPLICATION_DELETE_URL,
   APPLICATION_READ_URL,
   APPLICATION_STATUS_URL,
   MEMBER_REVIEW_URL,
@@ -159,5 +160,11 @@ export const patchTeamApplicationStatus = async (
     APPLICATION_STATUS_URL(applicationId),
     { status },
   );
+  return data;
+};
+
+// 팀 지원 취소
+export const deleteApplication = async (applicationId: number) => {
+  const { data } = await axiosInstance.delete(APPLICATION_DELETE_URL(applicationId));
   return data;
 };

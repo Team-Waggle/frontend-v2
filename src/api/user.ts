@@ -1,5 +1,5 @@
 import axiosInstance from './axiosInstance';
-import type { MyApplicationResponse, UserMeResponse } from '../types/api/user';
+import type { MyApplicationsResponse, UserMeResponse } from '../types/api/user';
 import {
   USERS_CHECK_URL,
   USERS_ME_APPLICATIONS_URL,
@@ -38,10 +38,8 @@ export const getUserCheck = async (username: string) => {
 };
 
 // 본인 지원 목록 조회
-export const getUserMeApplications = async (): Promise<
-  MyApplicationResponse[]
-> => {
-  const { data } = await axiosInstance.get<MyApplicationResponse[]>(
+export const getUserMeApplications = async (): Promise<MyApplicationsResponse> => {
+  const { data } = await axiosInstance.get<MyApplicationsResponse>(
     USERS_ME_APPLICATIONS_URL,
   );
   return data;
