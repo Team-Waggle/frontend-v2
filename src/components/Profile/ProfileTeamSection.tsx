@@ -5,6 +5,7 @@ import MyPageCard from '../common/Cards/MyPageCard/MyPageCard';
 import PostEmptyPage from '../common/empty/PostEmptyPage';
 
 import {
+  useGetUserDetail,
   useGetUserMeTeam,
   useGetUserTeams,
   usePatchTeamVisibility,
@@ -21,17 +22,26 @@ const ProfileTeamSection = ({ userId, isMyProfile }: ProfileTeamSectionProps) =>
   const { data: myTeams } = useGetUserMeTeam();
   const { data: otherTeams } = useGetUserTeams(userId);
   const { mutate: patchVisibility } = usePatchTeamVisibility();
+  const { data: userDetail } = useGetUserDetail(userId);
 
   const userTeams = isMyProfile ? myTeams : otherTeams;
 
   if (!userTeams || userTeams.length === 0) {
+    if (isMyProfile) {
+      return (
+        <PostEmptyPage
+          className="h-[auto] py-[5rem]"
+          title="참여 중인 팀이 없습니다."
+          subTitle="새로운 팀을 찾아보세요!"
+          btnText="새 팀 찾기"
+          onBtnClick={() => navigate('/')}
+        />
+      );
+    }
     return (
       <PostEmptyPage
-        className="h-[auto] py-[5rem]"
-        title="참여 중인 팀이 없습니다."
-        subTitle="새로운 팀을 찾아보세요!"
-        btnText="새 팀 찾기"
-        onBtnClick={() => navigate('/')}
+        className="h-[auto] py-[5rem] whitespace-nowrap"
+        title={`${userDetail?.username ?? ''}님이 현재 참여 중인 팀이 없어요.`}
       />
     );
   }
