@@ -24,7 +24,7 @@ import TeamStatusPage from './pages/TeamStatusPage';
 import PostFormPage from './pages/PostFormPage';
 import PostDetailPage from './pages/PostDetailPage';
 import ProfileRedirect from './components/Profile/ProfileRedirect';
-import MyPage from './pages/MyPage';
+import ProfilePage from './pages/ProfilePage';
 import MessagePage from './pages/MessagePage';
 import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -74,7 +74,7 @@ export const router = createBrowserRouter(
         />
         <Route
           path="/profile/:userId"
-          element={<MyPage />}
+          element={<ProfilePage />}
           loader={userLoader}
         />
         <Route path="/message" element={<MessagePage />} loader={withAuth()} />
