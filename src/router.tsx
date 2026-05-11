@@ -77,6 +77,11 @@ export const router = createBrowserRouter(
           element={<ProfilePage />}
           loader={userLoader}
         />
+        <Route
+          path="/profile/:userId/applications"
+          element={<ProfilePage />}
+          loader={userLoader}
+        />
         <Route path="/message" element={<MessagePage />} loader={withAuth()} />
         <Route
           path="/message/:partnerId"

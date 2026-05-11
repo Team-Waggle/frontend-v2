@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'sonner';
+import { useLocation, useParams } from 'react-router-dom';
 
 import IcWrite from '../assets/icons/normal/ic_write.svg?react';
 import IcInfo from '../assets/icons/normal/ic_circleInfo.svg?react';
@@ -12,17 +11,15 @@ import IcCharacterNoReviews from '../assets/icons/ic_character_main_page.svg?rea
 import IcLink from '../assets/icons/normal/ic_link.svg?react';
 
 import Tag from '../components/common/Tag/index';
-import MyPageCard from '../components/common/Cards/MyPageCard/MyPageCard';
-import PostEmptyPage from '../components/common/empty/PostEmptyPage';
 import Tooltip from '../components/common/Tooltip';
 import ProfileModal from '../components/Modal/ProfileModal';
+import ProfileNav from '../components/Profile/ProfileNav';
+import ProfileTeamSection from '../components/Profile/ProfileTeamSection';
+import ProfileApplicationSection from '../components/Profile/ProfileApplicationSection';
 
 import {
   useGetUserDetail,
   useGetUserMe,
-  useGetUserMeTeam,
-  useGetUserTeams,
-  usePatchTeamVisibility,
   useUpdateProfileImage,
 } from '../hooks/useUser';
 
@@ -56,18 +53,14 @@ const getReviewTagStyle = (isTop: boolean) => ({
 });
 
 const MyPage = () => {
-  const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
+  const { pathname } = useLocation();
+  const isApplicationsTab = pathname.endsWith('/applications');
   const { data: me, isPending: isMePending } = useGetUserMe();
   const isMyProfile = !isMePending && !!me?.id && me.id === userId;
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const { data: userDetail } = useGetUserDetail(userId!);
-  const { data: myTeams } = useGetUserMeTeam();
-  const { data: otherTeams } = useGetUserTeams(userId!);
-  const userTeams = isMyProfile ? myTeams : otherTeams;
-
-  const { mutate: patchVisibility } = usePatchTeamVisibility();
   const { mutate: updateProfileImage } = useUpdateProfileImage();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -317,60 +310,25 @@ const MyPage = () => {
               </div>
             </div>
           </div>
-          {/** 참여 중인 팀 */}
-          <div className="flex flex-col items-start self-stretch">
-            <div className="flex items-center self-stretch py-[1.2rem]">
-              <h2 className="overflow-hidden text-ellipsis text-[1.8rem] font-[700] leading-[1.5] tracking-[-0.036rem] text-black-100">
-                참여 중인 팀
-              </h2>
-            </div>
-            {userTeams && userTeams.length > 0 ? (
-              <div className="grid grid-cols-3 flex-wrap content-start items-start gap-[1.4rem] self-stretch max-1440:grid-cols-2">
-                {isMyProfile
-                  ? myTeams?.map((team) => (
-                      <MyPageCard
-                        key={team.id}
-                        title={team.name}
-                        position={
-                          POSITION_CONVERTER[team.position] ?? team.position
-                        }
-                        memberCount={team.memberCount}
-                        isLeader={team.role === 'LEADER'}
-                        profileImageUrl={team.profileImageUrl}
-                        status={team.status}
-                        isMyProfile
-                        visible={team.visible}
-                        teamId={team.id}
-                        onVisibilityToggle={(teamId, visible) => {
-                          patchVisibility({ teamId, visible });
-                          if (!visible)
-                            toast('프로젝트가 숨김처리 되었습니다.');
-                        }}
-                      />
-                    ))
-                  : otherTeams?.map((team) => (
-                      <MyPageCard
-                        key={team.id}
-                        title={team.name}
-                        position={
-                          POSITION_CONVERTER[team.position] ?? team.position
-                        }
-                        memberCount={team.memberCount}
-                        isLeader={team.role === 'LEADER'}
-                        profileImageUrl={team.profileImageUrl}
-                        status={team.status}
-                        teamId={team.id}
-                      />
-                    ))}
-              </div>
+          {/** 참여 중인 팀, 지원 목록 */}
+          <div className="flex flex-col items-start gap-[2.4rem] self-stretch">
+            {isMyProfile ? (
+              <>
+                <ProfileNav />
+                {isApplicationsTab
+                  ? <ProfileApplicationSection />
+                  : <ProfileTeamSection userId={userId!} isMyProfile />
+                }
+              </>
             ) : (
-              <PostEmptyPage
-                className="h-[auto] py-[5rem]"
-                title="참여 중인 팀이 없습니다."
-                subTitle="새로운 팀을 찾아보세요!"
-                btnText="새 팀 찾기"
-                onBtnClick={() => navigate('/')}
-              />
+              <>
+                <div className="flex items-center self-stretch py-[1.2rem]">
+                  <h2 className="overflow-hidden text-ellipsis text-[1.8rem] font-[700] leading-[1.5] tracking-[-0.036rem] text-black-100">
+                    참여 중인 팀
+                  </h2>
+                </div>
+                <ProfileTeamSection userId={userId!} isMyProfile={false} />
+              </>
             )}
           </div>
         </div>
