@@ -42,12 +42,12 @@ import CloseSmallIcon from '../../assets/icons/normal/ic_close_small.svg?react';
 
 interface FieldInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
-  error?: string;
+  error?: string | boolean;
 }
 
 interface FieldTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   id: string;
-  error?: string;
+  error?: string | boolean;
   maxLength?: number;
 }
 
@@ -74,6 +74,7 @@ interface FieldTeamNameProps {
   data: TeamResponse[];
   value: number;
   onChange: (teamId: number) => void;
+  isEditMode?: boolean;
 }
 
 export type RecruitmentsValue = {
@@ -140,16 +141,12 @@ FieldInput.displayName = 'FieldInput';
 
 export const FieldTextarea = memo(
   forwardRef<HTMLTextAreaElement, FieldTextareaProps>(
-    ({ id, error, maxLength = 100, className, onChange, ...props }, ref) => {
+    (
+      { id, error, maxLength = 100, className, onChange, onKeyDown, ...props },
+      ref,
+    ) => {
       const isEmpty = !props.value;
       const byteLength = getByteLength(String(props.value ?? ''));
-
-      const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        // Enter 키인지 확인 (Shift + Enter도 막으려면 e.shiftKey 조건 제외)
-        if (e.key === 'Enter') {
-          e.preventDefault(); // 줄바꿈 방지
-        }
-      };
 
       return (
         <div
@@ -162,7 +159,7 @@ export const FieldTextarea = memo(
           } ${className || ''}`}
         >
           <textarea
-            onKeyDown={handleKeyDown}
+            onKeyDown={onKeyDown}
             onChange={onChange}
             ref={ref}
             id={id}
@@ -203,7 +200,7 @@ export const FieldThumbnail = memo(
               <ImageIcon className="h-[3.2rem] w-[3.2rem] text-black-40" />
               <div className="flex flex-col gap-[0.2rem]">
                 <span className="text-[1.6rem] font-semibold text-black-90">
-                  클릭하거나 파일을 드래그하여 업로드하세요
+                  클릭하거나 파일을 드래그 하여 업로드 해주세요.
                 </span>
                 <span className="text-[1.6rem] font-medium text-black-60">
                   권장 사이즈: 1080x1080 (PNG, JPG)
@@ -601,10 +598,15 @@ export const FieldTeamName = ({
   data,
   value,
   onChange,
+  isEditMode = false,
 }: FieldTeamNameProps) => {
+  const teamList = isEditMode
+    ? data?.filter((team) => value === team.id)
+    : data;
+
   return (
     <div className="grid grid-cols-4 gap-[1rem]">
-      {data?.map((team) => (
+      {teamList?.map((team) => (
         <BaseChip
           key={team.id}
           variant="teamOutline"
@@ -728,6 +730,8 @@ export const FieldPositionSkill = ({
   const handleCountIncrease = (index: number) => {
     const newItems = [...items];
 
+    if (newItems[index].count >= 15) return;
+
     newItems[index] = {
       ...newItems[index],
       count: newItems[index].count + 1,
@@ -786,7 +790,7 @@ export const FieldPositionSkill = ({
           <div
             className={`h-[2.6rem] w-[24.8rem] text-[1.6rem] font-medium ${selectedPosition ? 'text-blue-100' : 'text-black-60'}`}
           >
-            {selectedPosition || '모집 직무'}
+            {selectedPosition || '모집 직무를 선택해주세요.'}
           </div>
           <ChevronDownIcon
             className={`text-black-60 transition-transform ${positionDropdownOpen ? 'rotate-180' : ''}`}
@@ -825,7 +829,7 @@ export const FieldPositionSkill = ({
           >
             {selectedSkill.length
               ? `사용 스킬(${selectedSkill.length}) ${selectedSkill.join(', ')}`
-              : '사용 스킬'}
+              : '사용 스킬을 선택해주세요.'}
           </div>
           <ChevronDownIcon
             className={`text-black-60 transition-transform ${skillDropdownOpen && selectedPosition && 'rotate-180'}`}
@@ -877,7 +881,7 @@ export const FieldPositionSkill = ({
               shape="circle"
               className="h-[4rem] w-[4rem]"
               onClick={() => {
-                setSelectedCount(selectedCount + 1);
+                if (selectedCount < 15) setSelectedCount(selectedCount + 1);
               }}
             >
               <PlusIcon className="h-[2.182rem] w-[2.182rem]" />

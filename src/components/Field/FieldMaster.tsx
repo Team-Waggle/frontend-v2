@@ -43,8 +43,8 @@ interface FiledMasterProps {
     | 'positionSkill'
     | 'tab';
   isRequired?: boolean;
+  isError?: boolean;
   errorMessage?: string;
-  warningMessage?: string;
   maxLength?: number;
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
   textareaProps?: React.TextareaHTMLAttributes<HTMLTextAreaElement>;
@@ -64,6 +64,7 @@ interface FiledMasterProps {
     data: TeamResponse[];
     value: number;
     onChange: (teamId: number) => void;
+    isEditMode?: boolean;
   };
   positionProps?: {
     value?: PositionType | null;
@@ -87,8 +88,8 @@ const FieldMaster = ({
   id,
   variant,
   isRequired = false,
+  isError = false,
   errorMessage,
-  warningMessage,
   maxLength,
   inputProps,
   textareaProps,
@@ -105,7 +106,7 @@ const FieldMaster = ({
       <FieldInput
         id={id || ''}
         {...inputProps}
-        error={errorMessage}
+        error={isError || errorMessage}
         maxLength={maxLength}
       />
     ),
@@ -113,7 +114,7 @@ const FieldMaster = ({
       <FieldTextarea
         id={id || ''}
         maxLength={maxLength}
-        error={errorMessage}
+        error={isError || errorMessage}
         {...textareaProps}
       />
     ),
@@ -144,11 +145,6 @@ const FieldMaster = ({
         {errorMessage && (
           <span className="text-[1.2rem] font-medium text-error">
             {errorMessage}
-          </span>
-        )}
-        {warningMessage && (
-          <span className="text-[1.2rem] font-medium text-error">
-            {warningMessage}
           </span>
         )}
       </div>

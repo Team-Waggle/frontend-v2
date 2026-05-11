@@ -62,7 +62,7 @@ const MainPage = () => {
   const { data: profileData, isSuccess } = useGetIsUserProfileComplete();
 
   const isOnboardingModalOpen =
-    isLoggedIn && isSuccess && profileData?.complete === false;
+    isLoggedIn && isSuccess && !profileData?.complete;
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
@@ -107,11 +107,15 @@ const MainPage = () => {
           <div className="relative h-[35.4rem] max-w-[152.6rem] self-stretch overflow-hidden rounded-[2.4rem] bg-blue-60">
             {/** 문구 */}
             <div className="pl-[6.4rem] pt-[6.4rem]">
-              <p className="text-black-5 text-[6.863rem] font-[500] font-mulmaru">나랑 같이 사.프하러</p>
-              <p className="text-black-5 text-[6.863rem] font-[500] font-mulmaru">가지 않을래?</p>
+              <p className="font-mulmaru text-[6.863rem] font-[500] text-black-5">
+                나랑 같이 사.프하러
+              </p>
+              <p className="font-mulmaru text-[6.863rem] font-[500] text-black-5">
+                가지 않을래?
+              </p>
             </div>
             {/** 캐릭터 이미지 */}
-            <div className="absolute max-w-[152.6rem] h-[7.4rem] bottom-[3.89rem] right-[7.4047rem] z-10 flex items-end gap-[2.3782rem]">
+            <div className="absolute bottom-[3.89rem] right-[7.4047rem] z-10 flex h-[7.4rem] max-w-[152.6rem] items-end gap-[2.3782rem]">
               <IcBannerCircle />
               <IcBannerTriangle />
               <IcBannerSquare />

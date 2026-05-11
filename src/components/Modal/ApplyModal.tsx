@@ -99,7 +99,7 @@ const ApplyModal = ({
     if (byteLength > 1500) {
       setError('detail', {
         type: 'manual',
-        message: '글자수를 초과했어요.',
+        message: '최대 1,500byte까지 입력할 수 있어요.',
       });
       return;
     }
@@ -109,6 +109,19 @@ const ApplyModal = ({
       shouldValidate: true,
       shouldDirty: true,
     });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      setError('detail', {
+        type: 'manual',
+        message: '줄바꿈은 사용할 수 없어요.',
+      });
+      return;
+    }
+
+    clearErrors('detail');
   };
 
   useModal({ isOpen, onClose });
@@ -129,7 +142,7 @@ const ApplyModal = ({
           <div className="flex flex-col gap-[4rem]">
             <div className="flex flex-col gap-[3.4rem]">
               <span className="text-[3rem] font-bold">
-                {postData?.team?.name} 팀에 지원합니다!
+                {postData?.team?.name} 팀에 지원합니다.
               </span>
               <div className="flex flex-col gap-[3.4rem]">
                 <Controller
@@ -156,15 +169,14 @@ const ApplyModal = ({
                   id="portfolioUrls"
                   variant="input"
                   errorMessage={errors.portfolioUrls?.message}
-                  warningMessage="URL 추가 시 권한제한/암호 없이 공유해주세요"
                   inputProps={{
                     ...register('portfolioUrls', {
                       pattern: {
                         value: /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/\S*)?$/,
-                        message: '올바른 URL 형식을 입력해 주세요.',
+                        message: '올바른 url을 사용해주셔야 해요.',
                       },
                     }),
-                    placeholder: 'URL::',
+                    placeholder: 'URL을 입력해주세요.',
                   }}
                 />
                 <FieldMaster
@@ -173,10 +185,12 @@ const ApplyModal = ({
                   variant="textarea"
                   errorMessage={errors.detail?.message}
                   textareaProps={{
-                    placeholder: '1500byte 이내 지원동기 (한글 500자 기준)',
+                    placeholder:
+                      '1,500byte 이내로 지원동기를 작성해주세요. (한글 500자 기준이에요.)',
                     value: detailValue,
                     ...register('detail'),
                     onChange: handleDetailChange,
+                    onKeyDown: handleKeyDown,
                   }}
                   maxLength={1500}
                 />
