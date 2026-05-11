@@ -109,7 +109,7 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
     try {
       if (mode === 'onboarding') {
         const response = await getUserCheck(data.username);
-        if (response?.available === false) {
+        if (!response?.available) {
           setError(
             'username',
             {

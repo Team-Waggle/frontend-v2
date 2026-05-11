@@ -39,7 +39,9 @@ const MyPageCard = ({
 
   return (
     <article
-      className={`flex w-full max-w-[49.4rem] cursor-pointer items-start gap-[1.6rem] rounded-[1.6rem] border border-solid border-black-30 bg-black-5 p-[2.4rem] ${visible === false ? 'opacity-60' : ''}`}
+      className={`flex w-full max-w-[49.4rem] cursor-pointer items-start gap-[1.6rem] rounded-[1.6rem] border border-solid border-black-30 bg-black-5 p-[2.4rem] ${
+        !visible && 'opacity-60'
+      }`}
       onClick={handleCardClick}
     >
       {/** 팀 이미지 */}

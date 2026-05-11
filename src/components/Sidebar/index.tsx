@@ -37,8 +37,7 @@ const Sidebar = () => {
   const accessToken = useAuthStore((state) => state.accessToken);
   const isLoggedIn = !!accessToken;
 
-  const isProfileComplete =
-    isLoggedIn && isProfileCompleteData?.complete === true;
+  const isProfileComplete = isLoggedIn && isProfileCompleteData?.complete;
 
   useModal({
     isOpen: isNotificationOpen,
