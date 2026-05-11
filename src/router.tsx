@@ -39,12 +39,24 @@ export const router = createBrowserRouter(
           element={<TeamFormPage />}
           loader={withAuth()}
         />
-        <Route path="/team/:teamId" loader={withAuth(teamLoader)}>
+        <Route path="/team/:teamId" loader={teamLoader}>
           <Route index element={<TeamHomePage />} />
-          <Route path="edit" element={<TeamFormPage />} />
-          <Route path="posts" element={<TeamPostManagementPage />} />
-          <Route path="applicants" element={<TeamApplicantPage />} />
-          <Route path="status" element={<TeamStatusPage />} />
+          <Route path="edit" element={<TeamFormPage />} loader={withAuth()} />
+          <Route
+            path="posts"
+            element={<TeamPostManagementPage />}
+            loader={withAuth()}
+          />
+          <Route
+            path="applicants"
+            element={<TeamApplicantPage />}
+            loader={withAuth()}
+          />
+          <Route
+            path="status"
+            element={<TeamStatusPage />}
+            loader={withAuth()}
+          />
         </Route>
         <Route
           path="/post/new"
@@ -63,7 +75,7 @@ export const router = createBrowserRouter(
         <Route
           path="/profile/:userId"
           element={<MyPage />}
-          loader={withAuth(userLoader)}
+          loader={userLoader}
         />
         <Route path="/message" element={<MessagePage />} loader={withAuth()} />
         <Route
