@@ -1,5 +1,5 @@
 import { useLocation, useParams } from 'react-router';
-import TeamTab from '../common/Tap/TeamTab';
+import NavTab from '../common/Tap/NavTab';
 
 const TeamNav = () => {
   const location = useLocation();
@@ -18,9 +18,9 @@ const TeamNav = () => {
         const isActive = location.pathname === tab.to;
 
         return (
-          <TeamTab key={tab.to} to={tab.to} isActive={isActive}>
+          <NavTab key={tab.to} to={tab.to} isActive={isActive}>
             {tab.label}
-          </TeamTab>
+          </NavTab>
         );
       })}
     </div>
