@@ -38,6 +38,9 @@ const Sidebar = () => {
   const isLoggedIn = !!accessToken;
 
   const isProfileComplete = isLoggedIn && isProfileCompleteData?.complete;
+  const hasWritableTeam = myteamData?.some(
+    (team) => team.role !== 'MEMBER' && team.status !== 'COMPLETED',
+  );
 
   useModal({
     isOpen: isNotificationOpen,
@@ -72,18 +75,14 @@ const Sidebar = () => {
               <IconWrapper
                 onClick={() => {
                   if (!isLoggedIn) return setIsLoginModalOpen(true);
-                  if (myteamData?.length === 0) navigate('/team/new');
-                  else navigate('/post/new');
+                  if (hasWritableTeam) navigate('/post/new');
+                  else navigate('/team/new');
                 }}
               >
                 {isLoggedIn ? <PencilIcon /> : <LogInIcon />}
               </IconWrapper>
             ) : isProfileComplete ? (
-              myteamData?.length === 0 ? (
-                <BaseButton onClick={() => navigate('/team/new')}>
-                  새 팀 만들기
-                </BaseButton>
-              ) : (
+              hasWritableTeam ? (
                 <div className="flex gap-[1.2rem]">
                   <BaseButton
                     color="secondary"
@@ -99,6 +98,10 @@ const Sidebar = () => {
                     모집글 작성
                   </BaseButton>
                 </div>
+              ) : (
+                <BaseButton onClick={() => navigate('/team/new')}>
+                  새 팀 만들기
+                </BaseButton>
               )
             ) : (
               <BaseButton
