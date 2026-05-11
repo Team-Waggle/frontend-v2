@@ -145,7 +145,7 @@ const TeamApplicantPage = () => {
             <div className="h-full max-h-[32.8rem] min-h-[8.2rem] overflow-y-auto">
               {!postData || postData.length === 0 ? (
                 <div className="flex h-[8.2rem] cursor-pointer items-center py-[1.8rem] pl-[1.1rem] text-[1.5rem] font-medium text-black-100 hover:bg-black-10">
-                  등록된 모집글이 없습니다.
+                  등록된 모집글이 없어요.
                 </div>
               ) : (
                 postData?.map((data) => (
@@ -181,10 +181,10 @@ const TeamApplicantPage = () => {
                 <NoApplicantIcon />
                 <div className="flex flex-col items-center gap-[0.8rem]">
                   <span className="text-[2rem] font-semibold text-black-90">
-                    지원한 지원자가 없습니다.
+                    지원한 동료가 아직 없어요.
                   </span>
-                  <span className="whitespace-pre-line text-center text-[1.6rem] font-medium text-black-80">
-                    {`우리 팀에 딱 맞는 동료를 기다리고 있어요.\n모집글을 수정하거나 조금 더 기다려볼까요?`}
+                  <span className="text-center text-[1.6rem] font-medium text-black-80">
+                    우리 팀에 딱 맞는 동료를 기다리고 있어요.
                   </span>
                 </div>
               </div>
@@ -195,9 +195,7 @@ const TeamApplicantPage = () => {
                     applicant.detail,
                     applicant.portfolioUrls,
                   );
-                  const isExpanded = expandedAppIds.has(
-                    applicant.id,
-                  );
+                  const isExpanded = expandedAppIds.has(applicant.id);
 
                   return (
                     <div key={applicant.id} className="px-[2.4rem]">
@@ -211,9 +209,7 @@ const TeamApplicantPage = () => {
                               <div className="flex items-center gap-[0.5rem]">
                                 <div
                                   onClick={() =>
-                                    navigate(
-                                      `/profile/${applicant.user.id}`,
-                                    )
+                                    navigate(`/profile/${applicant.user.id}`)
                                   }
                                   className="flex cursor-pointer gap-[0.7rem]"
                                 >
@@ -232,9 +228,7 @@ const TeamApplicantPage = () => {
                                   color="outline"
                                   shape="circle"
                                   onClick={() =>
-                                    navigate(
-                                      `/message/${applicant.user.id}`,
-                                    )
+                                    navigate(`/message/${applicant.user.id}`)
                                   }
                                   className="!h-[2.8rem] !w-[2.8rem]"
                                 >
@@ -265,7 +259,7 @@ const TeamApplicantPage = () => {
                               </BaseTag>
                             </div>
                             <span
-                              className={`text-[1.5rem] font-semibold ${
+                              className={`whitespace-nowrap text-[1.5rem] font-semibold ${
                                 applicant.status !== 'PENDING'
                                   ? 'text-black-40'
                                   : 'text-black-90'
@@ -291,9 +285,7 @@ const TeamApplicantPage = () => {
                                   color="tertiary"
                                   disabled={applicant.status !== 'PENDING'}
                                   onClick={() => {
-                                    setSelectedApplicantId(
-                                      applicant.id,
-                                    );
+                                    setSelectedApplicantId(applicant.id);
                                     setIsApproveModalOpen(true);
                                   }}
                                   className="w-[5.7rem] whitespace-nowrap"
@@ -305,9 +297,7 @@ const TeamApplicantPage = () => {
                                   color="secondary"
                                   disabled={applicant.status !== 'PENDING'}
                                   onClick={() => {
-                                    setSelectedApplicantId(
-                                      applicant.id,
-                                    );
+                                    setSelectedApplicantId(applicant.id);
                                     setIsRejectModalOpen(true);
                                   }}
                                   className="w-[5.7rem] whitespace-nowrap"

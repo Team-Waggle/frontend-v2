@@ -96,19 +96,12 @@ const TeamFormPage = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (/[\p{Extended_Pictographic}]/gu.test(value)) {
-      setError('name', {
-        type: 'manual',
-        message: '이모티콘은 사용할 수 없어요.',
-      });
-      return;
-    }
     const byteLength = getByteLength(value);
 
     if (byteLength > 18) {
       setError('name', {
         type: 'manual',
-        message: '글자수를 초과했어요.',
+        message: '최대 18byte까지 입력할 수 있어요.',
       });
       return;
     }
@@ -118,6 +111,40 @@ const TeamFormPage = () => {
       shouldValidate: true,
       shouldDirty: true,
     });
+  };
+
+  const handleDescriptionChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    const value = e.target.value.replace(/\n/g, ' ');
+    const byteLength = getByteLength(value);
+
+    if (byteLength > 600) {
+      setError('description', {
+        type: 'manual',
+        message: '최대 600byte까지 입력이 가능해요.',
+      });
+      return;
+    }
+
+    clearErrors('description');
+    setValue('description', value, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      setError('description', {
+        type: 'manual',
+        message: '줄바꿈은 사용할 수 없어요.',
+      });
+      return;
+    }
+
+    clearErrors('description');
   };
 
   const onSubmit = async (data: FormValues) => {
@@ -164,7 +191,7 @@ const TeamFormPage = () => {
         className="mb-[17.9rem] flex w-[90rem] max-w-full flex-col gap-[4rem]"
       >
         <span className="text-[2.4rem] font-bold text-black-100">
-          {isEditMode ? '팀 정보를 수정해요!' : '새로운 팀을 만들어요!'}
+          {isEditMode ? '우리 팀을 수정해요.' : '새로운 팀을 만들어요.'}
         </span>
         <div className="flex h-[74.7rem] flex-col gap-[3.6rem]">
           <FieldMaster
@@ -172,15 +199,16 @@ const TeamFormPage = () => {
             id="title"
             variant="input"
             isRequired
+            isError={Boolean(errors.name)}
             errorMessage={errors.name?.message}
             inputProps={{
-              placeholder: '팀명을 입력해주세요',
+              placeholder: '한글/영문/숫자만 가능해요.',
               value: teamnameValue,
               ...register('name', {
-                required: '팀 이름을 입력해주세요.',
+                required: true,
                 pattern: {
                   value: /^[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ ]*$/,
-                  message: '특수문자는 사용 불가합니다.',
+                  message: '특수문자와 이모지는 사용할 수 없어요.',
                 },
                 validate: (value) => {
                   if (value.trim().length === 0) {
@@ -200,9 +228,7 @@ const TeamFormPage = () => {
             variant="thumbnail"
             isRequired
             thumbnailProps={{
-              ...register('profileImageUrl', {
-                required: '이미지를 첨부해주세요.',
-              }),
+              ...register('profileImageUrl', { required: true }),
               rootProps: getRootProps(),
               inputProps: getInputProps(),
               preview,
@@ -231,24 +257,17 @@ const TeamFormPage = () => {
             id="description"
             variant="textarea"
             isRequired
+            isError={Boolean(errors.description)}
             errorMessage={errors.description?.message}
             textareaProps={{
               placeholder:
-                '팀 목표, 기술 스택 상세 정보, 지향하는 팀 문화 등을 자유롭게 작성해주세요.',
+                '예) 목표: 6주 안에 MVP 출시 / 진행방식: 주 2회 저녁 / 사용 기술: React, NestJS',
               value: descriptionValue,
-              ...register('description', {
-                required: '상세 소개를 작성해주세요.',
-                validate: (value) => {
-                  const byteLength = getByteLength(value);
-                  const maxByte = 600;
-                  if (byteLength > maxByte) {
-                    return `글자수를 초과했어요.`;
-                  }
-                  return true;
-                },
-              }),
-              maxLength: 600,
+              ...register('description', { required: true }),
+              onChange: handleDescriptionChange,
+              onKeyDown: handleKeyDown,
             }}
+            maxLength={600}
           />
         </div>
         <BaseButton

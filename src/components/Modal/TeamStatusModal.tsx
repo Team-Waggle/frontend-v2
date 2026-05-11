@@ -18,11 +18,16 @@ const TeamStatusModal = ({ isOpen, onClose, handleDone }: ModalProps) => {
         aria-modal="true"
       >
         <ModalOverlay onClose={onClose} />
-        <div className="relative h-[24.7rem] w-[48.8rem] rounded-[1.492rem] bg-black-5 pt-[6.4rem]">
+        <div className="relative h-[30.9rem] w-[48.8rem] rounded-[1.492rem] bg-black-5 py-[6.4rem]">
           <div className="flex flex-col items-center gap-[3.2rem]">
-            <span className="text-[2.2rem] font-bold text-black-100">
-              정말 팀 활동을 마무리할까요?
-            </span>
+            <div className="flex flex-col items-center gap-[0.8rem]">
+              <span className="text-[2.2rem] font-bold text-black-100">
+                정말 팀 활동을 완료할까요?
+              </span>
+              <span className="whitespace-pre-line text-[1.8rem] font-medium text-black-80">
+                {`'완료' 후에는 팀원 모집과 공고가 마감되며, \n이전 상태로 되돌릴 수 없습니다.`}
+              </span>
+            </div>
             <div className="flex gap-[1.2rem]">
               <BaseButton
                 size="lg"
