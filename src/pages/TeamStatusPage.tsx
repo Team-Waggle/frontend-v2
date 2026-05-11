@@ -27,7 +27,7 @@ const STATUS_CONFIG = [
   {
     type: 'PREPARING',
     title: '준비중',
-    description: `팀이 만들어졌어요! \n팀원들을 모집해보아요.`,
+    description: `팀이 만들어졌어요. \n팀원들을 모집해볼까요?`,
     ActiveIcon: PreparingIcon,
     InactiveIcon: PreparingGrayIcon,
     buttonText: '모집하기',
@@ -35,15 +35,15 @@ const STATUS_CONFIG = [
   {
     type: 'ACTIVE',
     title: '진행중',
-    description: `현재 팀 활동이 활발하게 \n진행되고 있습니다.`,
+    description: `현재 팀 활동이 진행되고 있습니다. \n조금만 더 힘내서 유종의 미를 거둬볼까요?`,
     ActiveIcon: ActiveIcon,
     InactiveIcon: ActiveGrayIcon,
-    buttonText: '팀 활동 완료하기',
+    buttonText: '완료하기',
   },
   {
     type: 'COMPLETED',
     title: '완료',
-    description: `모든 프로젝트가 마무리되어 \n활동이 종료된 상태입니다.`,
+    description: `프로젝트가 마무리되어, \n팀 활동이 종료된 상태입니다.`,
     ActiveIcon: CompleteIcon,
     InactiveIcon: CompleteGrayIcon,
     buttonText: '리뷰하기',
@@ -55,23 +55,22 @@ const STATUS_INFO = {
     <span className="text-[1.6rem] font-normal text-black-80">
       아직 모집글이 없어요. ‘
       <span className="font-bold text-blue-100">모집하기</span>’ 버튼을 눌러 첫
-      모집글을 작성해보세요.
+      모집글을 작성해 보세요.
     </span>
   ),
   ACTIVE: (
     <span className="text-[1.6rem] font-normal text-black-80">
-      현재 팀이
-      <span className="font-bold text-blue-100"> 진행중 </span>
-      상태입니다. 팀원들과 목표한 작업을 모두 마무리하셨나요? 팀이 끝나면
-      <span className="font-bold text-blue-100"> 완료 </span>
-      처리를 해주세요.
+      팀원들과 목표한 작업을 모두 마무리하셨나요? 팀 활동이 끝나면 ‘
+      <span className="font-bold text-blue-100"> 완료하기 </span>’ 버튼을
+      클릭해주세요.
     </span>
   ),
   COMPLETED: (
     <span className="text-[1.6rem] font-normal text-black-80">
-      모든 프로젝트가 마무리되어 팀 활동이
-      <span className="font-bold text-blue-100"> 종료</span>된 상태입니다.
-      <span className="font-bold text-blue-100">리뷰를 진행해 주세요.</span>
+      팀 활동이
+      <span className="font-bold text-blue-100"> 종료</span>된 상태입니다. ‘
+      <span className="font-bold text-blue-100">리뷰하기</span>’ 버튼을 눌러
+      함께한 팀원들의 리뷰를 진행해주세요.
     </span>
   ),
 };

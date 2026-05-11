@@ -78,7 +78,7 @@ const PostFormPage = () => {
     if (byteLength > 30) {
       setError('title', {
         type: 'manual',
-        message: '글자수를 초과했어요.',
+        message: '최대 30byte까지 입력할 수 있어요.',
       });
       return;
     }
@@ -118,7 +118,7 @@ const PostFormPage = () => {
         className="flex w-[90rem] max-w-full flex-col gap-[4rem] pb-[4.4rem]"
       >
         <span className="text-[2.4rem] font-bold">
-          {isEditMode ? '모집글 수정해요!' : '모집글 작성해요!'}
+          {isEditMode ? '모집글을 수정해주세요.' : '모집글을 작성해주세요.'}
         </span>
         <div className="flex flex-col gap-[3.6rem]">
           <Controller
@@ -143,11 +143,20 @@ const PostFormPage = () => {
             id="title"
             variant="input"
             isRequired
+            isError={Boolean(errors.title)}
             errorMessage={errors.title?.message}
             inputProps={{
-              placeholder: '최대 30자 제한',
+              placeholder: '자유롭게 입력해주세요.',
               value: postnameValue,
-              ...register('title'),
+              ...register('title', {
+                required: true,
+                validate: (value) => {
+                  if (value.trim().length === 0) {
+                    return '공백만 입력할 수 없습니다.';
+                  }
+                  return true;
+                },
+              }),
               onChange: handleChange,
             }}
             maxLength={30}
@@ -173,13 +182,14 @@ const PostFormPage = () => {
           <Controller
             name="content"
             control={control}
-            rules={{ required: '상세 내용을 입력해주세요.' }}
+            rules={{ required: true }}
             render={({ field }) => (
               <FieldMaster
                 title="상세 내용"
                 id="detail"
                 variant="detail"
                 isRequired
+                isError={Boolean(errors.content)}
                 errorMessage={errors.content?.message}
                 detailProps={{
                   value: field.value,
