@@ -104,12 +104,8 @@ const Sidebar = () => {
                 </BaseButton>
               )
             ) : (
-              <BaseButton
-                onClick={() =>
-                  isLoggedIn ? navigate('/post/new') : setIsLoginModalOpen(true)
-                }
-              >
-                {isLoggedIn ? '모집글 작성' : '로그인'}
+              <BaseButton onClick={() => setIsLoginModalOpen(true)}>
+                로그인
               </BaseButton>
             )}
           </div>
