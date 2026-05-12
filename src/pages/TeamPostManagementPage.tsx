@@ -30,6 +30,7 @@ const TeamPostManagementPage = () => {
               <TeamPostItem
                 key={post.id}
                 {...post}
+                teamId={Number(teamId)}
                 onClick={() => navigate(`/post/${post.id}`)}
               />
             ))
