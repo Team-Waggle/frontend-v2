@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-query';
 import {
   createPosts,
+  deletePost,
   getPostDetail,
   getPosts,
   patchPostClose,
@@ -129,6 +130,17 @@ export const useUpdatePosts = () => {
       updatePosts(postId, postData),
     onSuccess: (data) => {
       navigate(`/post/${data.id}`);
+    },
+  });
+};
+
+// 모집글 삭제
+export const useDeletePost = (teamId: number) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (postId: number) => deletePost(postId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['team-posts', teamId] });
     },
   });
 };

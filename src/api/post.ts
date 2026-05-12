@@ -6,6 +6,7 @@ import {
   POST_STATUS_URL,
 } from '../constants/endpoint';
 
+
 import type {
   GetPostsParams,
   CursorResponsePostDetailResponse,
@@ -62,4 +63,9 @@ export const createPosts = async (postData: object) => {
 export const updatePosts = async (postId: number, postData: object) => {
   const { data } = await axiosInstance.put(POST_DETAIL_URL(postId), postData);
   return data;
+};
+
+// 모집글 삭제
+export const deletePost = async (postId: number): Promise<void> => {
+  await axiosInstance.delete(POST_DETAIL_URL(postId));
 };

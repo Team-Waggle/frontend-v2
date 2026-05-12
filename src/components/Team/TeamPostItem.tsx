@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 
 import type { PostDetailResponse } from '../../types/api/posts';
 
-import { usePatchPostClose } from '../../hooks/usePost';
+import { useDeletePost, usePatchPostClose } from '../../hooks/usePost';
 
 import TeamPostStatusToggle from './TeamPostStatusToggle';
+import CustomBtn from '../common/Button/index';
 
 import IcVertiCalBar from '../../assets/icons/ic_vertical_bar.svg?react';
 import IcSkillMeatball from '../../assets/icons/skill/large/ic_skill_meatball_large.svg?react';
@@ -21,10 +22,12 @@ const TeamPostItem = ({
   applicantCount,
   createdAt,
   recruiting,
+  teamId,
   onClick,
-}: PostDetailResponse & { onClick?: () => void }) => {
+}: PostDetailResponse & { teamId: number; onClick?: () => void }) => {
   const [isClosed, setIsClosed] = useState(!recruiting);
-  const { mutate: patchClose, isPending } = usePatchPostClose();
+  const { mutate: patchClose, isPending: isClosePending } = usePatchPostClose();
+  const { mutate: deletePost, isPending: isDeletePending } = useDeletePost(teamId);
 
   useEffect(() => {
     setIsClosed(!recruiting);
@@ -104,18 +107,31 @@ const TeamPostItem = ({
           </div>
         </div>
       </div>
-      <TeamPostStatusToggle
-        isClosed={isClosed}
-        onClick={() => {
-          if (isPending) return;
-          const newStatus = isClosed ? 'RECRUITING' : 'CLOSED';
-          setIsClosed(!isClosed);
-          patchClose(
-            { postId: id, status: newStatus },
-            { onError: () => setIsClosed((prev) => !prev) },
-          );
-        }}
-      />
+      <div className="flex w-[19.2rem] items-center gap-[0.6rem]">
+        <CustomBtn
+          size="sm"
+          color="tertiary"
+          disabled={isClosed || isClosePending}
+          onClick={() => {
+            if (isClosed || isClosePending) return;
+            setIsClosed(true);
+            patchClose(
+              { postId: id, status: 'CLOSED' },
+              { onError: () => setIsClosed(false) },
+            );
+          }}
+        >
+          모집 마감
+        </CustomBtn>
+        <CustomBtn
+          size="sm"
+          color="secondary"
+          disabled={isDeletePending}
+          onClick={() => deletePost(id)}
+        >
+          모집글 삭제
+        </CustomBtn>
+      </div>
     </div>
   );
 };
