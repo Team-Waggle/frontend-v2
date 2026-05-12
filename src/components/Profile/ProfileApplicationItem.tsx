@@ -6,15 +6,14 @@ import IcChevronDown from '../../assets/icons/normal/chevron/ic_chevronDown.svg?
 import IcLink from '../../assets/icons/normal/ic_link.svg?react';
 
 import CustomBtn from '../../components/common/Button/index';
-
-export type ApplicationStatus = '검토중' | '합류확정' | '불합격';
+import type { ApplicationStatusLabel } from '../../types/api/user';
 
 interface ProfileApplicationItemProps {
   postId: number;
   teamName: string;
   title: string;
   position: string;
-  status: ApplicationStatus;
+  status: ApplicationStatusLabel;
   appliedAt: string;
   onCancel: () => void;
   coverLetter?: string;
@@ -33,83 +32,102 @@ const ProfileApplicationItem = ({
   portfolioUrl,
 }: ProfileApplicationItemProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const hasDetail = coverLetter || portfolioUrl;
 
   return (
-    <div className="flex flex-col items-start self-stretch border-t border-solid border-black-10">
-      {/** 내용 컨테이너 */}
-      <div className="flex items-center justify-between self-stretch py-[2.8rem]">
+    <>
+      <tr className="flex items-center justify-between border-y border-solid border-t-black-10 border-b-black-30 px-[2rem] py-[2.8rem]">
         {/** 팀명 / 제목 */}
-        <Link to={`/post/${postId}`} className="group flex w-[40rem] cursor-pointer flex-col items-start gap-[1rem]">
-          <div className="flex items-center gap-[0.8rem] self-stretch">
-            <IcTeamDefaultImg className="h-[2.4rem] w-[2.4rem]" />
-            <span className="line-clamp-1 overflow-hidden text-ellipsis text-[1.4rem] font-[500] leading-[1.5] tracking-[-0.028rem] text-black-90">
-              {teamName}
-            </span>
-          </div>
-          <div className="flex flex-wrap content-center items-center gap-[1.2rem] self-stretch">
-            <span className="line-clamp-1 overflow-hidden text-ellipsis text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black-100 group-hover:underline">
-              {title}
-            </span>
-          </div>
-        </Link>
+        <td className="w-[40rem]">
+          <Link to={`/post/${postId}`} className="group flex cursor-pointer flex-col items-start gap-[1rem] overflow-hidden">
+            <div className="flex items-center gap-[0.8rem] self-stretch">
+              <IcTeamDefaultImg className="h-[2.4rem] w-[2.4rem] shrink-0" />
+              <span className="line-clamp-1 overflow-hidden text-ellipsis text-[1.4rem] font-[500] leading-[1.5] tracking-[-0.028rem] text-black-90">
+                {teamName}
+              </span>
+            </div>
+            <div className="flex flex-wrap content-center items-center gap-[1.2rem] self-stretch">
+              <span className="line-clamp-1 overflow-hidden text-ellipsis text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black-100 group-hover:underline">
+                {title}
+              </span>
+            </div>
+          </Link>
+        </td>
         {/** 직무 */}
-        <div className="flex w-[7.7rem] items-center justify-center">
-          <span className="line-clamp-1 overflow-hidden text-ellipsis text-[1.8rem] font-[600] leading-[1.5] tracking-[-0.036rem] text-black-90">
+        <td className="w-[7.7rem] text-center">
+          <span className="whitespace-nowrap text-[1.8rem] font-[600] leading-[1.5] tracking-[-0.036rem] text-black-90">
             {position}
           </span>
-        </div>
+        </td>
         {/** 상태 */}
-        <div className="flex w-[6.2rem] items-center justify-center">
-          <span className={`line-clamp-1 overflow-hidden text-ellipsis text-[1.8rem] font-[700] leading-[1.5] tracking-[-0.036rem] ${status === '합류확정' ? 'text-blue-80' : status === '불합격' ? 'text-black-60' : 'text-blue-100'}`}>
+        <td className="w-[6.2rem] text-center">
+          <span className={`whitespace-nowrap text-[1.8rem] font-[700] leading-[1.5] tracking-[-0.036rem] ${status === '합류확정' ? 'text-blue-80' : status === '불합격' ? 'text-black-60' : 'text-blue-100'}`}>
             {status}
           </span>
-        </div>
+        </td>
         {/** 지원일 */}
-        <div className="flex w-[9.6rem] items-center justify-center">
+        <td className="w-[9.6rem] text-center">
           <span className="line-clamp-1 overflow-hidden text-ellipsis text-[1.7rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black-60">
             {appliedAt}
           </span>
-        </div>
-        {/** 취소 */}
-        <div className="flex w-[12rem] items-center justify-center px-[2.8rem]">
-          <CustomBtn size="sm" color="secondary" className="whitespace-nowrap" disabled={status !== '검토중'} onClick={onCancel}>
-            지원취소
-          </CustomBtn>
-          {(coverLetter || portfolioUrl) && (
-            <IcChevronDown
-              className={`flex h-[1.6rem] w-[1.6rem] cursor-pointer text-black-50 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-              onClick={() => setIsOpen((prev) => !prev)}
-            />
-          )}
-        </div>
-      </div>
-      {/** 지원내용 상세확인 */}
-      {isOpen && (
-        <div className="flex flex-col items-start gap-[1.2rem] self-stretch pb-[2rem]">
-          <span className="line-clamp-4 self-stretch text-[1.3rem] font-[500] leading-[1.5] tracking-[-0.026rem] text-black-90">
-            {coverLetter}
-          </span>
-          {portfolioUrl && (
-            <div className="flex items-center gap-[0.4rem] self-stretch rounded-[0.6rem] bg-blue-5 px-[0.8rem] py-[1rem]">
-              <div className="flex items-center gap-[0.2rem]">
-                <IcLink className="h-[1.2rem] w-[1.2rem] text-black-90" />
-                <span className="line-clamp-1 overflow-hidden text-ellipsis text-[1.3rem] font-[500] leading-[1.5] tracking-[-0.026rem] text-black-90">
-                  첨부링크 :
-                </span>
-              </div>
-              <a
-                href={/^https?:\/\//i.test(portfolioUrl) ? portfolioUrl : `https://${portfolioUrl}`}
-                target="_blank"
-                rel="noreferrer"
-                className="line-clamp-1 overflow-hidden text-ellipsis text-[1.3rem] font-[500] leading-[1.5] tracking-[-0.026rem] text-blue-60 underline"
+        </td>
+        {/** 취소 / 상세 토글 */}
+        <td className="w-[12rem] px-[2.8rem]">
+          <div className="flex items-center justify-center">
+            <CustomBtn
+              size="sm"
+              color="secondary"
+              className="whitespace-nowrap"
+              disabled={status !== '검토중'}
+              onClick={onCancel}
+            >
+              지원취소
+            </CustomBtn>
+            {hasDetail && (
+              <button
+                type="button"
+                aria-label="지원 내용 상세보기"
+                aria-expanded={isOpen}
+                onClick={() => setIsOpen((prev) => !prev)}
               >
-                {portfolioUrl}
-              </a>
+                <IcChevronDown
+                  className={`flex h-[1.6rem] w-[1.6rem] text-black-50 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                />
+              </button>
+            )}
+          </div>
+        </td>
+      </tr>
+      {isOpen && (
+        <tr className="flex px-[2rem]">
+          <td className="flex-1 pb-[2rem]">
+            <div className="flex flex-col items-start gap-[1.2rem]">
+              <span className="line-clamp-4 self-stretch text-[1.3rem] font-[500] leading-[1.5] tracking-[-0.026rem] text-black-90">
+                {coverLetter}
+              </span>
+              {portfolioUrl && (
+                <div className="flex items-center gap-[0.4rem] self-stretch rounded-[0.6rem] bg-blue-5 px-[0.8rem] py-[1rem]">
+                  <div className="flex items-center gap-[0.2rem]">
+                    <IcLink className="h-[1.2rem] w-[1.2rem] text-black-90" />
+                    <span className="line-clamp-1 overflow-hidden text-ellipsis text-[1.3rem] font-[500] leading-[1.5] tracking-[-0.026rem] text-black-90">
+                      첨부링크 :
+                    </span>
+                  </div>
+                  <a
+                    href={/^https?:\/\//i.test(portfolioUrl) ? portfolioUrl : `https://${portfolioUrl}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="line-clamp-1 overflow-hidden text-ellipsis text-[1.3rem] font-[500] leading-[1.5] tracking-[-0.026rem] text-blue-60 underline"
+                  >
+                    {portfolioUrl}
+                  </a>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </td>
+        </tr>
       )}
-    </div>
+    </>
   );
 };
 

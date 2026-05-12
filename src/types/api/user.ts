@@ -34,6 +34,9 @@ export type MyApplicationsResponse = {
 
 export type MyApplicationResponse = MyApplicationItem;
 
+export type ApplicationStatusLabel = '검토중' | '합류확정' | '불합격';
+export type ApplicationStat = '전체' | '검토중' | '합류확정' | '불합격';
+
 export type UserMeResponse = {
   id: string;
   username: string;

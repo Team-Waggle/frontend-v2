@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import IcEye from '../../../../assets/icons/normal/ic_eye.svg?react';
 import IcEyeSlash from '../../../../assets/icons/normal/ic_eye_slash.svg?react';
@@ -40,7 +40,6 @@ const MyPageCard = ({
   onLeaveTeam,
 }: MyPageCardProps) => {
   const isActive = status !== 'COMPLETED';
-  const navigate = useNavigate();
   const [isSelectBoxOpen, setIsSelectBoxOpen] = useState(false);
   const [imgError, setImgError] = useState(false);
   const selectBoxRef = useRef<HTMLDivElement | null>(null);
@@ -59,14 +58,14 @@ const MyPageCard = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isSelectBoxOpen]);
 
-  const handleCardClick = () => {
-    if (teamId !== undefined) navigate(`/team/${teamId}`);
-  };
-
   return (
+    <Link
+      to={teamId !== undefined ? `/team/${teamId}` : '/'}
+      className="block w-full max-w-[49.4rem]"
+      onClick={teamId === undefined ? (e) => e.preventDefault() : undefined}
+    >
     <article
-      className="flex w-full max-w-[49.4rem] cursor-pointer items-start gap-[1.6rem] rounded-[1.6rem] border border-solid border-black-30 bg-black-5 p-[2.4rem]"
-      onClick={handleCardClick}
+      className="flex w-full cursor-pointer items-start gap-[1.6rem] rounded-[1.6rem] border border-solid border-black-30 bg-black-5 p-[2.4rem]"
     >
       {/** 팀 이미지 */}
       {profileImageUrl && !imgError ? (
@@ -169,6 +168,7 @@ const MyPageCard = ({
         </div>
       </div>
     </article>
+    </Link>
   );
 };
 
