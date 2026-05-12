@@ -4,28 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import ProfileApplicationItem from './ProfileApplicationItem';
 import ProfileApplicationStats from './ProfileApplicationStats';
 import PostEmptyPage from '../common/empty/PostEmptyPage';
-import type { ApplicationStat } from './ProfileApplicationStats';
-import type { ApplicationStatus } from '../../types/api/user';
+import type { ApplicationStat, ApplicationStatus, ApplicationStatusLabel } from '../../types/api/user';
 import { useGetMyApplications, useDeleteApplication } from '../../hooks/useUser';
 import { POSITION_CONVERTER } from '../../utils/position';
 
-const HEADER_COLUMNS: { label: string; width: string; className?: string }[] = [
-  { label: '내용', width: 'w-[40rem]' },
-  { label: '직무', width: 'w-[7.7rem]' },
-  { label: '상태', width: 'w-[6.2rem]' },
-  { label: '지원일', width: 'w-[9.6rem]' },
-  { label: '취소', width: 'w-[12rem]', className: 'px-[2.8rem]' },
-];
-
-const HeaderCell = ({ label, width, className = '' }: { label: string; width: string; className?: string }) => (
-  <div className={`flex ${width} items-center justify-center gap-[1rem] ${className}`}>
-    <span className="text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black-90">
-      {label}
-    </span>
-  </div>
-);
-
-const STATUS_MAP: Record<ApplicationStatus, Exclude<ApplicationStat, '전체'>> = {
+const STATUS_MAP: Record<ApplicationStatus, ApplicationStatusLabel> = {
   PENDING: '검토중',
   APPROVED: '합류확정',
   REJECTED: '불합격',
@@ -35,6 +18,8 @@ const formatDate = (iso: string) => {
   const d = new Date(iso);
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
 };
+
+const TH_TEXT = 'text-[1.8rem] font-[500] leading-[1.5] tracking-[-0.036rem] text-black-90';
 
 const ProfileApplicationSection = () => {
   const [activeFilter, setActiveFilter] = useState<ApplicationStat>('전체');
@@ -62,38 +47,47 @@ const ProfileApplicationSection = () => {
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
       />
-      {/** 지원한 팀 */}
       <div className="flex flex-col items-center self-stretch">
-        {/** 내가 지원한 팀 Header */}
-        <div className="flex items-center justify-between self-stretch rounded-[1.2rem] bg-black-20 px-[2rem] py-[1.2rem]">
-          {HEADER_COLUMNS.map(({ label, width, className }) => (
-            <HeaderCell key={label} label={label} width={width} className={className} />
-          ))}
-        </div>
-        {filtered.length === 0 ? (
-          <PostEmptyPage
-            className="h-[auto] pt-[11rem] pb-[4rem] whitespace-nowrap"
-            title="아직 지원한 팀이 없어요"
-            subTitle="관심 있는 모집글을 찾아 지원해보세요."
-            btnText="새로운 팀 찾기"
-            onBtnClick={() => navigate('/')}
-          />
-        ) : (
-          <div className="flex flex-col items-start self-stretch border-b border-solid border-black-30 px-[2rem]">
-            {filtered.map((application) => (
-              <ProfileApplicationItem
-                key={application.id}
-                postId={application.post.id}
-                teamName={application.team.name}
-                title={application.post.title}
-                position={POSITION_CONVERTER[application.position] ?? application.position}
-                status={STATUS_MAP[application.status]}
-                appliedAt={formatDate(application.createdAt)}
-                onCancel={() => cancelApplication(application.id)}
-              />
-            ))}
-          </div>
-        )}
+        <table className="w-full">
+          <caption className="sr-only">지원 내역</caption>
+          <thead>
+            <tr className="flex items-center justify-between rounded-[1.2rem] bg-black-20 px-[2rem] py-[1.2rem]">
+              <th scope="col" className={`${TH_TEXT} w-[40rem] text-center`}>내용</th>
+              <th scope="col" className={`${TH_TEXT} w-[7.7rem] text-center`}>직무</th>
+              <th scope="col" className={`${TH_TEXT} w-[6.2rem] text-center`}>상태</th>
+              <th scope="col" className={`${TH_TEXT} w-[9.6rem] text-center`}>지원일</th>
+              <th scope="col" className={`${TH_TEXT} w-[12rem] px-[2.8rem] text-center`}>취소</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.length === 0 ? (
+              <tr>
+                <td colSpan={5}>
+                  <PostEmptyPage
+                    className="h-[auto] pt-[11rem] pb-[4rem] whitespace-nowrap"
+                    title="아직 지원한 팀이 없어요"
+                    subTitle="관심 있는 모집글을 찾아 지원해보세요."
+                    btnText="새로운 팀 찾기"
+                    onBtnClick={() => navigate('/')}
+                  />
+                </td>
+              </tr>
+            ) : (
+              filtered.map((application) => (
+                <ProfileApplicationItem
+                  key={application.id}
+                  postId={application.post.id}
+                  teamName={application.team.name}
+                  title={application.post.title}
+                  position={POSITION_CONVERTER[application.position] ?? application.position}
+                  status={STATUS_MAP[application.status]}
+                  appliedAt={formatDate(application.createdAt)}
+                  onCancel={() => cancelApplication(application.id)}
+                />
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
