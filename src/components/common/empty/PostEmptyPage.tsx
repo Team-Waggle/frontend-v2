@@ -27,13 +27,15 @@ const PostEmptyPage = ({ className, title, subTitle, btnText, onBtnClick }: Empt
             </p>
           </div>
         </div>
-        <BaseButton
-          color="secondary"
-          className="w-full"
-          onClick={onBtnClick}
-        >
-          {btnText}
-        </BaseButton>
+        {btnText && (
+          <BaseButton
+            color="secondary"
+            className="w-full"
+            onClick={onBtnClick}
+          >
+            {btnText}
+          </BaseButton>
+        )}
       </div>
     </div>
   );

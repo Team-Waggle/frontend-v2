@@ -21,6 +21,7 @@ import {
   getNotificationsCount,
   patchNotificationsRead,
 } from '../api/user';
+import { deleteApplication } from '../api/team';
 
 // 사용자 조회
 export const useGetUserDetail = (userId: string) => {
@@ -42,6 +43,17 @@ export const useGetMyApplications = () => {
     queryFn: getUserMeApplications,
     enabled: !!accessToken && !!profileStatus?.complete,
     refetchOnWindowFocus: false,
+  });
+};
+
+// 지원 취소
+export const useDeleteApplication = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (applicationId: number) => deleteApplication(applicationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-applications'] });
+    },
   });
 };
 

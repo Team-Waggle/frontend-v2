@@ -21,6 +21,7 @@ import {
   putTeamMemberReview,
   updateTeam,
   deleteTeam,
+  leaveTeam,
 } from '../api/team';
 import type { ApplyRequest } from '../types/api/posts';
 import type {
@@ -217,6 +218,17 @@ export const usePostTeamApplicationRead = () => {
       queryClient.invalidateQueries({
         queryKey: ['team-applications'],
       });
+    },
+  });
+};
+
+// 팀 탈퇴
+export const useLeaveTeam = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (teamId: number) => leaveTeam(teamId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-me-team'] });
     },
   });
 };
