@@ -107,18 +107,6 @@ const TeamPostItem = ({
           </div>
         </div>
       </div>
-      {/* <TeamPostStatusToggle
-        isClosed={isClosed}
-        onClick={() => {
-          if (isPending) return;
-          const newStatus = isClosed ? 'RECRUITING' : 'CLOSED';
-          setIsClosed(!isClosed);
-          patchClose(
-            { postId: id, status: newStatus },
-            { onError: () => setIsClosed((prev) => !prev) },
-          );
-        }}
-      /> */}
       <div className="flex w-[19.2rem] items-center gap-[0.6rem]">
         <CustomBtn
           size="sm"
