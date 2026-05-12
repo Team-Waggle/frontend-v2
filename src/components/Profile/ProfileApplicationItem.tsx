@@ -98,7 +98,7 @@ const ProfileApplicationItem = ({
                 </span>
               </div>
               <a
-                href={portfolioUrl}
+                href={/^https?:\/\//i.test(portfolioUrl) ? portfolioUrl : `https://${portfolioUrl}`}
                 target="_blank"
                 rel="noreferrer"
                 className="line-clamp-1 overflow-hidden text-ellipsis text-[1.3rem] font-[500] leading-[1.5] tracking-[-0.026rem] text-blue-60 underline"
