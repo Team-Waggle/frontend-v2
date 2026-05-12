@@ -10,6 +10,7 @@ import {
   useGetUserTeams,
   usePatchTeamVisibility,
 } from '../../hooks/useUser';
+import { useLeaveTeam } from '../../hooks/useTeam';
 import { POSITION_CONVERTER } from '../../utils/position';
 
 type ProfileTeamSectionProps = {
@@ -22,6 +23,7 @@ const ProfileTeamSection = ({ userId, isMyProfile }: ProfileTeamSectionProps) =>
   const { data: myTeams } = useGetUserMeTeam();
   const { data: otherTeams } = useGetUserTeams(userId);
   const { mutate: patchVisibility } = usePatchTeamVisibility();
+  const { mutate: leaveTeam } = useLeaveTeam();
   const { data: userDetail } = useGetUserDetail(userId);
 
   const userTeams = isMyProfile ? myTeams : otherTeams;
@@ -65,6 +67,7 @@ const ProfileTeamSection = ({ userId, isMyProfile }: ProfileTeamSectionProps) =>
                 patchVisibility({ teamId, visible });
                 if (!visible) toast('프로젝트가 숨김처리 되었습니다.');
               }}
+              onLeaveTeam={(teamId) => leaveTeam(teamId)}
             />
           ))
         : otherTeams?.map((team) => (

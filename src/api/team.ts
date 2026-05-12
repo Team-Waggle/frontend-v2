@@ -168,3 +168,9 @@ export const deleteApplication = async (applicationId: number) => {
   const { data } = await axiosInstance.delete(APPLICATION_DELETE_URL(applicationId));
   return data;
 };
+
+// 팀 탈퇴
+export const leaveTeam = async (teamId: number) => {
+  const { data } = await axiosInstance.delete(TEAMS_MEMBERS_URL(teamId));
+  return data;
+};
