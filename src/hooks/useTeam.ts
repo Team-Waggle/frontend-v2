@@ -126,6 +126,7 @@ export const useCreateTeamApplications = () => {
     }) => PostTeamApplications(teamId, postData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-applications'] });
+      queryClient.invalidateQueries({ queryKey: ['post-detail'] });
     },
   });
 };
