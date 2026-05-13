@@ -11,9 +11,19 @@ const LoginPage = () => {
   const isProcessing = useRef(false);
 
   const ott = searchParams.get('ott');
+  const errorCode = searchParams.get('errorCode');
 
   useEffect(() => {
-    if (!ott || isProcessing.current) return;
+    if (isProcessing.current) return;
+
+    if (errorCode) {
+      isProcessing.current = true;
+      console.error('OAuth error:', errorCode);
+      navigate('/', { replace: true });
+      return;
+    }
+
+    if (!ott) return;
     isProcessing.current = true;
 
     // URL에서 OTT 즉시 제거 — history/Referer 노출 차단
@@ -36,7 +46,7 @@ const LoginPage = () => {
       .finally(() => {
         isProcessing.current = false;
       });
-  }, [ott, setAccessToken, navigate]);
+  }, [ott, errorCode, setAccessToken, navigate]);
 
   return <div>Loading...</div>;
 };
