@@ -31,6 +31,10 @@ const LoginPage = () => {
       })
       .catch((e) => {
         console.error('OAuth OTT redeem failed:', e);
+        navigate('/', { replace: true });
+      })
+      .finally(() => {
+        isProcessing.current = false;
       });
   }, [ott, setAccessToken, navigate]);
 
