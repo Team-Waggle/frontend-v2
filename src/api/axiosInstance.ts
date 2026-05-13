@@ -10,6 +10,10 @@ const axiosInstance = axios.create({
 },
 });
 
+// 동시 401 요청이 각자 /auth/refresh를 호출하면 BE rotation이
+// 첫 응답 외 모두 reuse로 판정하므로, 진행 중인 refresh가 있으면 공유한다.
+let refreshPromise: Promise<string> | null = null;
+
 axiosInstance.interceptors.request.use((config) => {
   const token = useAuthStore.getState().accessToken;
   if (token) {
@@ -31,15 +35,24 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const res = await axios.post(
-          `${import.meta.env.VITE_BASE_URL}/auth/refresh`,
-          {},
-          { withCredentials: true },
-        );
+        if (!refreshPromise) {
+          refreshPromise = axios
+            .post(
+              `${import.meta.env.VITE_BASE_URL}${REFRESH_TOKEN_URL}`,
+              {},
+              { withCredentials: true },
+            )
+            .then((res) => {
+              const newAccessToken = res.data.accessToken as string;
+              useAuthStore.getState().setAccessToken(newAccessToken);
+              return newAccessToken;
+            })
+            .finally(() => {
+              refreshPromise = null;
+            });
+        }
 
-        const newAccessToken = res.data.accessToken;
-
-        useAuthStore.getState().setAccessToken(newAccessToken);
+        const newAccessToken = await refreshPromise;
 
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return axiosInstance(originalRequest);

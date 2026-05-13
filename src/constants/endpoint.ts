@@ -38,6 +38,7 @@ export const USERS_ME_NOTIFICATIONS_READ_ALL_URL = '/notifications/read-all'; //
 // 인증 토큰 API
 export const LOGOUT_URL = '/auth/logout'; // 로그아웃
 export const REFRESH_TOKEN_URL = '/auth/refresh'; // 액세스 토큰 재발급
+export const OAUTH_REDEEM_URL = '/auth/oauth/redeem'; // OAuth 콜백 OTT를 액세스 토큰으로 교환
 
 // 팀 API
 export const TEAMS_URL = '/teams'; // 팀 생성
