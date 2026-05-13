@@ -8,13 +8,13 @@ import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persist
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'sonner';
 
-const queryclient = new QueryClient();
+const queryClient = new QueryClient();
 const persister = createSyncStoragePersister({ storage: localStorage });
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <PersistQueryClientProvider
-      client={queryclient}
+      client={queryClient}
       persistOptions={{
         persister,
         maxAge: 1000 * 60 * 60 * 24,
