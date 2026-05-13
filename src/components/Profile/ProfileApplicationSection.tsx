@@ -56,7 +56,7 @@ const ProfileApplicationSection = () => {
               <th scope="col" className={`${TH_TEXT} w-[7.7rem] text-center`}>직무</th>
               <th scope="col" className={`${TH_TEXT} w-[6.2rem] text-center`}>상태</th>
               <th scope="col" className={`${TH_TEXT} w-[9.6rem] text-center`}>지원일</th>
-              <th scope="col" className={`${TH_TEXT} w-[12rem] px-[2.8rem] text-center`}>취소</th>
+              <th scope="col" className={`${TH_TEXT} w-[12rem] px-[2.8rem] text-left`}>취소</th>
             </tr>
           </thead>
           <tbody>
@@ -83,6 +83,8 @@ const ProfileApplicationSection = () => {
                   status={STATUS_MAP[application.status]}
                   appliedAt={formatDate(application.createdAt)}
                   onCancel={() => cancelApplication(application.id)}
+                  coverLetter={application.detail || undefined}
+                  portfolioUrls={application.portfolioUrls}
                 />
               ))
             )}

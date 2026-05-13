@@ -7,6 +7,8 @@ export type MyApplicationItem = {
   id: number;
   position: PositionType;
   status: ApplicationStatus;
+  detail: string;
+  portfolioUrls: string[];
   team: {
     id: number;
     name: string;

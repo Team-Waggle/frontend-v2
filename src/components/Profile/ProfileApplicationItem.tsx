@@ -17,7 +17,7 @@ interface ProfileApplicationItemProps {
   appliedAt: string;
   onCancel: () => void;
   coverLetter?: string;
-  portfolioUrl?: string;
+  portfolioUrls?: string[];
 }
 
 const ProfileApplicationItem = ({
@@ -29,14 +29,14 @@ const ProfileApplicationItem = ({
   appliedAt,
   onCancel,
   coverLetter,
-  portfolioUrl,
+  portfolioUrls,
 }: ProfileApplicationItemProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const hasDetail = coverLetter || portfolioUrl;
+  const hasDetail = coverLetter || portfolioUrls?.length;
 
   return (
     <>
-      <tr className="flex items-center justify-between border-y border-solid border-t-black-10 border-b-black-30 px-[2rem] py-[2.8rem]">
+      <tr className={`flex items-center justify-between border-t border-solid border-t-black-10 px-[2rem] py-[2.8rem] ${!isOpen ? 'border-b border-b-black-30' : ''}`}>
         {/** 팀명 / 제목 */}
         <td className="w-[40rem]">
           <Link to={`/post/${postId}`} className="group flex cursor-pointer flex-col items-start gap-[1rem] overflow-hidden">
@@ -72,8 +72,8 @@ const ProfileApplicationItem = ({
           </span>
         </td>
         {/** 취소 / 상세 토글 */}
-        <td className="w-[12rem] px-[2.8rem]">
-          <div className="flex items-center justify-center">
+        <td className="w-[12rem]">
+          <div className="flex items-center justify-between">
             <CustomBtn
               size="sm"
               color="secondary"
@@ -88,6 +88,7 @@ const ProfileApplicationItem = ({
                 type="button"
                 aria-label="지원 내용 상세보기"
                 aria-expanded={isOpen}
+
                 onClick={() => setIsOpen((prev) => !prev)}
               >
                 <IcChevronDown
@@ -99,14 +100,14 @@ const ProfileApplicationItem = ({
         </td>
       </tr>
       {isOpen && (
-        <tr className="flex px-[2rem]">
+        <tr className="flex border-b border-solid border-b-black-30 px-[2rem]">
           <td className="flex-1 pb-[2rem]">
             <div className="flex flex-col items-start gap-[1.2rem]">
               <span className="line-clamp-4 self-stretch text-[1.3rem] font-[500] leading-[1.5] tracking-[-0.026rem] text-black-90">
                 {coverLetter}
               </span>
-              {portfolioUrl && (
-                <div className="flex items-center gap-[0.4rem] self-stretch rounded-[0.6rem] bg-blue-5 px-[0.8rem] py-[1rem]">
+              {portfolioUrls?.map((url) => (
+                <div key={url} className="flex items-center gap-[0.4rem] self-stretch rounded-[0.6rem] bg-blue-5 px-[0.8rem] py-[1rem]">
                   <div className="flex items-center gap-[0.2rem]">
                     <IcLink className="h-[1.2rem] w-[1.2rem] text-black-90" />
                     <span className="line-clamp-1 overflow-hidden text-ellipsis text-[1.3rem] font-[500] leading-[1.5] tracking-[-0.026rem] text-black-90">
@@ -114,15 +115,15 @@ const ProfileApplicationItem = ({
                     </span>
                   </div>
                   <a
-                    href={/^https?:\/\//i.test(portfolioUrl) ? portfolioUrl : `https://${portfolioUrl}`}
+                    href={/^https?:\/\//i.test(url) ? url : `https://${url}`}
                     target="_blank"
                     rel="noreferrer"
                     className="line-clamp-1 overflow-hidden text-ellipsis text-[1.3rem] font-[500] leading-[1.5] tracking-[-0.026rem] text-blue-60 underline"
                   >
-                    {portfolioUrl}
+                    {url}
                   </a>
                 </div>
-              )}
+              ))}
             </div>
           </td>
         </tr>
