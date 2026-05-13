@@ -104,6 +104,7 @@ const SideTeamCard = ({
   const positionLabel = toPositionLabel(position);
   const [isSelectBoxOpen, setIsSelectBoxOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const selectBoxRef = useRef<HTMLDivElement | null>(null);
 
@@ -226,11 +227,12 @@ const SideTeamCard = ({
             .join(' ')}
         >
           <div className="flex flex-col items-center gap-[1.7rem]">
-            {profileImageUrl ? (
+            {profileImageUrl && !imgError ? (
               <img
                 alt={'프로필 이미지'}
                 src={profileImageUrl}
                 className="h-[6.1rem] w-[6.1rem] rounded-[9.9rem] object-cover"
+                onError={() => setImgError(true)}
               />
             ) : (
               <IcCharacter className="h-[6.1rem] w-[6.1rem] rounded-[9.9rem]" />
