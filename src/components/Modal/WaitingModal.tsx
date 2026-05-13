@@ -16,7 +16,7 @@ import Confetti2Icon from '../../assets/icons/ic_confetti2.svg?react';
 import Confetti3Icon from '../../assets/icons/ic_confetti3.svg?react';
 
 interface WaitingModalProps extends ModalProps {
-  myData?: UserMeResponse;
+  myData: UserMeResponse;
 }
 
 const WaitingModal = ({ isOpen, onClose, myData }: WaitingModalProps) => {
@@ -54,7 +54,7 @@ const WaitingModal = ({ isOpen, onClose, myData }: WaitingModalProps) => {
             <BaseButton
               size="xl"
               color="secondary"
-              onClick={() => navigate(`/profile/${myData?.id}/applications`)}
+              onClick={() => navigate(`/profile/${myData.id}/applications`)}
               className="w-[25rem]"
             >
               지원 목록 이동
