@@ -1,4 +1,5 @@
 import { Component, type ReactNode } from 'react';
+import { persister } from '../lib/persister';
 
 const CACHE_KEY = 'REACT_QUERY_OFFLINE_CACHE';
 const RECOVERY_FLAG = 'cache_recovery_at';
@@ -22,8 +23,16 @@ export class CacheErrorBoundary extends Component<Props, State> {
     if (Date.now() - lastRecoveryAt < RECOVERY_COOLDOWN_MS) return;
 
     sessionStorage.setItem(RECOVERY_FLAG, String(Date.now()));
-    localStorage.removeItem(CACHE_KEY);
-    window.location.reload();
+
+    // persister 내부 throttle queue까지 비워 race로 옛 캐시가 다시 들어가는
+    // 윈도우를 차단한다. 안전망으로 직접 removeItem도 한 번 더 호출.
+    // removeClient() 반환 타입이 Promisable<void>라 Promise.resolve로 래핑.
+    Promise.resolve(persister.removeClient())
+      .catch(() => {})
+      .then(() => {
+        localStorage.removeItem(CACHE_KEY);
+        window.location.reload();
+      });
   }
 
   handleRetry = () => {
