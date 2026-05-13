@@ -18,8 +18,8 @@ const NavTab = ({ to, children, className, isActive = false }: NavTabProps) => {
     .join(' ');
 
   const textStyle = [
-    'text-[2rem] font-[600] leading-[1.4] tracking-[-0.04rem]',
-    isActive ? 'text-blue-100' : 'text-black-60',
+    'text-[2rem] leading-[1.4] tracking-[-0.04rem]',
+    isActive ? 'text-blue-100 font-[700]' : 'text-black-60 font-[600]',
   ]
     .filter(Boolean)
     .join(' ');
