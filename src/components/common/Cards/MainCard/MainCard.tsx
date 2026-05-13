@@ -42,7 +42,7 @@ const MainCard = ({
   onClick,
 }: MainCardProps) => {
   const baseStyle =
-    'pointer-events-auto flex w-full min-w-[33.6rem] cursor-pointer flex-col items-start gap-[3.2rem] rounded-[1.2rem] border border-solid border-[#E7E8EA] bg-white px-[2.8rem] py-[2.4rem]';
+    'pointer-events-auto flex w-full min-w-[33.6rem] cursor-pointer flex-col items-start gap-[3.2rem] rounded-[1.2rem] border border-solid border-black-30 bg-white px-[2.8rem] py-[2.4rem]';
   const hoverStyle =
     variant === 'main' ? 'hover:shadow-main-card' : 'hover:bg-hover-5';
   const activeStyle = isActive ? 'border-blue-70' : '';
