@@ -4,12 +4,13 @@ import { RouterProvider } from 'react-router-dom';
 import { router } from './router.tsx';
 import { QueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
-import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'sonner';
+import { CacheErrorBoundary } from './components/CacheErrorBoundary';
 
 const queryClient = new QueryClient();
-const persister = createSyncStoragePersister({ storage: localStorage });
+const persister = createAsyncStoragePersister({ storage: localStorage });
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -20,7 +21,9 @@ createRoot(document.getElementById('root')!).render(
         maxAge: 1000 * 60 * 60 * 24,
       }}
     >
-      <RouterProvider router={router} />
+      <CacheErrorBoundary>
+        <RouterProvider router={router} />
+      </CacheErrorBoundary>
       <ReactQueryDevtools initialIsOpen={false} />
       <Toaster position="bottom-center" />
     </PersistQueryClientProvider>
