@@ -367,6 +367,7 @@ const PostDetailPage = () => {
         />
       )}
       <WaitingModal
+        myData={me}
         isOpen={isApplyWaitingModalOpen}
         onClose={() => setIsApplyWaitingModalOpen(false)}
       />
