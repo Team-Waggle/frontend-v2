@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import IcProfileImg from '../../assets/icons/image/ic_character_circle_gray_60.svg?react';
 import type { ConversationResponse } from '../../types/api/message';
 import { formatConversationTime } from '../../utils/kst-time';
@@ -12,20 +13,22 @@ interface MessageListItemProps {
 const MessageListItem = ({ conversation, isSelected, onClick }: MessageListItemProps) => {
   const { partner, lastMessage, unreadCount } = conversation;
   const hasUnread = unreadCount > 0;
+  const [imgError, setImgError] = useState(false);
 
   return (
     <li>
     <button
       type="button"
-      className={`group flex w-full cursor-pointer items-center justify-between px-[1.2rem] py-[1.4rem] hover:bg-hover-5 ${isSelected ? 'bg-hover-5' : ''}`}
+      className={`group flex w-full cursor-pointer items-center justify-between px-[1.2rem] py-[1.4rem] rounded-[0.8rem] hover:bg-hover-5 ${isSelected ? 'bg-hover-5' : ''}`}
       onClick={onClick}
     >
       <div className="flex flex-1 items-center gap-[1rem]">
-        {partner.profileImageUrl ? (
+        {partner.profileImageUrl && !imgError ? (
           <img
             src={partner.profileImageUrl}
             alt={partner.username ?? '프로필'}
             className="h-[5.2rem] w-[5.2rem] flex-shrink-0 rounded-full object-cover"
+            onError={() => setImgError(true)}
           />
         ) : (
           <IcProfileImg className="h-[5.2rem] w-[5.2rem] rounded-full flex-shrink-0" />
