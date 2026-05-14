@@ -30,7 +30,7 @@ export const SKILL_MAP = {
   TypeScript: 'TYPESCRIPT',
   UE: 'UE',
   Unity: 'UNITY',
-  // UnrealEngine: 'UNREAL_ENGINE',
+  UnrealEngine: 'UNREAL_ENGINE',
   'Vue.js': 'VUE',
   XD: 'XD',
   콘텐츠제작: 'CONTENT_CREATION',
