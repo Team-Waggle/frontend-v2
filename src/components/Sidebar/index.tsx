@@ -67,7 +67,8 @@ const Sidebar = () => {
             <SidebarProfile
               data={myData}
               isFolded={isFolded}
-              isLoggedIn={isProfileComplete}
+              isLoggedIn={isLoggedIn}
+              isProfileComplete={!!isProfileComplete}
               setIsNotificationOpen={setIsNotificationOpen}
             />
 

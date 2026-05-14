@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "@stomp/stompjs": "^7.3.0",
+    "@tanstack/query-async-storage-persister": "^5.100.10",
     "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-query-devtools": "^5.91.2",
+    "@tanstack/react-query-persist-client": "^5.100.10",
     "@tiptap/extension-link": "^3.19.0",
     "@tiptap/extension-placeholder": "^3.18.0",
     "@tiptap/markdown": "^3.19.0",
