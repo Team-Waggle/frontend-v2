@@ -88,9 +88,9 @@ const MessageList = () => {
           <ul>
             {conversations.map((conversation) => (
               <MessageListItem
-                key={conversation.partner.id}
+                key={conversation?.partner.id}
                 conversation={conversation}
-                isSelected={partnerId === conversation.partner.id}
+                isSelected={partnerId === conversation?.partner.id}
                 onClick={() =>
                   handleClickConversation(
                     conversation.partner.id,

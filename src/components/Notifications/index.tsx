@@ -151,7 +151,7 @@ const Notifications = ({
             모두 읽음 처리
           </BaseButton>
         </div>
-        {mynotificationsData?.data.length !== 0 && (
+        {mynotificationsData?.data?.length !== 0 && (
           <div className="flex h-full justify-between overflow-y-scroll pl-[2.2rem] pr-[0.8rem]">
             <div className="flex flex-col gap-[1rem]">
               {mynotificationsData?.data?.map((data) => {
@@ -210,7 +210,7 @@ const Notifications = ({
             </div>
           </div>
         )}
-        {mynotificationsData?.data.length === 0 && (
+        {mynotificationsData?.data?.length === 0 && (
           <div className="flex h-full flex-col justify-center px-[2.2rem]">
             <div className="flex flex-col items-center gap-[1.8rem]">
               <NoNotificaitionIcon width={55} height={53} />
