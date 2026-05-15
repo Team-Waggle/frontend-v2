@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Outlet, ScrollRestoration, useMatch } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 import { usePostRefresh } from './hooks/useAuth';
@@ -8,38 +8,30 @@ import FloatingMessageButton from './components/Message/FloatingMessageButton';
 
 function App() {
   const { mutateAsync: silentRefresh } = usePostRefresh();
-  const messageMatch = useMatch('/message/:partnerId');
-  useStompClient(messageMatch?.params?.partnerId);
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const isAuthLoading = useAuthStore((state) => state.isAuthLoading);
 
-  const { accessToken } = useAuthStore();
-  const [isInitializing, setIsInitializing] = useState(true);
+  const messageMatch = useMatch('/message/:partnerId');
+  const partnerId = messageMatch?.params?.partnerId;
 
   useEffect(() => {
     const initAuth = async () => {
-      if (accessToken) {
-        setIsInitializing(false);
-        return;
-      }
-
       try {
         await silentRefresh();
-      } catch (error) {
-        console.error(error);
+      } catch {
+        useAuthStore.getState().logout();
       } finally {
-        setIsInitializing(false);
+        useAuthStore.getState().setAuthLoading(false);
       }
     };
 
     initAuth();
-  }, [accessToken, silentRefresh]);
+  }, []);
 
-  // 초기 인증 확인 중에는 화면을 가려줍니다 (깜빡임 방지)
-  if (isInitializing) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>인증 정보 확인 중...</p>
-      </div>
-    );
+  useStompClient(!isAuthLoading && accessToken ? partnerId : '');
+
+  if (isAuthLoading) {
+    return null;
   }
 
   return (

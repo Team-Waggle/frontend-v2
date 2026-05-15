@@ -4,6 +4,7 @@ import { getPostDetail } from '../api/post';
 import { GetTeamDetail } from '../api/team';
 import { getUserDetail } from '../api/user';
 import { useAuthStore } from '../stores/authStore';
+import { isAccessTokenExpired } from '../utils/authToken';
 
 type RouteLoader = (args: LoaderFunctionArgs) => Promise<unknown> | unknown;
 
@@ -58,7 +59,7 @@ const validateEntity = async (request: () => Promise<unknown>) => {
 export const requireAuthLoader = async () => {
   const { accessToken, setAccessToken } = useAuthStore.getState();
 
-  if (accessToken) {
+  if (accessToken && !isAccessTokenExpired(accessToken)) {
     return null;
   }
 

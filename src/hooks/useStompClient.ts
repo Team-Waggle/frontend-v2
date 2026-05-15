@@ -5,13 +5,18 @@ import type { InfiniteData } from '@tanstack/react-query';
 import { useAuthStore } from '../stores/authStore';
 import { useMessageStore } from '../stores/messageStore';
 import { getWsToken } from '../api/message';
-import type { ConversationResponse, CursorResponse, MessageResponse } from '../types/api/message';
+import type {
+  ConversationResponse,
+  CursorResponse,
+  MessageResponse,
+} from '../types/api/message';
 
 // OTT(일회용 토큰)를 URL 쿼리 파라미터로 전달 — 서버가 WebSocket 업그레이드 시점에 검증
 const buildBrokerURL = (ottToken: string) =>
   `${import.meta.env.VITE_WS_URL as string}?token=${ottToken}`;
 
-const getReconnectDelay = (attempt: number) => Math.min(1000 * 2 ** attempt, 30_000);
+const getReconnectDelay = (attempt: number) =>
+  Math.min(1000 * 2 ** attempt, 30_000);
 const MAX_RECONNECT_ATTEMPTS = 5;
 // 연속 5회 실패 후 잠시 대기했다가 재시도 (로그아웃 대신)
 const PAUSE_AFTER_MAX_ATTEMPTS = 5 * 60_000;
@@ -37,10 +42,16 @@ export const useStompClient = (partnerId?: string) => {
   const tabHiddenAtRef = useRef<number | null>(null);
 
   const setStompClient = useMessageStore((state) => state.setStompClient);
-  const appendRealtimeMessage = useMessageStore((state) => state.appendRealtimeMessage);
-  const clearRealtimeMessages = useMessageStore((state) => state.clearRealtimeMessages);
+  const appendRealtimeMessage = useMessageStore(
+    (state) => state.appendRealtimeMessage,
+  );
+  const clearRealtimeMessages = useMessageStore(
+    (state) => state.clearRealtimeMessages,
+  );
   const reconnectPending = useMessageStore((state) => state.reconnectPending);
-  const clearReconnectPending = useMessageStore((state) => state.clearReconnectPending);
+  const clearReconnectPending = useMessageStore(
+    (state) => state.clearReconnectPending,
+  );
 
   useEffect(() => {
     if (!accessToken) return;
@@ -76,7 +87,9 @@ export const useStompClient = (partnerId?: string) => {
                   body: JSON.stringify({ receiverId, content }),
                 });
                 setTimeout(() => {
-                  queryClient.invalidateQueries({ queryKey: ['messages', receiverId] });
+                  queryClient.invalidateQueries({
+                    queryKey: ['messages', receiverId],
+                  });
                 }, 800);
               });
             }
@@ -86,7 +99,9 @@ export const useStompClient = (partnerId?: string) => {
               queryClient.invalidateQueries({ queryKey: ['conversations'] });
               const currentPartnerId = partnerIdRef.current;
               if (currentPartnerId) {
-                queryClient.invalidateQueries({ queryKey: ['messages', currentPartnerId] });
+                queryClient.invalidateQueries({
+                  queryKey: ['messages', currentPartnerId],
+                });
               }
             }
             isFirstConnectRef.current = false;
@@ -102,7 +117,9 @@ export const useStompClient = (partnerId?: string) => {
 
               const currentPartnerId = partnerIdRef.current;
               const senderIdStr = String(msg.sender.id);
-              const currentPartnerIdStr = currentPartnerId ? String(currentPartnerId) : null;
+              const currentPartnerIdStr = currentPartnerId
+                ? String(currentPartnerId)
+                : null;
 
               // 현재 열린 채팅 상대의 메시지만 realtimeMessages에 추가
               if (currentPartnerIdStr && senderIdStr === currentPartnerIdStr) {
@@ -110,37 +127,38 @@ export const useStompClient = (partnerId?: string) => {
               }
 
               // 대화 목록 낙관적 업데이트
-              queryClient.setQueryData<InfiniteData<CursorResponse<ConversationResponse>>>(
-                ['conversations', undefined],
-                (old) => {
-                  if (!old) return old;
-                  return {
-                    ...old,
-                    pages: old.pages.map((page) => ({
-                      ...page,
-                      data: page.data.map((conv) => {
-                        if (String(conv.partner.id) === senderIdStr) {
-                          return {
-                            ...conv,
-                            lastMessage: {
-                              id: msg.id,
-                              content: msg.content,
-                              createdAt: msg.createdAt,
-                            },
-                            unreadCount:
-                              currentPartnerIdStr === senderIdStr
-                                ? conv.unreadCount
-                                : conv.unreadCount + 1,
-                          };
-                        }
-                        return conv;
-                      }),
-                    })),
-                  };
-                },
-              );
+              queryClient.setQueryData<
+                InfiniteData<CursorResponse<ConversationResponse>>
+              >(['conversations', undefined], (old) => {
+                if (!old) return old;
+                return {
+                  ...old,
+                  pages: old.pages.map((page) => ({
+                    ...page,
+                    data: page.data.map((conv) => {
+                      if (String(conv.partner.id) === senderIdStr) {
+                        return {
+                          ...conv,
+                          lastMessage: {
+                            id: msg.id,
+                            content: msg.content,
+                            createdAt: msg.createdAt,
+                          },
+                          unreadCount:
+                            currentPartnerIdStr === senderIdStr
+                              ? conv.unreadCount
+                              : conv.unreadCount + 1,
+                        };
+                      }
+                      return conv;
+                    }),
+                  })),
+                };
+              });
 
-              queryClient.invalidateQueries({ queryKey: ['messages', msg.sender.id] });
+              queryClient.invalidateQueries({
+                queryKey: ['messages', msg.sender.id],
+              });
               queryClient.invalidateQueries({ queryKey: ['conversations'] });
             });
           },
@@ -153,7 +171,9 @@ export const useStompClient = (partnerId?: string) => {
             if (reconnectAttemptsRef.current >= MAX_RECONNECT_ATTEMPTS) {
               reconnectAttemptsRef.current = 0;
               isReconnectingRef.current = false;
-              await new Promise((resolve) => setTimeout(resolve, PAUSE_AFTER_MAX_ATTEMPTS));
+              await new Promise((resolve) =>
+                setTimeout(resolve, PAUSE_AFTER_MAX_ATTEMPTS),
+              );
               if (!cancelled) connectRef.current?.();
               return;
             }
@@ -164,9 +184,15 @@ export const useStompClient = (partnerId?: string) => {
 
             try {
               await new Promise((resolve) => setTimeout(resolve, delay));
-              if (cancelled) { isReconnectingRef.current = false; return; }
+              if (cancelled) {
+                isReconnectingRef.current = false;
+                return;
+              }
               const newToken = await getWsToken();
-              if (cancelled) { isReconnectingRef.current = false; return; }
+              if (cancelled) {
+                isReconnectingRef.current = false;
+                return;
+              }
               client.configure({ brokerURL: buildBrokerURL(newToken) });
               isReconnectingRef.current = false;
               client.activate();
@@ -226,7 +252,9 @@ export const useStompClient = (partnerId?: string) => {
         return;
       }
 
-      const hiddenMs = tabHiddenAtRef.current ? Date.now() - tabHiddenAtRef.current : 0;
+      const hiddenMs = tabHiddenAtRef.current
+        ? Date.now() - tabHiddenAtRef.current
+        : 0;
       tabHiddenAtRef.current = null;
       reconnectAttemptsRef.current = 0;
 
@@ -240,7 +268,8 @@ export const useStompClient = (partnerId?: string) => {
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    return () =>
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
   // 장기 탭 zombie 방지 — 서버가 heartbeat 미지원이므로 주기적 강제 재연결

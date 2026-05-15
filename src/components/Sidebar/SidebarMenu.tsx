@@ -1,7 +1,9 @@
 import { useLocation, useNavigate } from 'react-router';
+import { useQueryClient } from '@tanstack/react-query';
 import type { TeamResponse } from '../../types/api/team';
 import SidebarIcon from './SidebarIcon';
 import SidebarItem from './SidebarItem';
+import { ensureFreshAccessToken } from '../../utils/authToken';
 
 // Icons
 import FaceSmileIcon from '../../assets/icons/normal/ic_faceSmile.svg?react';
@@ -77,6 +79,7 @@ const SidebarMenu = ({
 }: SidebarMenuProps) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const visibleMenus = isLoggedIn
     ? SIDEBAR_MENUS
@@ -102,13 +105,26 @@ const SidebarMenu = ({
           : pathname.includes(key) &&
             !(key === 'team' && pathname === '/team/new');
 
-        const handleClick = () => {
+        const handleClick = async () => {
           if (!isLoggedIn && key === 'team') {
             setIsLoginModalOpen();
             return;
           }
 
           if (key === 'notification') {
+            const isAuthenticated = await ensureFreshAccessToken();
+            if (!isAuthenticated) {
+              setIsNotificationOpen(false);
+              setIsLoginModalOpen();
+              return;
+            }
+
+            await queryClient.invalidateQueries({
+              queryKey: ['my-notifications'],
+            });
+            await queryClient.invalidateQueries({
+              queryKey: ['my-notifications-count'],
+            });
             setIsNotificationOpen(!isNotificationOpen);
             return;
           }
