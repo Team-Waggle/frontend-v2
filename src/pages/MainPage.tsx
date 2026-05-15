@@ -115,10 +115,10 @@ const MainPage = () => {
               </p>
             </div>
             {/** 캐릭터 이미지 */}
-            <div className="absolute bottom-[2.72cqw] right-[5.178cqw] z-10 flex h-[5.175cqw] items-end gap-[1.663cqw]">
-              <IcBannerCircle className="h-full w-auto" />
-              <IcBannerTriangle className="h-full w-auto" />
-              <IcBannerSquare className="h-full w-auto" />
+            <div className="absolute bottom-[2.72cqw] right-[5.178cqw] z-10 flex items-end gap-[1.663cqw]">
+              <IcBannerCircle className="h-[7.94cqw] w-[7.94cqw]" />
+              <IcBannerTriangle className="h-[7.94cqw] w-[7.94cqw]" />
+              <IcBannerSquare className="h-[7.94cqw] w-[7.94cqw]" />
             </div>
             {/** 하단 색상 바 */}
             <div className="absolute bottom-0 h-[4.019cqw] w-full bg-blue-50" />
