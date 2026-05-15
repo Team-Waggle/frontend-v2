@@ -189,7 +189,7 @@ const PostDetailPage = () => {
                   </span>
                 </div>
               </div>
-              <div className="flex items-center justify-between self-stretch">
+              <div className="flex items-start justify-between self-stretch">
                 {/** 왼쪽: 모집인원 */}
                 <div className="flex w-[39.5rem] flex-col items-start gap-[1.6rem] rounded-[0.8rem] border border-solid border-black-30 px-[2.2rem] pb-[2.8rem] pt-[2rem]">
                   <div className="flex items-center gap-[0.4rem]">
@@ -224,7 +224,7 @@ const PostDetailPage = () => {
                 </div>
 
                 {/** 오른쪽: 사용스킬 */}
-                <div className="flex h-[14.9rem] w-[27.9rem] flex-col items-start gap-[1.6rem] rounded-[0.8rem] border border-solid border-black-30 px-[2.2rem] pb-[2.8rem] pt-[2rem]">
+                <div className="flex min-h-[14.9rem] w-[27.9rem] flex-col items-start gap-[1.6rem] rounded-[0.8rem] border border-solid border-black-30 px-[2.2rem] pb-[2.8rem] pt-[2rem]">
                   <div className="flex items-center gap-[0.4rem]">
                     <IcFolder className="h-[1.6rem] w-[1.6rem]" />
                     <span className="text-[1.3rem] font-[600] leading-[1.5] tracking-[-0.026rem] text-black-100">
@@ -274,7 +274,7 @@ const PostDetailPage = () => {
           </div>
 
           {/** 작성자 기준 화면: 마감하기, 수정하기 버튼 */}
-          {isMyPost && (
+          {isMyPost && postDetail?.recruiting && (
             <div className="flex w-[32rem] items-start gap-[1.2rem] pb-[6.6rem] pt-[1.2rem]">
               <BaseButton
                 size="lg"
@@ -317,9 +317,9 @@ const PostDetailPage = () => {
         {/** 추후 기획에 따라 변경 될 예정 */}
         {!isMyPost &&
           applyButtonPx !== null &&
-          postDetail?.recruiting &&
-          myApplicationStatus !== 'APPROVED' &&
-          myApplicationStatus !== 'REJECTED' && (
+          (!postDetail?.recruiting ||
+            (myApplicationStatus !== 'APPROVED' &&
+              myApplicationStatus !== 'REJECTED')) && (
             <div
               className="fixed bottom-[3.6rem] z-50 -translate-x-1/2"
               style={{ left: applyButtonPx ?? undefined }}
@@ -333,7 +333,9 @@ const PostDetailPage = () => {
                   className="relative z-10 w-[32rem]"
                   size="lg"
                   color="primary"
-                  disabled={myApplicationStatus === 'PENDING'}
+                  disabled={
+                    !postDetail?.recruiting || myApplicationStatus === 'PENDING'
+                  }
                   onClick={() => {
                     if (!accessToken) {
                       setIsLoginModalOpen(true);
@@ -342,9 +344,11 @@ const PostDetailPage = () => {
                     }
                   }}
                 >
-                  {myApplicationStatus === 'PENDING'
-                    ? '승인 대기중'
-                    : '지원하기'}
+                  {!postDetail?.recruiting
+                    ? '마감공고'
+                    : myApplicationStatus === 'PENDING'
+                      ? '승인 대기중'
+                      : '지원하기'}
                 </BaseButton>
               </div>
             </div>
@@ -363,6 +367,7 @@ const PostDetailPage = () => {
         />
       )}
       <WaitingModal
+        myData={me}
         isOpen={isApplyWaitingModalOpen}
         onClose={() => setIsApplyWaitingModalOpen(false)}
       />

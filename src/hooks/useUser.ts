@@ -21,6 +21,7 @@ import {
   getNotificationsCount,
   patchNotificationsRead,
 } from '../api/user';
+import { deleteApplication } from '../api/team';
 
 // 사용자 조회
 export const useGetUserDetail = (userId: string) => {
@@ -42,6 +43,17 @@ export const useGetMyApplications = () => {
     queryFn: getUserMeApplications,
     enabled: !!accessToken && !!profileStatus?.complete,
     refetchOnWindowFocus: false,
+  });
+};
+
+// 지원 취소
+export const useDeleteApplication = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (applicationId: number) => deleteApplication(applicationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-applications'] });
+    },
   });
 };
 
@@ -136,22 +148,15 @@ export const useUpdateProfileImage = () => {
 export const usePatchTeamVisibility = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      teamId,
-      visible,
-    }: {
-      teamId: number;
-      visible: boolean;
-    }) => patchTeamVisibility(teamId, visible),
+    mutationFn: ({ teamId, visible }: { teamId: number; visible: boolean }) =>
+      patchTeamVisibility(teamId, visible),
     onMutate: async ({ teamId, visible }) => {
       await queryClient.cancelQueries({ queryKey: ['user-me-team'] });
       const previous = queryClient.getQueryData<TeamResponse[]>([
         'user-me-team',
       ]);
       queryClient.setQueryData<TeamResponse[]>(['user-me-team'], (old) =>
-        old?.map((team) =>
-          team.id === teamId ? { ...team, visible } : team,
-        ),
+        old?.map((team) => (team.id === teamId ? { ...team, visible } : team)),
       );
       return { previous };
     },
@@ -189,18 +194,24 @@ export const useGetUserTeams = (userId: string) => {
 
 // 본인 알림 목록 조회
 export const useGetNotifications = () => {
+  const accessToken = useAuthStore((state) => state.accessToken);
+
   return useQuery({
     queryKey: ['my-notifications'],
     queryFn: getNotifications,
+    enabled: !!accessToken,
     refetchOnWindowFocus: false,
   });
 };
 
 // 본인 알림 개수 조회
 export const useGetNotificationsCount = () => {
+  const accessToken = useAuthStore((state) => state.accessToken);
+
   return useQuery({
     queryKey: ['my-notifications-count'],
     queryFn: getNotificationsCount,
+    enabled: !!accessToken,
     refetchOnWindowFocus: false,
   });
 };

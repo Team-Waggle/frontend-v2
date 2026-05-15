@@ -166,7 +166,7 @@ const TeamApplicantPage = () => {
                       {data.title}
                     </div>
                     {hasUnreadApplicantByPost(data.id) && (
-                      <div className="h-[0.8rem] w-[0.8rem] rounded-full bg-blue-80" />
+                      <div className="h-[0.8rem] w-[0.8rem] shrink-0 rounded-full bg-blue-80" />
                     )}
                   </div>
                 ))

@@ -96,8 +96,8 @@ const NOTIFICATION_CONFIG: Record<NotificationType, NotificationConfig> = {
 };
 
 type NotificationCountDataType = {
-  totalCount: number;
-  unreadCount: number;
+  total: number;
+  unread: number;
 };
 
 interface NotificationsProps {
@@ -120,18 +120,16 @@ const Notifications = ({
     <>
       <div className="fixed inset-0 z-30 bg-[#12141A40]" onClick={onClose} />
       <div
-        className={`fixed top-0 z-40 flex h-full w-[38rem] flex-col gap-[1.6rem] bg-black-5 py-[2.8rem] pl-[2.2rem] pr-[0.8rem] ${
+        className={`fixed top-0 z-40 flex h-full w-[38rem] flex-col bg-black-5 ${
           isFolded ? 'left-[8.8rem]' : 'left-[29.8rem]'
         }`}
       >
-        <div className="flex flex-col gap-[1.6rem] pl-[2.4rem] pr-[1.4rem]">
+        <div className="flex flex-col gap-[1.6rem] px-[2.2rem] pb-[1.6rem] pt-[2.8rem]">
           <div className="flex items-center justify-between">
-            <div className="flex gap-[0.8rem]">
-              <span className="text-[1.6rem] font-bold text-black-100">
-                전체 알림
-              </span>
-              <span className="text-[1.6rem] font-bold text-blue-80">
-                {notificationCountData?.totalCount}
+            <div className="flex gap-[0.8rem] text-[1.6rem] font-bold">
+              <span className="text-black-100">전체 알림</span>
+              <span className="text-blue-80">
+                {notificationCountData?.total}
               </span>
             </div>
             <CloseIcon onClick={onClose} className="cursor-pointer" />
@@ -141,80 +139,82 @@ const Notifications = ({
             leftIcon={
               <CheckIcon
                 className={
-                  notificationCountData?.unreadCount
+                  notificationCountData?.unread
                     ? 'text-black-80'
                     : 'text-black-40'
                 }
               />
             }
             onClick={() => patchReadAll()}
-            disabled={!notificationCountData?.unreadCount}
+            disabled={!notificationCountData?.unread}
           >
             모두 읽음 처리
           </BaseButton>
         </div>
-        {mynotificationsData?.data.length !== 0 && (
-          <div className="flex h-full flex-col overflow-y-scroll">
-            {mynotificationsData?.data?.map((data) => {
-              const config = NOTIFICATION_CONFIG[data.type];
-              const Icon = config.Icon;
-              return (
-                <div
-                  key={data.id}
-                  onClick={() => {
-                    patchRead([data.id], {
-                      onSuccess: () => {
-                        const route = config.getRoute?.(data);
-                        if (route) navigate(route);
-                        onClose();
-                      },
-                    });
-                  }}
-                  className="cursor-pointer bg-black-5 px-[2.4rem] hover:bg-black-10"
-                >
-                  <div className="flex flex-col gap-[1rem] border-b border-black-20 py-[2.4rem]">
-                    <div className="flex flex-col gap-[0.8rem]">
-                      <div className="flex items-center gap-[0.8rem]">
-                        <div className="flex h-[2.4rem] w-[2.4rem] items-center justify-center rounded-[4.569rem] bg-blue-5">
-                          <Icon
-                            className={`h-[1.6rem] w-[1.6rem] ${data.readAt ? 'text-black-40' : 'text-blue-40'}`}
-                          />
+        {mynotificationsData?.data?.length !== 0 && (
+          <div className="flex h-full justify-between overflow-y-scroll pl-[2.2rem] pr-[0.8rem]">
+            <div className="flex flex-col gap-[1rem]">
+              {mynotificationsData?.data?.map((data) => {
+                const config = NOTIFICATION_CONFIG[data.type];
+                const Icon = config.Icon;
+                return (
+                  <div
+                    key={data.id}
+                    onClick={() => {
+                      patchRead([data.id], {
+                        onSuccess: () => {
+                          const route = config.getRoute?.(data);
+                          if (route) navigate(route);
+                          onClose();
+                        },
+                      });
+                    }}
+                    className="cursor-pointer rounded-[0.8rem] bg-black-5 px-[2.4rem] hover:bg-black-10"
+                  >
+                    <div className="flex flex-col gap-[1rem] border-b border-black-20 py-[2.4rem]">
+                      <div className="flex flex-col gap-[0.8rem]">
+                        <div className="flex items-center gap-[0.8rem]">
+                          <div className="flex h-[2.4rem] w-[2.4rem] items-center justify-center rounded-[4.569rem] bg-blue-5">
+                            <Icon
+                              className={`h-[1.6rem] w-[1.6rem] ${data.readAt ? 'text-black-40' : 'text-blue-40'}`}
+                            />
+                          </div>
+                          <div
+                            className={`text-[1.4rem] font-semibold ${data.readAt ? 'text-black-40' : 'text-blue-70'}`}
+                          >
+                            {config.title}
+                          </div>
                         </div>
-                        <div
-                          className={`text-[1.4rem] font-semibold ${data.readAt ? 'text-black-40' : 'text-blue-70'}`}
-                        >
-                          {config.title}
+                        <div className="flex items-center gap-[1rem]">
+                          <span
+                            className={`line-clamp-2 w-[27rem] text-[1.6rem] font-medium ${data.readAt ? 'text-black-40' : 'text-black-100'}`}
+                          >
+                            {config.getMessage(data)}
+                          </span>
+                          {!data.readAt && (
+                            <div className="h-[0.8rem] w-[0.8rem] rounded-full bg-blue-80" />
+                          )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-[1rem]">
+                      <div className="pr-[0.6rem]">
                         <span
-                          className={`line-clamp-2 w-[27rem] text-[1.6rem] font-medium ${data.readAt ? 'text-black-40' : 'text-black-100'}`}
+                          className={`text-[1.4rem] font-medium ${data.readAt ? 'text-black-40' : 'text-black-60'}`}
                         >
-                          {config.getMessage(data)}
+                          {formatPostListCreatedAt(data.createdAt)}
                         </span>
-                        {!data.readAt && (
-                          <div className="h-[0.8rem] w-[0.8rem] rounded-full bg-blue-80" />
-                        )}
                       </div>
-                    </div>
-                    <div className="pr-[0.6rem]">
-                      <span
-                        className={`text-[1.4rem] font-medium ${data.readAt ? 'text-black-40' : 'text-black-60'}`}
-                      >
-                        {formatPostListCreatedAt(data.createdAt)}
-                      </span>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         )}
-        {mynotificationsData?.data.length === 0 && (
-          <div className="flex h-full flex-col justify-center">
+        {mynotificationsData?.data?.length === 0 && (
+          <div className="flex h-full flex-col justify-center px-[2.2rem]">
             <div className="flex flex-col items-center gap-[1.8rem]">
-              <NoNotificaitionIcon />
-              <div className="flex flex-col items-center gap-[0.4rem]">
+              <NoNotificaitionIcon width={55} height={53} />
+              <div className="flex w-full flex-col items-center gap-[0.4rem]">
                 <span className="text-[1.8rem] font-semibold text-black-90">
                   새로운 알림이 없어요
                 </span>

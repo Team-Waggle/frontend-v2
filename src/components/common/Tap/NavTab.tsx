@@ -1,14 +1,14 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 
-type TabsProps = {
+type NavTabProps = {
   to: string;
   children: ReactNode;
   className?: string;
   isActive?: boolean;
 };
 
-const TeamTab = ({ to, children, className, isActive = false }: TabsProps) => {
+const NavTab = ({ to, children, className, isActive = false }: NavTabProps) => {
   const containerStyle = [
     'inline-flex h-[5.4rem] py-[1.2rem] px-[0.8rem] justify-center items-center gap-[1rem]',
     isActive ? 'border-b border-b-[3px] border-solid border-b-blue-100' : '',
@@ -18,8 +18,8 @@ const TeamTab = ({ to, children, className, isActive = false }: TabsProps) => {
     .join(' ');
 
   const textStyle = [
-    'text-[2rem] font-[600] leading-[1.4] tracking-[-0.04rem]',
-    isActive ? 'text-blue-100' : 'text-black-60',
+    'text-[2rem] leading-[1.4] tracking-[-0.04rem]',
+    isActive ? 'text-blue-100 font-[700]' : 'text-black-60 font-[600]',
   ]
     .filter(Boolean)
     .join(' ');
@@ -31,4 +31,4 @@ const TeamTab = ({ to, children, className, isActive = false }: TabsProps) => {
   );
 };
 
-export default TeamTab;
+export default NavTab;

@@ -231,9 +231,9 @@ const TeamHomePage = () => {
         {/** 팀 모집글 / 팀원 관리 */}
         <div className="flex flex-col items-start gap-[3.6rem] self-stretch">
           {/** 모집글 */}
-          <div className="flex flex-col items-start gap-[1.6rem] self-stretch">
+          <div className="flex flex-col items-start self-stretch">
             {/** 모집글 타이틀 */}
-            <div className="flex items-start gap-[1rem] self-stretch border-b border-solid border-b-black-40 p-[1rem]">
+            <div className="flex items-start gap-[1rem] self-stretch p-[1rem]">
               <p className="text-[2rem] font-[600] leading-[1.5] tracking-[-0.04rem] text-black">
                 모집글
               </p>
@@ -316,9 +316,9 @@ const TeamHomePage = () => {
           </div>
 
           {/** 팀원 관리 */}
-          <div className="mb-[8rem] flex flex-col items-start gap-[1.6rem] self-stretch">
+          <div className="mb-[8rem] flex flex-col items-start self-stretch">
             {/** 팀원 관리 타이틀 */}
-            <div className="flex items-start gap-[1rem] self-stretch border-b border-solid border-b-black-40 p-[1rem]">
+            <div className="flex items-start gap-[1rem] self-stretch p-[1rem]">
               <p className="text-[2rem] font-[600] leading-[1.5] tracking-[-0.04rem] text-black">
                 팀원
               </p>

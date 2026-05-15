@@ -7,7 +7,7 @@ const axiosInstance = axios.create({
   withCredentials: true,
   paramsSerializer: {
     indexes: null,
-},
+  },
 });
 
 // 동시 401 요청이 각자 /auth/refresh를 호출하면 BE rotation이
@@ -58,7 +58,7 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         useAuthStore.getState().logout();
-        window.location.href = '/login';
+        window.location.href = '/';
         return Promise.reject(refreshError);
       }
     }

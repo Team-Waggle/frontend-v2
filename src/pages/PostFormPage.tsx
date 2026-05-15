@@ -75,10 +75,10 @@ const PostFormPage = () => {
     const value = e.target.value;
     const byteLength = getByteLength(value);
 
-    if (byteLength > 30) {
+    if (byteLength > 100) {
       setError('title', {
         type: 'manual',
-        message: '최대 30byte까지 입력할 수 있어요.',
+        message: '최대 100byte까지 입력할 수 있어요.',
       });
       return;
     }
@@ -163,7 +163,7 @@ const PostFormPage = () => {
               }),
               onChange: handleChange,
             }}
-            maxLength={30}
+            maxLength={100}
           />
 
           <Controller

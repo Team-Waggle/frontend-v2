@@ -12,9 +12,9 @@ import IcMe from '../../../assets/icons/tag/ic_me.svg?react';
 import IcVertical from '../../../assets/icons/normal/ic_moreVertical_tight.svg?react';
 import IcCharacter from '../../../assets/icons/image/ic_character_circle_gray_40.svg?react';
 
+import SelectBox from '../SelectBox';
 import IcSelectBoxShield from '../../../assets/icons/normal/ic_shield.svg?react';
 import IcSelectBoxTrash from '../../../assets/icons/normal/ic_trash.svg?react';
-
 import { SkillIcon } from '../../../utils/SkillIcon';
 import { toSkillLabel } from '../../../utils/skill';
 import ReviewModal from '../../Modal/ReviewModal';
@@ -40,48 +40,6 @@ interface SideTeamCardProps {
   onKickMember?: (memberId: number) => void;
 }
 
-type SelectBoxProps = {
-  isManager?: boolean;
-  onAssignManager?: () => void;
-  onDemoteManager?: () => void;
-  onKickMember?: () => void;
-};
-
-// 따로 컴포넌트 제작해야함. 임시.
-const SelectBox = ({ isManager, onAssignManager, onDemoteManager, onKickMember }: SelectBoxProps) => {
-  return (
-    <div className="flex cursor-pointer flex-col items-end rounded-[0.8rem] bg-black-5 shadow-search-select-box">
-      <div
-        className="flex h-[4.4rem] items-center gap-[0.4rem] rounded-[0.8rem] bg-black-5 px-[1.2rem] hover:bg-hover-5 hover:text-black-80"
-        onClick={(e) => {
-          e.stopPropagation();
-          if (isManager) {
-            onDemoteManager?.();
-          } else {
-            onAssignManager?.();
-          }
-        }}
-      >
-        <IcSelectBoxShield className="h-[1.6rem] w-[1.6rem] text-black-60" />
-        <span className="text-[1.4rem] font-[500] leading-[1.5] tracking-[-0.028rem] text-black-60">
-          {isManager ? '관리자 취소' : '관리자 지정'}
-        </span>
-      </div>
-      <div
-        className="flex h-[4.4rem] items-center gap-[0.4rem] self-stretch rounded-[0.8rem] bg-black-5 px-[1.2rem] hover:bg-hover-5 hover:text-black-80"
-        onClick={(e) => {
-          e.stopPropagation();
-          onKickMember?.();
-        }}
-      >
-        <IcSelectBoxTrash className="h-[1.6rem] w-[1.6rem] text-error" />
-        <span className="text-[1.4rem] font-[500] leading-[1.5] tracking-[-0.028rem] text-error">
-          내보내기
-        </span>
-      </div>
-    </div>
-  );
-};
 
 const toPositionLabel = (position?: string): string => {
   if (position === 'PM') {
@@ -102,6 +60,10 @@ const toPositionLabel = (position?: string): string => {
 
   if (position === 'MARKETER') {
     return '마케팅';
+  }
+
+  if (position === 'OTHER') {
+    return '기타';
   }
 
   return position ?? '';
@@ -142,6 +104,7 @@ const SideTeamCard = ({
   const positionLabel = toPositionLabel(position);
   const [isSelectBoxOpen, setIsSelectBoxOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const selectBoxRef = useRef<HTMLDivElement | null>(null);
 
@@ -225,19 +188,29 @@ const SideTeamCard = ({
                     }}
                   >
                     <SelectBox
-                      isManager={isManager}
-                      onAssignManager={() => {
-                        onAssignManager?.(Number(memberId!));
-                        setIsSelectBoxOpen(false);
-                      }}
-                      onDemoteManager={() => {
-                        onDemoteManager?.(Number(memberId!));
-                        setIsSelectBoxOpen(false);
-                      }}
-                      onKickMember={() => {
-                        onKickMember?.(Number(memberId!));
-                        setIsSelectBoxOpen(false);
-                      }}
+                      items={[
+                        {
+                          icon: <IcSelectBoxShield className="h-[1.6rem] w-[1.6rem]" />,
+                          label: isManager ? '관리자 취소' : '관리자 지정',
+                          onClick: () => {
+                            if (isManager) {
+                              onDemoteManager?.(Number(memberId!));
+                            } else {
+                              onAssignManager?.(Number(memberId!));
+                            }
+                            setIsSelectBoxOpen(false);
+                          },
+                        },
+                        {
+                          icon: <IcSelectBoxTrash className="h-[1.6rem] w-[1.6rem]" />,
+                          label: '내보내기',
+                          onClick: () => {
+                            onKickMember?.(Number(memberId!));
+                            setIsSelectBoxOpen(false);
+                          },
+                          variant: 'danger',
+                        },
+                      ]}
                     />
                   </div>
                 )}
@@ -254,11 +227,12 @@ const SideTeamCard = ({
             .join(' ')}
         >
           <div className="flex flex-col items-center gap-[1.7rem]">
-            {profileImageUrl ? (
+            {profileImageUrl && !imgError ? (
               <img
                 alt={'프로필 이미지'}
                 src={profileImageUrl}
                 className="h-[6.1rem] w-[6.1rem] rounded-[9.9rem] object-cover"
+                onError={() => setImgError(true)}
               />
             ) : (
               <IcCharacter className="h-[6.1rem] w-[6.1rem] rounded-[9.9rem]" />

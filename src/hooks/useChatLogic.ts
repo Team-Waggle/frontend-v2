@@ -47,6 +47,7 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
   const initialScrollDoneRef = useRef(false);
   const highlightHandledRef = useRef<string | null>(null);
   const tempIdCounterRef = useRef(0);
+  const lastSentAtRef = useRef(0);
   const isAtBottomRef = useRef(true);
 
   const [inputValue, setInputValue] = useState('');
@@ -286,14 +287,18 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
   }, [partnerId, queryClient]);
 
   const handleSend = () => {
+    const now = Date.now();
+    if (now - lastSentAtRef.current < 100) return;
+
     const content = inputValue.trim();
     if (!content) return;
 
+    lastSentAtRef.current = now;
     setInputValue('');
     removeFailedTemps();
 
     const tempId = TEMP_ID_BASE + (++tempIdCounterRef.current);
-    const now = new Date().toISOString();
+    const createdAt = new Date().toISOString();
 
     // 전송 즉시 임시 메시지로 화면에 표시
     if (me) {
@@ -307,12 +312,12 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
         },
         receiver: { id: partnerId, username: null, profileImageUrl: null, position: '' },
         content,
-        createdAt: now,
+        createdAt: createdAt,
         readAt: null,
       });
 
       // 대화 목록 낙관적 업데이트
-      const updatedLastMessage = { id: tempId, content, createdAt: now };
+      const updatedLastMessage = { id: tempId, content, createdAt: createdAt };
       const conversationsCache = queryClient.getQueryData<InfiniteData<CursorResponse<ConversationResponse>>>(['conversations', undefined]);
       const exists = conversationsCache?.pages.some((page) =>
         page.data.some((conv) => String(conv.partner.id) === String(partnerId)),

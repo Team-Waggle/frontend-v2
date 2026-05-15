@@ -97,10 +97,14 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
       console.warn('STOMP not connected');
       return false;
     }
-    stompClient.publish({
-      destination: '/app/message/send',
-      body: JSON.stringify({ receiverId, content }),
-    });
-    return true;
+    try {
+      stompClient.publish({
+        destination: '/app/message/send',
+        body: JSON.stringify({ receiverId, content }),
+      });
+      return true;
+    } catch {
+      return false;
+    }
   },
 }));

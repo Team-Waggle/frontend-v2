@@ -5,14 +5,23 @@ import type { InfiniteData } from '@tanstack/react-query';
 import { useAuthStore } from '../stores/authStore';
 import { useMessageStore } from '../stores/messageStore';
 import { getWsToken } from '../api/message';
-import type { ConversationResponse, CursorResponse, MessageResponse } from '../types/api/message';
+import type {
+  ConversationResponse,
+  CursorResponse,
+  MessageResponse,
+} from '../types/api/message';
 
 // OTT(일회용 토큰)를 URL 쿼리 파라미터로 전달 — 서버가 WebSocket 업그레이드 시점에 검증
 const buildBrokerURL = (ottToken: string) =>
   `${import.meta.env.VITE_WS_URL as string}?token=${ottToken}`;
 
-const getReconnectDelay = (attempt: number) => Math.min(1000 * 2 ** attempt, 30_000);
+const getReconnectDelay = (attempt: number) =>
+  Math.min(1000 * 2 ** attempt, 30_000);
 const MAX_RECONNECT_ATTEMPTS = 5;
+// 연속 5회 실패 후 잠시 대기했다가 재시도 (로그아웃 대신)
+const PAUSE_AFTER_MAX_ATTEMPTS = 5 * 60_000;
+// 서버가 heartbeat 미지원(heart-beat:0,0) — 주기적 강제 재연결로 NAT timeout/zombie 방지
+const KEEPALIVE_INTERVAL = 5 * 60_000;
 
 export const useStompClient = (partnerId?: string) => {
   const queryClient = useQueryClient();
@@ -21,6 +30,7 @@ export const useStompClient = (partnerId?: string) => {
   const connectRef = useRef<(() => Promise<void>) | null>(null);
   // 재시도 횟수를 ref로 관리 — 두 effect 간 공유 및 리셋 가능
   const reconnectAttemptsRef = useRef(0);
+  const isReconnectingRef = useRef(false);
   const accessToken = useAuthStore((state) => state.accessToken);
   const isFirstConnectRef = useRef(true);
 
@@ -29,17 +39,25 @@ export const useStompClient = (partnerId?: string) => {
     partnerIdRef.current = partnerId;
   }, [partnerId]);
 
+  const tabHiddenAtRef = useRef<number | null>(null);
+
   const setStompClient = useMessageStore((state) => state.setStompClient);
-  const appendRealtimeMessage = useMessageStore((state) => state.appendRealtimeMessage);
-  const clearRealtimeMessages = useMessageStore((state) => state.clearRealtimeMessages);
+  const appendRealtimeMessage = useMessageStore(
+    (state) => state.appendRealtimeMessage,
+  );
+  const clearRealtimeMessages = useMessageStore(
+    (state) => state.clearRealtimeMessages,
+  );
   const reconnectPending = useMessageStore((state) => state.reconnectPending);
-  const clearReconnectPending = useMessageStore((state) => state.clearReconnectPending);
+  const clearReconnectPending = useMessageStore(
+    (state) => state.clearReconnectPending,
+  );
 
   useEffect(() => {
     if (!accessToken) return;
 
     let cancelled = false;
-    let isReconnecting = false;
+    isReconnectingRef.current = false;
     reconnectAttemptsRef.current = 0;
 
     const connect = async () => {
@@ -50,7 +68,6 @@ export const useStompClient = (partnerId?: string) => {
         const client = new Client({
           brokerURL: buildBrokerURL(ottToken),
           reconnectDelay: 0,
-          heartbeatIncoming: 4000,
           heartbeatOutgoing: 4000,
 
           onConnect: () => {
@@ -70,7 +87,9 @@ export const useStompClient = (partnerId?: string) => {
                   body: JSON.stringify({ receiverId, content }),
                 });
                 setTimeout(() => {
-                  queryClient.invalidateQueries({ queryKey: ['messages', receiverId] });
+                  queryClient.invalidateQueries({
+                    queryKey: ['messages', receiverId],
+                  });
                 }, 800);
               });
             }
@@ -80,7 +99,9 @@ export const useStompClient = (partnerId?: string) => {
               queryClient.invalidateQueries({ queryKey: ['conversations'] });
               const currentPartnerId = partnerIdRef.current;
               if (currentPartnerId) {
-                queryClient.invalidateQueries({ queryKey: ['messages', currentPartnerId] });
+                queryClient.invalidateQueries({
+                  queryKey: ['messages', currentPartnerId],
+                });
               }
             }
             isFirstConnectRef.current = false;
@@ -96,7 +117,9 @@ export const useStompClient = (partnerId?: string) => {
 
               const currentPartnerId = partnerIdRef.current;
               const senderIdStr = String(msg.sender.id);
-              const currentPartnerIdStr = currentPartnerId ? String(currentPartnerId) : null;
+              const currentPartnerIdStr = currentPartnerId
+                ? String(currentPartnerId)
+                : null;
 
               // 현재 열린 채팅 상대의 메시지만 realtimeMessages에 추가
               if (currentPartnerIdStr && senderIdStr === currentPartnerIdStr) {
@@ -104,51 +127,54 @@ export const useStompClient = (partnerId?: string) => {
               }
 
               // 대화 목록 낙관적 업데이트
-              queryClient.setQueryData<InfiniteData<CursorResponse<ConversationResponse>>>(
-                ['conversations', undefined],
-                (old) => {
-                  if (!old) return old;
-                  return {
-                    ...old,
-                    pages: old.pages.map((page) => ({
-                      ...page,
-                      data: page.data.map((conv) => {
-                        if (String(conv.partner.id) === senderIdStr) {
-                          return {
-                            ...conv,
-                            lastMessage: {
-                              id: msg.id,
-                              content: msg.content,
-                              createdAt: msg.createdAt,
-                            },
-                            unreadCount:
-                              currentPartnerIdStr === senderIdStr
-                                ? conv.unreadCount
-                                : conv.unreadCount + 1,
-                          };
-                        }
-                        return conv;
-                      }),
-                    })),
-                  };
-                },
-              );
+              queryClient.setQueryData<
+                InfiniteData<CursorResponse<ConversationResponse>>
+              >(['conversations', undefined], (old) => {
+                if (!old) return old;
+                return {
+                  ...old,
+                  pages: old.pages.map((page) => ({
+                    ...page,
+                    data: page.data.map((conv) => {
+                      if (String(conv.partner.id) === senderIdStr) {
+                        return {
+                          ...conv,
+                          lastMessage: {
+                            id: msg.id,
+                            content: msg.content,
+                            createdAt: msg.createdAt,
+                          },
+                          unreadCount:
+                            currentPartnerIdStr === senderIdStr
+                              ? conv.unreadCount
+                              : conv.unreadCount + 1,
+                        };
+                      }
+                      return conv;
+                    }),
+                  })),
+                };
+              });
 
-              queryClient.invalidateQueries({ queryKey: ['messages', msg.sender.id] });
+              queryClient.invalidateQueries({
+                queryKey: ['messages', msg.sender.id],
+              });
               queryClient.invalidateQueries({ queryKey: ['conversations'] });
             });
           },
 
           onWebSocketClose: async () => {
-            if (cancelled || isReconnecting) return;
-            isReconnecting = true;
+            if (cancelled || isReconnectingRef.current) return;
+            isReconnectingRef.current = true;
 
-            // 최대 재시도 초과 시 로그아웃 처리 (서버 장기 다운 등)
+            // 연속 실패 한도 초과 — 로그아웃 대신 일정 시간 대기 후 재시도
             if (reconnectAttemptsRef.current >= MAX_RECONNECT_ATTEMPTS) {
-              console.error('WebSocket 재연결 한도 초과 — 로그아웃 처리');
-              isReconnecting = false;
-              useAuthStore.getState().logout();
-              window.location.replace('/login');
+              reconnectAttemptsRef.current = 0;
+              isReconnectingRef.current = false;
+              await new Promise((resolve) =>
+                setTimeout(resolve, PAUSE_AFTER_MAX_ATTEMPTS),
+              );
+              if (!cancelled) connectRef.current?.();
               return;
             }
 
@@ -158,16 +184,20 @@ export const useStompClient = (partnerId?: string) => {
 
             try {
               await new Promise((resolve) => setTimeout(resolve, delay));
-              if (cancelled) { isReconnecting = false; return; }
+              if (cancelled) {
+                isReconnectingRef.current = false;
+                return;
+              }
               const newToken = await getWsToken();
-              if (cancelled) { isReconnecting = false; return; }
+              if (cancelled) {
+                isReconnectingRef.current = false;
+                return;
+              }
               client.configure({ brokerURL: buildBrokerURL(newToken) });
-              isReconnecting = false;
+              isReconnectingRef.current = false;
               client.activate();
             } catch {
-              isReconnecting = false;
-              useAuthStore.getState().logout();
-              window.location.replace('/login');
+              isReconnectingRef.current = false;
             }
           },
 
@@ -214,21 +244,43 @@ export const useStompClient = (partnerId?: string) => {
     }
   }, [partnerId, clearRealtimeMessages]);
 
-  // 탭 포커스 복귀 시 연결 상태 확인 → 끊겨 있으면 재연결
+  // 탭 포커스 복귀 시 연결 상태 확인 → 끊겨 있거나 오래 숨겨져 있었으면 재연결
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.visibilityState !== 'visible') return;
-      if (clientRef.current?.connected) return;
+      if (document.visibilityState === 'hidden') {
+        tabHiddenAtRef.current = Date.now();
+        return;
+      }
+
+      const hiddenMs = tabHiddenAtRef.current
+        ? Date.now() - tabHiddenAtRef.current
+        : 0;
+      tabHiddenAtRef.current = null;
       reconnectAttemptsRef.current = 0;
-      if (clientRef.current) {
-        // 기존 클라이언트 deactivate → onWebSocketClose가 재연결 처리
-        clientRef.current.deactivate();
-      } else {
-        connectRef.current?.();
+
+      // 끊긴 경우, 또는 1분 이상 숨겨져 있었던 경우 재연결
+      if (!clientRef.current?.connected || hiddenMs > 60_000) {
+        if (clientRef.current) {
+          clientRef.current.deactivate();
+        } else {
+          connectRef.current?.();
+        }
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    return () =>
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
+  // 장기 탭 zombie 방지 — 서버가 heartbeat 미지원이므로 주기적 강제 재연결
+  // heartbeatOutgoing(4s)이 NAT keepalive 역할을 하지만, TCP가 silently drop되는 경우 보완
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (!clientRef.current?.connected) return;
+      reconnectAttemptsRef.current = 0;
+      clientRef.current.deactivate();
+    }, KEEPALIVE_INTERVAL);
+    return () => clearInterval(id);
   }, []);
 
   useEffect(() => {
@@ -237,10 +289,16 @@ export const useStompClient = (partnerId?: string) => {
     // 수동 재연결 요청 시 재시도 카운터 초기화
     reconnectAttemptsRef.current = 0;
     if (clientRef.current) {
-      // 클라이언트가 있으면 deactivate → onWebSocketClose가 재연결 처리
-      clientRef.current.deactivate();
+      if (clientRef.current.connected) {
+        // 연결된 상태 → deactivate → onWebSocketClose가 재연결
+        clientRef.current.deactivate();
+      } else if (!isReconnectingRef.current) {
+        // 끊긴 상태인데 재연결 중도 아님 (5분 pause 중이거나 onWebSocketClose 미발동)
+        // → 직접 새 연결 시도
+        connectRef.current?.();
+      }
+      // isReconnectingRef.current = true면 onWebSocketClose 백오프 진행 중 → 개입 안 함
     } else {
-      // 클라이언트가 없으면 (OTT 실패 or 아직 연결 중) connect 직접 재시도
       connectRef.current?.();
     }
   }, [reconnectPending, clearReconnectPending]);
