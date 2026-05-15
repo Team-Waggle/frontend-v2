@@ -58,7 +58,7 @@ const MyBubble = ({
                   {isLast && (
                     <div className="flex flex-col items-end gap-[0.2rem]">
                       {isFailed && (
-                        <span className="text-[1rem] font-[500]">전송 실패</span>
+                        <span className="text-[1rem] text-black-30 font-[500]">전송 실패</span>
                       )}
                       <span
                         className={`text-[1.2rem] font-[500] leading-[1.5] tracking-[-0.024rem] ${isSending ? 'text-black-30' : 'text-black-50'}`}
