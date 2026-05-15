@@ -104,24 +104,24 @@ const MainPage = () => {
     <>
       <div className="flex w-full justify-center">
         <div className="flex w-full max-w-[152.6rem] flex-col gap-[5.6rem] px-[4.8rem] pt-[5.4rem]">
-          <div className="relative h-[35.4rem] max-w-[152.6rem] self-stretch overflow-hidden rounded-[2.4rem] bg-blue-60">
+          <div className="relative aspect-[763/177] w-full self-stretch overflow-hidden rounded-[2.4rem] bg-blue-60 [container-type:inline-size]">
             {/** 문구 */}
-            <div className="pl-[6.4rem] pt-[6.4rem]">
-              <p className="font-mulmaru text-[6.863rem] font-[500] text-black-5">
+            <div className="pl-[4.476cqw] pt-[4.476cqw]">
+              <p className="font-mulmaru text-[4.799cqw] font-[500] text-black-5">
                 나랑 같이 사.프하러
               </p>
-              <p className="font-mulmaru text-[6.863rem] font-[500] text-black-5">
+              <p className="font-mulmaru text-[4.799cqw] font-[500] text-black-5">
                 가지 않을래?
               </p>
             </div>
             {/** 캐릭터 이미지 */}
-            <div className="absolute bottom-[3.89rem] right-[7.4047rem] z-10 flex h-[7.4rem] max-w-[152.6rem] items-end gap-[2.3782rem]">
-              <IcBannerCircle />
-              <IcBannerTriangle />
-              <IcBannerSquare />
+            <div className="absolute bottom-[2.72cqw] right-[5.178cqw] z-10 flex h-[5.175cqw] items-end gap-[1.663cqw]">
+              <IcBannerCircle className="h-full w-auto" />
+              <IcBannerTriangle className="h-full w-auto" />
+              <IcBannerSquare className="h-full w-auto" />
             </div>
             {/** 하단 색상 바 */}
-            <div className="absolute bottom-0 h-[5.7478rem] w-full bg-blue-50" />
+            <div className="absolute bottom-0 h-[4.019cqw] w-full bg-blue-50" />
           </div>
 
           <div className="flex w-full flex-col items-start gap-[2rem]">
