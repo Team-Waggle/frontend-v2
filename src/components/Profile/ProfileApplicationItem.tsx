@@ -32,7 +32,7 @@ const ProfileApplicationItem = ({
   portfolioUrls,
 }: ProfileApplicationItemProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const hasDetail = coverLetter || portfolioUrls?.length;
+  const hasDetail = !!(coverLetter || portfolioUrls?.length);
 
   return (
     <>
@@ -83,19 +83,17 @@ const ProfileApplicationItem = ({
             >
               지원취소
             </CustomBtn>
-            {hasDetail && (
-              <button
-                type="button"
-                aria-label="지원 내용 상세보기"
-                aria-expanded={isOpen}
-
-                onClick={() => setIsOpen((prev) => !prev)}
-              >
-                <IcChevronDown
-                  className={`flex h-[1.6rem] w-[1.6rem] text-black-50 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                />
-              </button>
-            )}
+            <button
+              type="button"
+              aria-label="지원 내용 상세보기"
+              aria-expanded={isOpen}
+              className={!hasDetail ? 'invisible' : ''}
+              onClick={() => setIsOpen((prev) => !prev)}
+            >
+              <IcChevronDown
+                className={`flex h-[1.6rem] w-[1.6rem] text-black-50 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
           </div>
         </td>
       </tr>
