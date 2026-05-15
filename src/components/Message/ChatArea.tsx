@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 
 import MsgSendBtn from '../common/IconWrapper/index';
@@ -11,6 +12,7 @@ import { useChatLogic } from '../../hooks/useChatLogic';
 import { POSITION_CONVERTER } from '../../utils/position';
 
 const ChatArea = ({ partnerId }: { partnerId: string }) => {
+  const [imgError, setImgError] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const highlight = searchParams.get('highlight');
@@ -33,11 +35,12 @@ const ChatArea = ({ partnerId }: { partnerId: string }) => {
       {/** 헤더 */}
       <header className="flex items-center gap-[0.7rem] self-stretch border-b border-solid border-black-30 p-[2.4rem]">
         <div className="flex items-center gap-[1rem] cursor-pointer " onClick={() => navigate(`/profile/${partnerId}`)}>
-          {partnerInfo?.profileImageUrl ? (
+          {partnerInfo?.profileImageUrl && !imgError ? (
             <img
               src={partnerInfo.profileImageUrl}
               alt="프로필"
               className="h-[4.4rem] w-[4.4rem] flex-shrink-0 rounded-full object-cover"
+              onError={() => setImgError(true)}
             />
           ) : (
             <IcProfileImg

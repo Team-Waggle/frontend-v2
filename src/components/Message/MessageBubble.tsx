@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import IcProfileImg from '../../assets/icons/image/ic_character_circle_gray_60.svg?react';
@@ -98,6 +99,7 @@ const OpponentBubble = ({
   variant?: 'default' | 'modal';
   partnerId?: string;
 }) => {
+  const [imgError, setImgError] = useState(false);
   const navigate = useNavigate();
   const isConsecutive = messages.length > 1;
   const maxW = variant === 'modal' ? 'max-w-[23.6rem]' : 'max-w-[36rem]';
@@ -111,12 +113,13 @@ const OpponentBubble = ({
   return (
     <div className="flex flex-col items-start gap-[1rem] self-stretch">
       <div className="inline-flex items-end gap-[0.8rem] px-[1.2rem] py-[0.8rem]">
-        {profileImageUrl ? (
+        {profileImageUrl && !imgError ? (
           <img
             src={profileImageUrl}
             alt="프로필"
             onClick={handleProfileClick}
             className={`${profileSize} flex-shrink-0 rounded-full object-cover ${partnerId ? 'cursor-pointer' : ''}`}
+            onError={() => setImgError(true)}
           />
         ) : (
           <IcProfileImg
