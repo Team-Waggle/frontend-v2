@@ -41,7 +41,7 @@ const TeamPostItem = ({
     .filter(Boolean);
 
   return (
-    <div className="flex items-start justify-between gap-[clamp(12rem,_calc(11.667vw_-_4.8rem),_17.6rem)] self-stretch border-b border-solid border-black-30 py-[2.8rem]">
+    <div className="flex items-start justify-between gap-[clamp(2rem,_calc(2.917vw_-_1.2rem),_4.4rem)] self-stretch border-b border-solid border-black-30 py-[2.8rem]">
       {/** 토글을 제외한 모든 내용 */}
       <div className="flex min-w-0 flex-1 items-start gap-[5.2rem]">
         {/** 날짜 */}
@@ -59,7 +59,7 @@ const TeamPostItem = ({
             onClick={onClick}
           >
             <span
-              className={`w-[clamp(35rem,_calc(39.583vw_-_22rem),_54rem)] overflow-hidden text-ellipsis whitespace-nowrap text-[1.8rem] font-[600] ${isClosed ? 'text-black-40' : 'text-black-100'}`}
+              className={`max-w-[clamp(35rem,_calc(39.583vw_-_22rem),_54rem)] overflow-hidden text-ellipsis whitespace-nowrap text-[1.8rem] font-[600] ${isClosed ? 'text-black-40' : 'text-black-100'}`}
             >
               {title}
             </span>
