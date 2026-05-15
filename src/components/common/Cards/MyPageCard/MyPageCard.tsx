@@ -100,6 +100,7 @@ const MyPageCard = ({
                 <IcKebab
                   className="h-[2rem] w-[2rem] cursor-pointer text-black-50"
                   onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     setIsSelectBoxOpen((prev) => !prev);
                   }}
