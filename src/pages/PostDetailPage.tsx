@@ -146,7 +146,7 @@ const PostDetailPage = () => {
         {/** 모집글 상세조회 구간 */}
         <div
           ref={leftColRef}
-          className="flex w-[68.8rem] flex-col items-center gap-[6rem]"
+          className={`flex w-[68.8rem] flex-col items-center gap-[6rem] ${!isMyPost ? 'mb-[21.2rem]' : ''}`}
         >
           {/** 모집글 상세조회 제목 및 핈수 정보 */}
           <div className="flex flex-col items-start gap-[1rem] self-stretch">
