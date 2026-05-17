@@ -13,6 +13,7 @@ import {
 } from '../../hooks/useUser';
 import { useModal } from '../../hooks/useModal';
 import { useGetTerms } from '../../hooks/useTerms';
+import { useOnboardingStore } from '../../stores/onboardingStore';
 
 // Sidebar Components
 import SidebarLogo from './SidebarLogo';
@@ -36,6 +37,9 @@ const Sidebar = () => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   const accessToken = useAuthStore((state) => state.accessToken);
+  const isPendingTermsAfterProfileCreation = useOnboardingStore(
+    (state) => state.isPendingTermsAfterProfileCreation,
+  );
   const isLoggedIn = !!accessToken;
 
   const isProfileCreated = isLoggedIn && !!isProfileCompleteData?.complete;
@@ -45,8 +49,10 @@ const Sidebar = () => {
   const isRequiredTermsAgreed =
     isTermsSuccess &&
     !termsData.some(({ mandatory, agreed }) => mandatory && !agreed);
-  const isProfileComplete = isProfileCreated && isRequiredTermsAgreed;
-  const visibleMyData = isProfileComplete ? myData : undefined;
+  const shouldHideProfile =
+    isPendingTermsAfterProfileCreation && !isRequiredTermsAgreed;
+  const isProfileVisible = isProfileCreated && !shouldHideProfile;
+  const visibleMyData = isProfileVisible ? myData : undefined;
   const hasWritableTeam = myteamData?.some(
     (team) => team.role !== 'MEMBER' && team.status !== 'COMPLETED',
   );
@@ -77,21 +83,21 @@ const Sidebar = () => {
               data={visibleMyData}
               isFolded={isFolded}
               isLoggedIn={isLoggedIn}
-              isProfileComplete={!!isProfileComplete}
+              isProfileComplete={!!isProfileVisible}
               setIsNotificationOpen={setIsNotificationOpen}
             />
 
             {isFolded ? (
               <IconWrapper
                 onClick={() => {
-                  if (!isProfileComplete) return;
+                  if (!isProfileVisible) return;
                   if (hasWritableTeam) navigate('/post/new');
                   else navigate('/team/new');
                 }}
               >
-                {isProfileComplete ? <PencilIcon /> : <LogInIcon />}
+                {isProfileVisible ? <PencilIcon /> : <LogInIcon />}
               </IconWrapper>
-            ) : isProfileComplete ? (
+            ) : isProfileVisible ? (
               hasWritableTeam ? (
                 <div className="flex gap-[1.2rem]">
                   <BaseButton
@@ -121,10 +127,10 @@ const Sidebar = () => {
           </div>
 
           <SidebarMenu
-            isLoggedIn={isProfileComplete}
+            isLoggedIn={isProfileVisible}
             setIsLoginModalOpen={() => setIsLoginModalOpen(true)}
             isFolded={isFolded}
-            teamData={isProfileComplete ? (myteamData ?? []) : []}
+            teamData={isProfileVisible ? (myteamData ?? []) : []}
             userId={visibleMyData?.id}
             notificationCountData={notificationCountData}
             isNotificationOpen={isNotificationOpen}

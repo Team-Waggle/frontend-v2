@@ -24,10 +24,17 @@ const getProfileDisplay = ({
   isProfileComplete: boolean;
   data: UserMeResponse | undefined;
 }): ProfileDisplay => {
-  if (!isLoggedIn || isLoadingProfile) {
+  if (!isLoggedIn) {
     return {
       title: '게스트',
       subtitle: '로그인해주세요',
+      subtitleColorClass: 'text-blue-60',
+    };
+  }
+  if (isLoadingProfile) {
+    return {
+      title: '게스트',
+      subtitle: '프로필을 불러오는 중',
       subtitleColorClass: 'text-blue-60',
     };
   }
@@ -61,8 +68,7 @@ const SidebarProfile = ({
   const navigate = useNavigate();
   const { mutate: logout } = usePostLogout();
 
-  // 토큰은 있지만 /users/me 응답이 아직 도착 전 — 비로그인 UI로 떨어뜨리지 않는다
-  const isLoadingProfile = isLoggedIn && !data;
+  const isLoadingProfile = isLoggedIn && isProfileComplete && !data;
 
   const profileImage = data?.profileImageUrl ? (
     <img

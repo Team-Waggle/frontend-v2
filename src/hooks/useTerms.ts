@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getTerms, postTerms } from '../api/terms';
 import { useAuthStore } from '../stores/authStore';
+import { useOnboardingStore } from '../stores/onboardingStore';
 
 // 약관 목록 조회
 export const useGetTerms = (options: { enabled?: boolean } = {}) => {
@@ -17,9 +18,13 @@ export const useGetTerms = (options: { enabled?: boolean } = {}) => {
 // 약관 동의
 export const usePostTerms = () => {
   const queryClient = useQueryClient();
+  const setPendingTermsAfterProfileCreation = useOnboardingStore(
+    (state) => state.setPendingTermsAfterProfileCreation,
+  );
   return useMutation({
     mutationFn: postTerms,
     onSuccess: () => {
+      setPendingTermsAfterProfileCreation(false);
       queryClient.invalidateQueries({ queryKey: ['terms'] });
     },
   });
