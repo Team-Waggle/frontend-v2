@@ -27,6 +27,8 @@ import type { UserMeResponse } from '../../types/api/user';
 
 // Icons
 import RequireIcon from '../../assets/icons/ic_require.svg?react';
+import CheckboxIcon from '../../assets/icons/normal/ic_checkbox.svg?react';
+import CheckboxFillIcon from '../../assets/icons/normal/ic_checkbox_fill.svg?react';
 
 interface FormValues {
   username: string;
@@ -45,7 +47,59 @@ const positions = Object.keys(
 ) as (keyof typeof positionSkillData)[];
 
 type PositionType = keyof typeof positionSkillData;
-type ProfileModalStep = 'edit' | 'deleteConfirm';
+type ProfileModalStep = 'edit' | 'deleteConfirm' | 'onboardingConfirm';
+type AgreementKey =
+  | 'service'
+  | 'privacy'
+  | 'thirdParty'
+  | 'profile'
+  | 'marketing';
+
+const AGREEMENT_ITEMS: {
+  key: AgreementKey;
+  label: string;
+  required: boolean;
+  href: string;
+}[] = [
+  {
+    key: 'service',
+    label: '서비스 이용약관',
+    required: true,
+    href: 'https://www.notion.so/9cd51a2bbe9c4356a522c73bc6300a14?source=copy_link',
+  },
+  {
+    key: 'privacy',
+    label: '개인정보 수집 및 이용 동의',
+    required: true,
+    href: 'https://www.notion.so/ae3cc843672f42e0964e7824a816c3ba?source=copy_link',
+  },
+  {
+    key: 'thirdParty',
+    label: '개인정보 제3자 제공 동의',
+    required: true,
+    href: 'https://www.notion.so/3-94a111aaf78a4ddc8899b03257c83729?source=copy_link',
+  },
+  {
+    key: 'profile',
+    label: '프로필·지원 정보 제공 동의',
+    required: true,
+    href: 'https://www.notion.so/4aea6ba5e04249d28a6eaf8bbb9c245a?source=copy_link',
+  },
+  {
+    key: 'marketing',
+    label: '마케팅 정보 수신동의',
+    required: false,
+    href: 'https://www.notion.so/04abd9f9bb434dad8f7950f80f4845aa?source=copy_link',
+  },
+];
+
+const DEFAULT_AGREEMENTS: Record<AgreementKey, boolean> = {
+  service: false,
+  privacy: false,
+  thirdParty: false,
+  profile: false,
+  marketing: false,
+};
 
 const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
   const {
@@ -69,6 +123,8 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
   });
 
   const [step, setStep] = useState<ProfileModalStep>('edit');
+  const [agreements, setAgreements] =
+    useState<Record<AgreementKey, boolean>>(DEFAULT_AGREEMENTS);
 
   const queryClient = useQueryClient();
   const { mutate: createUserProfile } = useCreateUserProfile();
@@ -85,6 +141,7 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
   useEffect(() => {
     if (!isOpen) {
       setStep('edit');
+      setAgreements(DEFAULT_AGREEMENTS);
 
       if (myData) {
         reset({
@@ -118,6 +175,41 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
 
   const handleDeleteUser = () => {
     deleteUser();
+  };
+
+  const isAllAgreed = AGREEMENT_ITEMS.every(({ key }) => agreements[key]);
+  const isRequiredAgreed = AGREEMENT_ITEMS.filter(
+    ({ required }) => required,
+  ).every(({ key }) => agreements[key]);
+
+  const handleAllAgreementChange = () => {
+    const nextChecked = !isAllAgreed;
+
+    setAgreements(
+      AGREEMENT_ITEMS.reduce(
+        (nextAgreements, { key }) => ({
+          ...nextAgreements,
+          [key]: nextChecked,
+        }),
+        {} as Record<AgreementKey, boolean>,
+      ),
+    );
+  };
+
+  const handleAgreementChange = (key: AgreementKey) => {
+    setAgreements((prevAgreements) => ({
+      ...prevAgreements,
+      [key]: !prevAgreements[key],
+    }));
+  };
+
+  const handleEditSubmit = (data: FormValues) => {
+    if (mode === 'onboarding') {
+      setStep('onboardingConfirm');
+      return;
+    }
+
+    onSubmit(data);
   };
 
   const onSubmit = async (data: FormValues) => {
@@ -246,7 +338,7 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
 
         {step === 'edit' && (
           <form
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleSubmit(handleEditSubmit)}
             className="relative flex h-[80.7rem] w-[73.8rem] flex-col gap-[4rem] overflow-y-scroll scroll-smooth rounded-[2rem] bg-white px-[4rem] pt-[4.4rem] scrollbar-hide"
           >
             <div className="flex w-full flex-col gap-[3.4rem]">
@@ -392,7 +484,7 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                   disabled={!isValid}
                   className="w-[25rem]"
                 >
-                  완료
+                  {mode === 'edit' ? '완료' : '다음'}
                 </BaseButton>
               </div>
               {mode === 'edit' && (
@@ -439,6 +531,113 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                 >
                   탈퇴하기
                 </BaseButton>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {step === 'onboardingConfirm' && (
+          <div className="relative flex h-[86.7rem] w-[73.8rem] justify-center rounded-[2rem] bg-black-5 px-[4rem] pt-[4rem]">
+            <div className="flex w-[65.8rem] flex-col gap-[3.4rem]">
+              <span className="whitespace-pre-line text-[3rem] font-bold text-black-100">
+                {'마지막이에요 \n서비스 이용을 위해 약관에 동의해 주세요'}
+              </span>
+              <div className="flex flex-1 flex-col justify-between">
+                <div className="flex flex-col gap-[1rem]">
+                  {/* 모두 동의 */}
+                  <div className="border-b border-black-20 pb-[4rem]">
+                    <div className="flex gap-[0.8rem]">
+                      <input
+                        id="agreement-all"
+                        type="checkbox"
+                        checked={isAllAgreed}
+                        onChange={handleAllAgreementChange}
+                        className="sr-only"
+                      />
+                      <label
+                        htmlFor="agreement-all"
+                        className="flex cursor-pointer gap-[0.8rem]"
+                      >
+                        <span className="flex h-[3.2rem] w-[3.2rem] items-center justify-center">
+                          {isAllAgreed ? (
+                            <CheckboxFillIcon width={20} height={20} />
+                          ) : (
+                            <CheckboxIcon width={20} height={20} />
+                          )}
+                        </span>
+                      </label>
+                      <div className="flex flex-1 flex-col gap-[0.8rem]">
+                        <label
+                          htmlFor="agreement-all"
+                          className="cursor-pointer text-[2rem] font-bold text-black-90"
+                        >
+                          모두 동의
+                        </label>
+                        <label
+                          htmlFor="agreement-all"
+                          className="cursor-pointer text-[1.6rem] font-medium text-black-70"
+                        >
+                          전체 동의는 필수 및 선택 정보에 대한 동의도 포함되어
+                          있으며, 개별적으로도 동의를 선택하실 수 있습니다.
+                          선택항목에 대한 동의를 거부하시는 경우에도 서비스는
+                          이용이 가능합니다.
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  {AGREEMENT_ITEMS.map(({ key, label, required, href }) => {
+                    const inputId = `agreement-${key}`;
+                    const isChecked = agreements[key];
+
+                    return (
+                      <div
+                        key={key}
+                        className="flex items-center justify-between py-[0.4rem]"
+                      >
+                        <input
+                          id={inputId}
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => handleAgreementChange(key)}
+                          className="sr-only"
+                        />
+                        <label
+                          htmlFor={inputId}
+                          className="flex cursor-pointer items-center gap-[0.8rem]"
+                        >
+                          <span className="flex h-[3.2rem] w-[3.2rem] items-center justify-center">
+                            {isChecked ? (
+                              <CheckboxFillIcon width={20} height={20} />
+                            ) : (
+                              <CheckboxIcon width={20} height={20} />
+                            )}
+                          </span>
+                          <span className="text-[1.8rem] font-medium text-black-90">
+                            [{required ? '필수' : '선택'}] {label}
+                          </span>
+                        </label>
+                        <a
+                          href={href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[1.6rem] font-medium text-black-70 underline"
+                        >
+                          보기
+                        </a>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="flex justify-center pb-[3.8rem]">
+                  <BaseButton
+                    size="xl"
+                    disabled={!isRequiredAgreed}
+                    onClick={handleSubmit(onSubmit)}
+                    className="w-[25rem]"
+                  >
+                    시작하기
+                  </BaseButton>
+                </div>
               </div>
             </div>
           </div>
