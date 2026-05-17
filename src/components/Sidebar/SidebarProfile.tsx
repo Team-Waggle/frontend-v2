@@ -24,15 +24,12 @@ const getProfileDisplay = ({
   isProfileComplete: boolean;
   data: UserMeResponse | undefined;
 }): ProfileDisplay => {
-  if (!isLoggedIn) {
+  if (!isLoggedIn || isLoadingProfile) {
     return {
       title: '게스트',
       subtitle: '로그인해주세요',
       subtitleColorClass: 'text-blue-60',
     };
-  }
-  if (isLoadingProfile) {
-    return { title: '', subtitle: '', subtitleColorClass: 'text-black-60' };
   }
   if (isProfileComplete && data?.position) {
     return {
@@ -42,7 +39,7 @@ const getProfileDisplay = ({
     };
   }
   return {
-    title: data?.username || '게스트',
+    title: '게스트',
     subtitle: '프로필을 완성해주세요',
     subtitleColorClass: 'text-blue-60',
   };

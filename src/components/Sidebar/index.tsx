@@ -12,6 +12,7 @@ import {
   useGetUserMeTeam,
 } from '../../hooks/useUser';
 import { useModal } from '../../hooks/useModal';
+import { useGetTerms } from '../../hooks/useTerms';
 
 // Sidebar Components
 import SidebarLogo from './SidebarLogo';
@@ -37,7 +38,15 @@ const Sidebar = () => {
   const accessToken = useAuthStore((state) => state.accessToken);
   const isLoggedIn = !!accessToken;
 
-  const isProfileComplete = isLoggedIn && isProfileCompleteData?.complete;
+  const isProfileCreated = isLoggedIn && !!isProfileCompleteData?.complete;
+  const { data: termsData = [], isSuccess: isTermsSuccess } = useGetTerms({
+    enabled: isProfileCreated,
+  });
+  const isRequiredTermsAgreed =
+    isTermsSuccess &&
+    !termsData.some(({ mandatory, agreed }) => mandatory && !agreed);
+  const isProfileComplete = isProfileCreated && isRequiredTermsAgreed;
+  const visibleMyData = isProfileComplete ? myData : undefined;
   const hasWritableTeam = myteamData?.some(
     (team) => team.role !== 'MEMBER' && team.status !== 'COMPLETED',
   );
@@ -65,7 +74,7 @@ const Sidebar = () => {
           {/* 프로필 및 모집글 작성 버튼 */}
           <div className="flex flex-col gap-[1.8rem] py-[2rem]">
             <SidebarProfile
-              data={myData}
+              data={visibleMyData}
               isFolded={isFolded}
               isLoggedIn={isLoggedIn}
               isProfileComplete={!!isProfileComplete}
@@ -75,12 +84,12 @@ const Sidebar = () => {
             {isFolded ? (
               <IconWrapper
                 onClick={() => {
-                  if (!isLoggedIn) return setIsLoginModalOpen(true);
+                  if (!isProfileComplete) return;
                   if (hasWritableTeam) navigate('/post/new');
                   else navigate('/team/new');
                 }}
               >
-                {isLoggedIn ? <PencilIcon /> : <LogInIcon />}
+                {isProfileComplete ? <PencilIcon /> : <LogInIcon />}
               </IconWrapper>
             ) : isProfileComplete ? (
               hasWritableTeam ? (
@@ -116,7 +125,7 @@ const Sidebar = () => {
             setIsLoginModalOpen={() => setIsLoginModalOpen(true)}
             isFolded={isFolded}
             teamData={isProfileComplete ? (myteamData ?? []) : []}
-            userId={myData?.id}
+            userId={visibleMyData?.id}
             notificationCountData={notificationCountData}
             isNotificationOpen={isNotificationOpen}
             setIsNotificationOpen={setIsNotificationOpen}
@@ -146,11 +155,25 @@ const Sidebar = () => {
                   고객지원/문의
                 </a>
                 <a
-                  href="https://satin-mint-d68.notion.site/34738daa31cd80af8a40cfab76a855d0"
+                  href="https://www.notion.so/9cd51a2bbe9c4356a522c73bc6300a14?source=copy_link"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  와글 정책 안내
+                  이용약관
+                </a>
+                <a
+                  href="https://www.notion.so/WAGGLE-ae3cc843672f42e0964e7824a816c3ba?source=copy_link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  개인정보처리방침
+                </a>
+                <a
+                  href="https://www.notion.so/34738daa31cd80af8a40cfab76a855d0?source=copy_link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  그 외 정책
                 </a>
               </div>
               <span className="text-[1.4rem] font-normal text-black-60">
