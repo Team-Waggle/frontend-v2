@@ -32,7 +32,11 @@ const getProfileDisplay = ({
     };
   }
   if (isLoadingProfile) {
-    return { title: '', subtitle: '', subtitleColorClass: 'text-black-60' };
+    return {
+      title: '게스트',
+      subtitle: '프로필을 불러오는 중',
+      subtitleColorClass: 'text-blue-60',
+    };
   }
   if (isProfileComplete && data?.position) {
     return {
@@ -42,7 +46,7 @@ const getProfileDisplay = ({
     };
   }
   return {
-    title: data?.username || '게스트',
+    title: '게스트',
     subtitle: '프로필을 완성해주세요',
     subtitleColorClass: 'text-blue-60',
   };
@@ -64,8 +68,7 @@ const SidebarProfile = ({
   const navigate = useNavigate();
   const { mutate: logout } = usePostLogout();
 
-  // 토큰은 있지만 /users/me 응답이 아직 도착 전 — 비로그인 UI로 떨어뜨리지 않는다
-  const isLoadingProfile = isLoggedIn && !data;
+  const isLoadingProfile = isLoggedIn && isProfileComplete && !data;
 
   const profileImage = data?.profileImageUrl ? (
     <img

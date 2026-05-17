@@ -6,10 +6,12 @@ import PostEmptyPage from '../components/common/empty/PostEmptyPage';
 import { usePostsInfinite } from '../hooks/usePost';
 import type { PostsSort } from '../types/api/posts';
 import { useGetIsUserProfileComplete } from '../hooks/useUser';
+import { useGetTerms } from '../hooks/useTerms';
 
 import MainSearch from '../components/Main/MainSearch/MainSearch';
 import ProfileModal from '../components/Modal/ProfileModal';
 import LoginModal from '../components/Modal/LoginModal';
+import TermsModal from '../components/Modal/TermsModal';
 
 import { formatPostListCreatedAt } from '../utils/kst-time';
 import type { PostDetailResponse } from '../types/api/posts';
@@ -59,10 +61,21 @@ const MainPage = () => {
 
   const { accessToken } = useAuthStore();
   const isLoggedIn = !!accessToken;
-  const { data: profileData, isSuccess } = useGetIsUserProfileComplete();
+  const { data: profileData, isSuccess: isProfileSuccess } =
+    useGetIsUserProfileComplete();
 
   const isOnboardingModalOpen =
-    isLoggedIn && isSuccess && !profileData?.complete;
+    isLoggedIn && isProfileSuccess && !profileData?.complete;
+  const isProfileComplete =
+    isLoggedIn && isProfileSuccess && !!profileData?.complete;
+  const { data: termsData = [], isSuccess: isTermsSuccess } = useGetTerms({
+    enabled: isProfileComplete,
+  });
+  const hasRequiredTermsToAgree = termsData.some(
+    ({ mandatory, agreed }) => mandatory && !agreed,
+  );
+  const isTermsModalOpen =
+    isProfileComplete && isTermsSuccess && hasRequiredTermsToAgree;
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
@@ -186,6 +199,11 @@ const MainPage = () => {
         isOpen={isOnboardingModalOpen}
         onClose={() => {}}
         mode="onboarding"
+      />
+      <TermsModal
+        isOpen={isTermsModalOpen}
+        onClose={() => {}}
+        terms={termsData}
       />
       <LoginModal
         isOpen={isLoginModalOpen}

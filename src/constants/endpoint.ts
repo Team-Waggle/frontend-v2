@@ -63,3 +63,7 @@ export const APPLICATION_READ_URL = (applicationId: number) =>
   `/applications/${applicationId}/read`; // 팀 지원 읽음 처리
 export const APPLICATION_STATUS_URL = (applicationId: number) =>
   `/applications/${applicationId}/status`; // 팀 지원 상태 변경
+
+// 약관 동의 API
+export const TERMS_URL = '/terms'; // 약관 목록 조회 (현재 사용자의 동의 여부 포함)
+export const TERMS_AGREE_URL = '/terms/agree'; // 약관 동의

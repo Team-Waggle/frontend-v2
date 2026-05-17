@@ -392,7 +392,7 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                   disabled={!isValid}
                   className="w-[25rem]"
                 >
-                  완료
+                  {mode === 'edit' ? '완료' : '다음'}
                 </BaseButton>
               </div>
               {mode === 'edit' && (

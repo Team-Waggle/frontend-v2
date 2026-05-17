@@ -22,6 +22,7 @@ import {
   patchNotificationsRead,
 } from '../api/user';
 import { deleteApplication } from '../api/team';
+import { useOnboardingStore } from '../stores/onboardingStore';
 
 // 사용자 조회
 export const useGetUserDetail = (userId: string) => {
@@ -79,11 +80,15 @@ export const usePutUserMe = () => {
 export const useDeleteUserMe = () => {
   const queryClient = useQueryClient();
   const logout = useAuthStore((state) => state.logout);
+  const setPendingTermsAfterProfileCreation = useOnboardingStore(
+    (state) => state.setPendingTermsAfterProfileCreation,
+  );
   const navigate = useNavigate();
   return useMutation({
     mutationFn: deleteUserMe,
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: ['me'] });
+      setPendingTermsAfterProfileCreation(false);
       logout();
       navigate('/');
     },
@@ -94,9 +99,13 @@ export const useDeleteUserMe = () => {
 export const useCreateUserProfile = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const setPendingTermsAfterProfileCreation = useOnboardingStore(
+    (state) => state.setPendingTermsAfterProfileCreation,
+  );
   return useMutation({
     mutationFn: (profileData: object) => postUserProfile(profileData),
     onSuccess: () => {
+      setPendingTermsAfterProfileCreation(true);
       queryClient.invalidateQueries({ queryKey: ['profile-complete'] });
       queryClient.invalidateQueries({ queryKey: ['me'] });
       navigate('/');

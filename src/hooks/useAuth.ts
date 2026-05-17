@@ -2,15 +2,20 @@ import { useNavigate } from 'react-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { postLogout, postRefresh } from '../api/auth';
 import { useAuthStore } from '../stores/authStore';
+import { useOnboardingStore } from '../stores/onboardingStore';
 
 // 로그아웃
 export const usePostLogout = () => {
   const logout = useAuthStore((state) => state.logout);
+  const setPendingTermsAfterProfileCreation = useOnboardingStore(
+    (state) => state.setPendingTermsAfterProfileCreation,
+  );
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   return useMutation({
     mutationFn: postLogout,
     onSuccess: () => {
+      setPendingTermsAfterProfileCreation(false);
       logout();
       queryClient.clear();
       navigate('/');
