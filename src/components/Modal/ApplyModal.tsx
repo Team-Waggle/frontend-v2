@@ -170,13 +170,9 @@ const ApplyModal = ({
                   variant="input"
                   errorMessage={errors.portfolioUrls?.message}
                   inputProps={{
-                    ...register('portfolioUrls', {
-                      pattern: {
-                        value: /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/\S*)?$/,
-                        message: '올바른 url을 사용해주셔야 해요.',
-                      },
-                    }),
-                    placeholder: 'URL을 입력해주세요.',
+                    ...register('portfolioUrls'),
+                    placeholder:
+                      '권한/암호가 해제된 올바른 URL을 사용해주세요.',
                   }}
                 />
                 <FieldMaster
