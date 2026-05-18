@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams } from 'react-router';
 import { Controller, useForm } from 'react-hook-form';
 import BaseButton from '../components/common/Button';
@@ -55,6 +55,10 @@ const PostFormPage = () => {
   const { mutate: updatePosts } = useUpdatePosts();
 
   const postnameValue = watch('title', '');
+  const selectableTeamData = useMemo(
+    () => myTeamData?.filter((team) => team.role !== 'MEMBER') ?? [],
+    [myTeamData],
+  );
 
   useEffect(() => {
     if (isEditMode && myPostData) {
@@ -134,7 +138,7 @@ const PostFormPage = () => {
                   data:
                     isEditMode && myPostData
                       ? [myPostData.team]
-                      : (myTeamData ?? []),
+                      : selectableTeamData,
                   value: field.value,
                   onChange: field.onChange,
                   isEditMode,
