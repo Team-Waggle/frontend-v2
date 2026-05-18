@@ -1,9 +1,10 @@
-import type { LoaderFunctionArgs } from 'react-router-dom';
+import { redirect, type LoaderFunctionArgs } from 'react-router-dom';
 import { postRefresh } from '../api/auth';
 import { getPostDetail } from '../api/post';
 import { GetTeamDetail } from '../api/team';
-import { getUserDetail } from '../api/user';
+import { getUserDetail, getUserMe, getUserMeTeam } from '../api/user';
 import { useAuthStore } from '../stores/authStore';
+import type { TeamResponse } from '../types/api/team';
 import { isAccessTokenExpired } from '../utils/authToken';
 
 type RouteLoader = (args: LoaderFunctionArgs) => Promise<unknown> | unknown;
@@ -14,6 +15,10 @@ const notFoundResponse = (): never => {
 
 const unAuthorizedResponse = (): never => {
   throw new Response(null, { status: 401 });
+};
+
+const forbiddenResponse = (): never => {
+  throw new Response(null, { status: 403 });
 };
 
 const isNotFoundError = (error: unknown) => {
@@ -56,6 +61,21 @@ const validateEntity = async (request: () => Promise<unknown>) => {
   }
 };
 
+const validateWritableTeam = async (teamId: number): Promise<TeamResponse> => {
+  const myTeams = await getUserMeTeam();
+  const team = myTeams.find((myTeam) => myTeam.id === teamId);
+
+  if (!team) {
+    return forbiddenResponse();
+  }
+
+  if (team.role === 'MEMBER') {
+    return forbiddenResponse();
+  }
+
+  return team;
+};
+
 export const requireAuthLoader = async () => {
   const { accessToken, setAccessToken } = useAuthStore.getState();
 
@@ -92,14 +112,66 @@ export const postLoader = ({ params }: LoaderFunctionArgs) => {
   return validateEntity(() => getPostDetail(postId));
 };
 
+export const postCreateLoader = async () => {
+  await requireAuthLoader();
+
+  const myTeams = await getUserMeTeam();
+  const hasWritableTeam = myTeams.some(
+    (team) => team.role !== 'MEMBER' && team.status !== 'COMPLETED',
+  );
+
+  if (!hasWritableTeam) {
+    forbiddenResponse();
+  }
+
+  return null;
+};
+
+export const postEditLoader = async ({ params }: LoaderFunctionArgs) => {
+  const postId = parsePositiveIntegerParam(params.postId);
+
+  const post = await getPostDetail(postId).catch((error) => {
+    if (isNotFoundError(error)) {
+      notFoundResponse();
+    }
+
+    throw error;
+  });
+
+  await requireAuthLoader();
+
+  const team = await validateWritableTeam(post.team.id);
+
+  if (team.status === 'COMPLETED') {
+    forbiddenResponse();
+  }
+
+  return null;
+};
+
+export const teamManageLoader = async ({ params }: LoaderFunctionArgs) => {
+  const teamId = parsePositiveIntegerParam(params.teamId);
+
+  await validateEntity(() => GetTeamDetail(teamId));
+  await requireAuthLoader();
+  await validateWritableTeam(teamId);
+
+  return null;
+};
+
 export const userLoader = ({ params }: LoaderFunctionArgs) => {
   const userId = parseRequiredStringParam(params.userId);
 
   return validateEntity(() => getUserDetail(userId));
 };
 
-export const partnerLoader = ({ params }: LoaderFunctionArgs) => {
+export const partnerLoader = async ({ params }: LoaderFunctionArgs) => {
   const partnerId = parseRequiredStringParam(params.partnerId);
+  const me = await getUserMe();
+
+  if (partnerId === me.id) {
+    return redirect('/message');
+  }
 
   return validateEntity(() => getUserDetail(partnerId));
 };

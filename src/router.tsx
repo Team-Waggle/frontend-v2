@@ -7,7 +7,10 @@ import './styles/global.css';
 import App from './App';
 import {
   partnerLoader,
+  postCreateLoader,
+  postEditLoader,
   postLoader,
+  teamManageLoader,
   teamLoader,
   userLoader,
   withAuth,
@@ -41,31 +44,39 @@ export const router = createBrowserRouter(
         />
         <Route path="/team/:teamId" loader={teamLoader}>
           <Route index element={<TeamHomePage />} />
-          <Route path="edit" element={<TeamFormPage />} loader={withAuth()} />
+          <Route
+            path="edit"
+            element={<TeamFormPage />}
+            loader={teamManageLoader}
+          />
           <Route
             path="posts"
             element={<TeamPostManagementPage />}
-            loader={withAuth()}
+            loader={teamManageLoader}
           />
           <Route
             path="applicants"
             element={<TeamApplicantPage />}
-            loader={withAuth()}
+            loader={teamManageLoader}
           />
           <Route
             path="status"
             element={<TeamStatusPage />}
-            loader={withAuth()}
+            loader={teamManageLoader}
           />
         </Route>
         <Route
           path="/post/new"
           element={<PostFormPage />}
-          loader={withAuth()}
+          loader={postCreateLoader}
         />
         <Route path="/post/:postId" loader={postLoader}>
           <Route index element={<PostDetailPage />} />
-          <Route path="edit" element={<PostFormPage />} loader={withAuth()} />
+          <Route
+            path="edit"
+            element={<PostFormPage />}
+            loader={postEditLoader}
+          />
         </Route>
         <Route
           path="/profile"
