@@ -140,7 +140,7 @@ const Sidebar = () => {
 
         {/* 고객지원 문의 */}
         {!isFolded && (
-          <div className="flex h-[17.1rem] flex-col gap-[2.4rem] pb-[2.8rem]">
+          <div className="flex h-[22rem] flex-col gap-[2.4rem] pb-[2.8rem]">
             <div className="h-[0.1rem] bg-black-10" />
             <div className="flex flex-col gap-[0.8rem] px-[2rem]">
               <div className="flex flex-col gap-[0.4rem]">
@@ -182,7 +182,7 @@ const Sidebar = () => {
                   그 외 정책
                 </a>
               </div>
-              <span className="text-[1.4rem] font-normal text-black-60">
+              <span className="text-[1.2rem] font-normal text-black-60">
                 © 2026 Waggle Inc. All rights reserved.
               </span>
             </div>
