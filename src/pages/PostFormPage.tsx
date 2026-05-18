@@ -56,7 +56,10 @@ const PostFormPage = () => {
 
   const postnameValue = watch('title', '');
   const selectableTeamData = useMemo(
-    () => myTeamData?.filter((team) => team.role !== 'MEMBER') ?? [],
+    () =>
+      myTeamData?.filter(
+        (team) => team.role !== 'MEMBER' && team.status !== 'COMPLETED',
+      ) ?? [],
     [myTeamData],
   );
 
