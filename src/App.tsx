@@ -3,8 +3,12 @@ import { Outlet, ScrollRestoration, useMatch } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 import { usePostRefresh } from './hooks/useAuth';
 import { useStompClient } from './hooks/useStompClient';
+import { usePageTracking } from './hooks/usePageTracking';
+import { initGA } from './lib/ga';
 import Sidebar from './components/Sidebar';
 import FloatingMessageButton from './components/Message/FloatingMessageButton';
+
+initGA();
 
 function App() {
   const { mutateAsync: silentRefresh } = usePostRefresh();
@@ -13,6 +17,8 @@ function App() {
 
   const messageMatch = useMatch('/message/:partnerId');
   const partnerId = messageMatch?.params?.partnerId;
+
+  usePageTracking();
 
   useEffect(() => {
     const initAuth = async () => {

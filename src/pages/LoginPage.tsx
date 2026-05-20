@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { postOAuthRedeem } from '../api/auth';
 import { useAuthStore } from '../stores/authStore';
+import { trackEvent } from '../lib/ga';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -31,6 +32,12 @@ const LoginPage = () => {
 
     postOAuthRedeem(ott)
       .then(({ accessToken }) => {
+        const provider = sessionStorage.getItem('loginProvider') as 'google' | 'kakao' | null;
+        if (provider === 'google' || provider === 'kakao') {
+          trackEvent({ action: 'login', label: provider });
+        }
+        sessionStorage.removeItem('loginProvider');
+
         setAccessToken(accessToken);
 
         const returnUrl = sessionStorage.getItem('returnUrl');

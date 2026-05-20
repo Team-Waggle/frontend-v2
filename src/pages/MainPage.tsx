@@ -16,6 +16,7 @@ import TermsModal from '../components/Modal/TermsModal';
 import { formatPostListCreatedAt } from '../utils/kst-time';
 import type { PostDetailResponse } from '../types/api/posts';
 import { useAuthStore } from '../stores/authStore';
+import { trackEvent } from '../lib/ga';
 
 import IcBannerCircle from '../assets/icons/image/ic_character_banner_circle.svg?react';
 import IcBannerSquare from '../assets/icons/image/ic_character_banner_square.svg?react';
@@ -51,7 +52,6 @@ const MainPage = () => {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
-    isError,
   } = usePostsInfinite({
     q: appliedFilters.q,
     positions: appliedFilters.positions,
@@ -184,7 +184,10 @@ const MainPage = () => {
                     mainCardSkills={skillsList}
                     mainCardCreatedAt={createdAtText}
                     isClosed={!post.recruiting}
-                    onClick={() => navigate(`/post/${post.id}`)}
+                    onClick={() => {
+                      trackEvent({ action: 'click_post', label: post.title, post_id: String(post.id) });
+                      navigate(`/post/${post.id}`);
+                    }}
                   />
                 );
               })}

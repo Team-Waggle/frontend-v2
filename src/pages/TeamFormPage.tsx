@@ -12,6 +12,7 @@ import {
   useUpdateTeam,
 } from '../hooks/useTeam';
 import { getByteLength } from '../utils/getByteLength';
+import { trackEvent } from '../lib/ga';
 
 // Icons
 import NewTeamIcon from '../assets/icons/ic_character_new_team.svg?react';
@@ -174,6 +175,7 @@ const TeamFormPage = () => {
 
       createTeam(data, {
         onSuccess: (responseData) => {
+          trackEvent({ action: 'create_team' });
           navigate(`/team/${responseData.id}`);
         },
         onError: (error) => console.error(error),

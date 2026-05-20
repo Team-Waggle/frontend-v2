@@ -17,6 +17,7 @@ const LoginModal = ({ isOpen, onClose }: ModalProps) => {
   const handleLoginClick = (provider: 'google' | 'kakao') => {
     const currentPath = window.location.pathname + window.location.search;
     sessionStorage.setItem('returnUrl', currentPath);
+    sessionStorage.setItem('loginProvider', provider);
     window.location.href = `${BASE_URL}/oauth2/authorization/${provider}`;
   };
 

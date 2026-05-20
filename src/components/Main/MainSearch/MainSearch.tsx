@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import useHorizontalScroll from '../../../hooks/useHorizontalScroll';
 import type { PostsSort } from '../../../types/api/posts';
+import { trackEvent } from '../../../lib/ga';
 
 import { POSITION_CONVERTER } from '../../../utils/position';
 import { SKILL_MAP } from '../../../constants/skillMap';
@@ -67,6 +68,14 @@ const MainSearch = ({
   const [debouncedKeyword, setDebouncedKeyword] = useState('');
 
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const lastTrackedKeywordRef = useRef('');
+
+  const trackSearch = (kw: string) => {
+    const trimmed = kw.trim();
+    if (!trimmed || trimmed === lastTrackedKeywordRef.current) return;
+    lastTrackedKeywordRef.current = trimmed;
+    trackEvent({ action: 'search', label: trimmed });
+  };
 
   useEffect(() => {
     const onPointerDown = (e: PointerEvent) => {
@@ -131,6 +140,7 @@ const MainSearch = ({
     setSelectedJobs((prev) => {
       const exists = prev.some((j) => j.id === label);
       if (exists) return prev.filter((j) => j.id !== label);
+      trackEvent({ action: 'filter_job', label });
       return [...prev, { id: label, label }];
     });
   };
@@ -139,6 +149,7 @@ const MainSearch = ({
     setSelectedSkills((prev) => {
       const exists = prev.some((s) => s.id === skill.id);
       if (exists) return prev.filter((s) => s.id !== skill.id);
+      trackEvent({ action: 'filter_skill', label: skill.label });
       return [...prev, skill];
     });
   };
@@ -175,6 +186,8 @@ const MainSearch = ({
   }, [keyword]);
 
   useEffect(() => {
+    trackSearch(debouncedKeyword);
+
     onApplyFilters({
       q: debouncedKeyword.trim(),
       positions: toApiPositions(selectedJobs),
@@ -183,6 +196,8 @@ const MainSearch = ({
   }, [selectedJobs, selectedSkills, debouncedKeyword]);
 
   const applyFilters = () => {
+    trackSearch(keyword);
+
     onApplyFilters({
       q: keyword.trim(),
       positions: toApiPositions(selectedJobs),

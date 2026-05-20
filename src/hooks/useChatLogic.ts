@@ -8,6 +8,7 @@ import { useGetUserDetail, useGetUserMe } from './useUser';
 import { TEMP_ID_BASE, useMessageStore } from '../stores/messageStore';
 import type { ConversationResponse, CursorResponse, MessageResponse } from '../types/api/message';
 import { formatKstHhMm, formatKstYyyyMmDd } from '../utils/kst-time';
+import { trackEvent } from '../lib/ga';
 
 const HISTORY_REFETCH_DELAY_MS = 800;
 
@@ -375,6 +376,8 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
       requestReconnect();
       return;
     }
+
+    trackEvent({ action: 'send_message' });
 
     prevScrollHeightRef.current = 0;
 
