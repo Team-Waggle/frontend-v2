@@ -187,7 +187,9 @@ const MainSearch = ({
 
   useEffect(() => {
     trackSearch(debouncedKeyword);
+  }, [debouncedKeyword]);
 
+  useEffect(() => {
     onApplyFilters({
       q: debouncedKeyword.trim(),
       positions: toApiPositions(selectedJobs),

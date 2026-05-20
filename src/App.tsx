@@ -4,11 +4,8 @@ import { useAuthStore } from './stores/authStore';
 import { usePostRefresh } from './hooks/useAuth';
 import { useStompClient } from './hooks/useStompClient';
 import { usePageTracking } from './hooks/usePageTracking';
-import { initGA } from './lib/ga';
 import Sidebar from './components/Sidebar';
 import FloatingMessageButton from './components/Message/FloatingMessageButton';
-
-initGA();
 
 function App() {
   const { mutateAsync: silentRefresh } = usePostRefresh();
