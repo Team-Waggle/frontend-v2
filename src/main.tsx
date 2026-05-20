@@ -8,6 +8,9 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'sonner';
 import { persister } from './lib/persister';
 import { CacheErrorBoundary } from './components/CacheErrorBoundary';
+import { initGA } from './lib/ga';
+
+initGA();
 
 const queryClient = new QueryClient();
 

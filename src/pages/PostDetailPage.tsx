@@ -24,6 +24,7 @@ import WaitingModal from '../components/Modal/WaitingModal';
 import LoginModal from '../components/Modal/LoginModal';
 
 import { useAuthStore } from '../stores/authStore';
+import { trackEvent } from '../lib/ga';
 
 type RecruitmentCountKey =
   | 'plan'
@@ -337,6 +338,7 @@ const PostDetailPage = () => {
                     !postDetail?.recruiting || myApplicationStatus === 'PENDING'
                   }
                   onClick={() => {
+                    trackEvent({ action: 'click_apply', label: postDetail?.title ?? String(parsedPostId), post_id: String(parsedPostId) });
                     if (!accessToken) {
                       setIsLoginModalOpen(true);
                     } else {

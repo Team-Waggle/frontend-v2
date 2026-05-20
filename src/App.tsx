@@ -3,6 +3,7 @@ import { Outlet, ScrollRestoration, useMatch } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 import { usePostRefresh } from './hooks/useAuth';
 import { useStompClient } from './hooks/useStompClient';
+import { usePageTracking } from './hooks/usePageTracking';
 import Sidebar from './components/Sidebar';
 import FloatingMessageButton from './components/Message/FloatingMessageButton';
 
@@ -13,6 +14,8 @@ function App() {
 
   const messageMatch = useMatch('/message/:partnerId');
   const partnerId = messageMatch?.params?.partnerId;
+
+  usePageTracking();
 
   useEffect(() => {
     const initAuth = async () => {

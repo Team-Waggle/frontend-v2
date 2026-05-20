@@ -10,6 +10,7 @@ import {
   useGetPostDetail,
   useUpdatePosts,
 } from '../hooks/usePost';
+import { trackEvent } from '../lib/ga';
 import { POSITION_CONVERTER, type PositionKey } from '../utils/position';
 import { toSkillEnum, toSkillLabel } from '../utils/skill';
 import { getByteLength } from '../utils/getByteLength';
@@ -111,7 +112,9 @@ const PostFormPage = () => {
     if (isEditMode) {
       updatePosts({ postId: Number(postId), postData: formattedData });
     } else {
-      createPosts(formattedData);
+      createPosts(formattedData, {
+        onSuccess: () => trackEvent({ action: 'create_post' }),
+      });
     }
   };
 
