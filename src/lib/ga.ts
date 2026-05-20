@@ -14,7 +14,7 @@ export const trackPageView = (path: string) => {
 };
 
 type GAEvent =
-  | { action: 'click_apply'; label: string }
+  | { action: 'click_apply'; label: string; post_id: string }
   | { action: 'click_post'; label: string; post_id: string }
   | { action: 'search'; label: string }
   | { action: 'filter_job'; label: string }

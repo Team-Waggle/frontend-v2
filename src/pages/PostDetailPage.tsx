@@ -338,7 +338,7 @@ const PostDetailPage = () => {
                     !postDetail?.recruiting || myApplicationStatus === 'PENDING'
                   }
                   onClick={() => {
-                    trackEvent({ action: 'click_apply', label: String(parsedPostId) });
+                    trackEvent({ action: 'click_apply', label: postDetail?.title ?? String(parsedPostId), post_id: String(parsedPostId) });
                     if (!accessToken) {
                       setIsLoginModalOpen(true);
                     } else {
