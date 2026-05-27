@@ -15,13 +15,15 @@ import type {
 const buildBrokerURL = (ottToken: string) =>
   `${import.meta.env.VITE_WS_URL as string}?token=${ottToken}`;
 
-const getReconnectDelay = (attempt: number) =>
-  Math.min(1000 * 2 ** attempt, 30_000);
+const getReconnectDelay = (attempt: number) => {
+  const cap = Math.min(1000 * 2 ** attempt, 30_000);
+  return Math.floor(Math.random() * cap);
+};
 const MAX_RECONNECT_ATTEMPTS = 5;
 // 연속 5회 실패 후 잠시 대기했다가 재시도 (로그아웃 대신)
 const PAUSE_AFTER_MAX_ATTEMPTS = 5 * 60_000;
-// 서버가 heartbeat 미지원(heart-beat:0,0) — 주기적 강제 재연결로 NAT timeout/zombie 방지
-const KEEPALIVE_INTERVAL = 5 * 60_000;
+// 서버 heartbeat 간격 (서버 설정: longArrayOf(10_000L, 10_000L))
+const HEARTBEAT_MS = 10_000;
 
 export const useStompClient = (partnerId?: string) => {
   const queryClient = useQueryClient();
@@ -68,7 +70,8 @@ export const useStompClient = (partnerId?: string) => {
         const client = new Client({
           brokerURL: buildBrokerURL(ottToken),
           reconnectDelay: 0,
-          heartbeatOutgoing: 4000,
+          heartbeatOutgoing: HEARTBEAT_MS,
+          heartbeatIncoming: HEARTBEAT_MS,
 
           onConnect: () => {
             reconnectAttemptsRef.current = 0;
@@ -198,6 +201,7 @@ export const useStompClient = (partnerId?: string) => {
               client.activate();
             } catch {
               isReconnectingRef.current = false;
+              if (!cancelled) connectRef.current?.();
             }
           },
 
@@ -260,9 +264,9 @@ export const useStompClient = (partnerId?: string) => {
 
       // 끊긴 경우, 또는 1분 이상 숨겨져 있었던 경우 재연결
       if (!clientRef.current?.connected || hiddenMs > 60_000) {
-        if (clientRef.current) {
+        if (clientRef.current?.connected) {
           clientRef.current.deactivate();
-        } else {
+        } else if (!isReconnectingRef.current) {
           connectRef.current?.();
         }
       }
@@ -270,17 +274,6 @@ export const useStompClient = (partnerId?: string) => {
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () =>
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
-
-  // 장기 탭 zombie 방지 — 서버가 heartbeat 미지원이므로 주기적 강제 재연결
-  // heartbeatOutgoing(4s)이 NAT keepalive 역할을 하지만, TCP가 silently drop되는 경우 보완
-  useEffect(() => {
-    const id = setInterval(() => {
-      if (!clientRef.current?.connected) return;
-      reconnectAttemptsRef.current = 0;
-      clientRef.current.deactivate();
-    }, KEEPALIVE_INTERVAL);
-    return () => clearInterval(id);
   }, []);
 
   useEffect(() => {
