@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+Disallow: /post/new
+Disallow: /post/*/edit
+
+Disallow: /team/new
+Disallow: /team/*/edit
+Disallow: /team/*/posts
+Disallow: /team/*/applicants
+Disallow: /team/*/status
+
+Disallow: /profile
+Disallow: /message
+Disallow: /oauth/callback
+
+Sitemap: https://waggle.lol/sitemap.xml

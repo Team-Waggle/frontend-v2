@@ -25,6 +25,7 @@ import LoginModal from '../components/Modal/LoginModal';
 
 import { useAuthStore } from '../stores/authStore';
 import { trackEvent } from '../lib/ga';
+import SEO from '../components/seo';
 
 type RecruitmentCountKey =
   | 'plan'
@@ -143,6 +144,7 @@ const PostDetailPage = () => {
 
   return (
     <>
+      <SEO title={postDetail?.title} />
       <div className="flex flex-1 items-start justify-center gap-[7.2rem] self-stretch pt-[11.2rem]">
         {/** 모집글 상세조회 구간 */}
         <div
@@ -338,7 +340,11 @@ const PostDetailPage = () => {
                     !postDetail?.recruiting || myApplicationStatus === 'PENDING'
                   }
                   onClick={() => {
-                    trackEvent({ action: 'click_apply', label: postDetail?.title ?? String(parsedPostId), post_id: String(parsedPostId) });
+                    trackEvent({
+                      action: 'click_apply',
+                      label: postDetail?.title ?? String(parsedPostId),
+                      post_id: String(parsedPostId),
+                    });
                     if (!accessToken) {
                       setIsLoginModalOpen(true);
                     } else {
