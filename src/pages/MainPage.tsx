@@ -21,6 +21,7 @@ import { trackEvent } from '../lib/ga';
 import IcBannerCircle from '../assets/icons/image/ic_character_banner_circle.svg?react';
 import IcBannerSquare from '../assets/icons/image/ic_character_banner_square.svg?react';
 import IcBannerTriangle from '../assets/icons/image/ic_character_banner_triangle.svg?react';
+import SEO from '../components/seo';
 
 /**
  *
@@ -115,6 +116,10 @@ const MainPage = () => {
 
   return (
     <>
+      <SEO
+        title="사이드 프로젝트 팀원 찾기는 와글에서!"
+        description="사이드 프로젝트·창업·스터디 팀원을 가장 쉽게 찾는 곳. 직무와 스킬로 매칭하고, 모집글을 올리고, 바로 지원하세요. 개발자·디자이너·기획자 팀빌딩은 와글에서."
+      />
       <div className="flex w-full justify-center">
         <div className="flex w-full max-w-[152.6rem] flex-col gap-[5.6rem] px-[4.8rem] pt-[5.4rem]">
           <div className="relative aspect-[763/177] w-full self-stretch overflow-hidden rounded-[2.4rem] bg-blue-60 [container-type:inline-size]">
@@ -185,7 +190,11 @@ const MainPage = () => {
                     mainCardCreatedAt={createdAtText}
                     isClosed={!post.recruiting}
                     onClick={() => {
-                      trackEvent({ action: 'click_post', label: post.title, post_id: String(post.id) });
+                      trackEvent({
+                        action: 'click_post',
+                        label: post.title,
+                        post_id: String(post.id),
+                      });
                       navigate(`/post/${post.id}`);
                     }}
                   />
