@@ -146,7 +146,7 @@ const TeamHomePage = () => {
 
   return (
     <>
-      <SEO title={teamDetail?.name} />
+      <SEO title={teamDetail?.name || ''} />
       <div
         className={[
           'flex flex-1 flex-col items-center gap-[6rem] self-stretch',

@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 
 type SEOProps = {
-  title?: string;
+  title: string;
   description?: string;
   image?: string;
   url?: string;

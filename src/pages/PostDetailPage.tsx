@@ -144,7 +144,7 @@ const PostDetailPage = () => {
 
   return (
     <>
-      <SEO title={postDetail?.title} />
+      <SEO title={postDetail?.title || ''} />
       <div className="flex flex-1 items-start justify-center gap-[7.2rem] self-stretch pt-[11.2rem]">
         {/** 모집글 상세조회 구간 */}
         <div
