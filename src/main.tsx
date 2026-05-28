@@ -5,6 +5,7 @@ import { router } from './router.tsx';
 import { QueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'sonner';
 import { persister } from './lib/persister';
 import { CacheErrorBoundary } from './components/CacheErrorBoundary';
@@ -23,9 +24,11 @@ createRoot(document.getElementById('root')!).render(
         maxAge: 1000 * 60 * 60 * 24,
       }}
     >
-      <CacheErrorBoundary>
-        <RouterProvider router={router} />
-      </CacheErrorBoundary>
+      <HelmetProvider>
+        <CacheErrorBoundary>
+          <RouterProvider router={router} />
+        </CacheErrorBoundary>
+      </HelmetProvider>
       <ReactQueryDevtools initialIsOpen={false} />
       <Toaster position="bottom-center" />
     </PersistQueryClientProvider>
