@@ -5,6 +5,7 @@ type SEOProps = {
   description?: string;
   image?: string;
   url?: string;
+  canonical?: string;
 };
 
 const DEFAULT_DESCRIPTION = '여기를 눌러 링크를 확인하세요.';
@@ -16,6 +17,7 @@ const SEO = ({
   description = DEFAULT_DESCRIPTION,
   image = DEFAULT_IMAGE,
   url,
+  canonical,
 }: SEOProps) => {
   const fullTitle = title === 'Waggle' ? title : `Waggle 와글 | ${title}`;
 
@@ -33,6 +35,7 @@ const SEO = ({
       <meta property="og:site_name" content="Waggle" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
+      {canonical && <link rel="canonical" href={canonical} />}
     </Helmet>
   );
 };
