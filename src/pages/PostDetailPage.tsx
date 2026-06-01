@@ -144,7 +144,12 @@ const PostDetailPage = () => {
 
   return (
     <>
-      <SEO title={postDetail?.title || ''} />
+      <SEO
+        title={postDetail?.title || ''}
+        description={`${postDetail?.content} - 함께할 팀원을 찾고 있어요. 모집 직무·필요 스킬을 확인하고 와글에서 바로 지원해보세요.`}
+        url={`https://waggle.lol/post/${postDetail?.id}`}
+        canonical={`https://waggle.lol/post/${postId}`}
+      />
       <div className="flex flex-1 items-start justify-center gap-[7.2rem] self-stretch pt-[11.2rem]">
         {/** 모집글 상세조회 구간 */}
         <div
