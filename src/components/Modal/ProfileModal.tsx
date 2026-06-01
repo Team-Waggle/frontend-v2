@@ -247,7 +247,7 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
         {step === 'edit' && (
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="relative flex h-[80.7rem] w-[73.8rem] flex-col gap-[4rem] overflow-y-scroll scroll-smooth rounded-[2rem] bg-white px-[4rem] pt-[4.4rem] scrollbar-hide"
+            className="relative flex h-[63.2rem] w-[73.8rem] flex-col gap-[4rem] overflow-y-scroll scroll-smooth rounded-[2rem] bg-white px-[4rem] pt-[4.4rem] scrollbar-hide max-1440:h-[59.8rem]"
           >
             <div className="flex w-full flex-col gap-[3.4rem]">
               {mode === 'onboarding' && (

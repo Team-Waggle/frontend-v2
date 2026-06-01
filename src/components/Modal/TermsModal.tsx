@@ -98,7 +98,7 @@ const TermsModal = ({ isOpen, onClose, terms }: TermsModalProps) => {
       >
         <ModalOverlay onClose={onClose} isOnboarding />
 
-        <div className="relative flex h-[86.7rem] w-[73.8rem] justify-center rounded-[2rem] bg-black-5 px-[4rem] pt-[4rem]">
+        <div className="relative flex h-[69rem] w-[73.8rem] justify-center rounded-[2rem] bg-black-5 px-[4rem] pt-[4rem]">
           <div className="flex w-[65.8rem] flex-col gap-[3.4rem]">
             <span className="whitespace-pre-line text-[3rem] font-bold text-black-100">
               {'서비스 이용을 위해\n약관에 동의해 주세요'}
