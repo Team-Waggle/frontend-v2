@@ -11,6 +11,7 @@ import {
   getPostDetail,
   getPosts,
   patchPostClose,
+  postPostImage,
   updatePosts,
 } from '../api/post';
 import type {
@@ -47,6 +48,13 @@ export const usePatchPostClose = () => {
     onSuccess: (_, { postId }) => {
       queryClient.invalidateQueries({ queryKey: ['post-detail', postId] });
     },
+  });
+};
+
+// 모집글 본문 이미지 업로드용 Presigned URL 생성
+export const useCreatePostImage = () => {
+  return useMutation({
+    mutationFn: (contentType: string) => postPostImage(contentType),
   });
 };
 
@@ -113,7 +121,9 @@ export const useCreatePosts = () => {
   return useMutation({
     mutationFn: (postData: object) => createPosts(postData),
     onSuccess: (data) => {
-      mutate({ teamId: data.team.id, status: 'ACTIVE' });
+      if (data.team.status === 'PREPARING') {
+        mutate({ teamId: data.team.id, status: 'ACTIVE' });
+      }
       navigate(`/team/${data.team.id}`);
     },
     onError: (err) => {

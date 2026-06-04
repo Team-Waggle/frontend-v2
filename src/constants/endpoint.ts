@@ -7,6 +7,7 @@ export const POST_DETAIL_URL = (postId: number) => `/posts/${postId}`; // 모집
 export const POST_CLOSE_URL = (postId: number) => `/posts/${postId}/close`;
 export const POST_STATUS_URL = (postId: number) =>
   `/posts/${postId}/recruitment-status`; // 모집글 상태 변경
+export const POST_PRESIGNED_URL = '/posts/content-image/presigned-url'; // 모집글 본문 이미지 업로드용 Presigned URL 생성
 
 // 북마크 API
 export const BOOKMARK_URL = '/bookmarks'; // 북마크 토글(ON/OFF)
