@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { forwardRef, memo, useEffect, useRef, useState } from 'react';
 import type { DropzoneInputProps, DropzoneRootProps } from 'react-dropzone';
 import BaseChip from '../common/Chip/BaseChip';
@@ -10,6 +11,7 @@ import { POSITION_CONVERTER, type PositionKey } from '../../utils/position';
 import { getByteLength } from '../../utils/getByteLength';
 import type { TeamResponse } from '../../types/api/team';
 import type { PositionType } from '../../types/api/posts';
+import { useCreatePostImage } from '../../hooks/usePost';
 
 // @tiptap
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -263,6 +265,11 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
   const linkModalRef = useRef<HTMLDivElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
+  const { mutate: createImage } = useCreatePostImage();
+
+  const MAX_EDITOR_BYTE = 7000;
+  const currentByte = getByteLength(value ?? '');
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -297,10 +304,13 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
         },
       }),
       Placeholder.configure({
-        placeholder: '내용을 입력하세요.',
+        placeholder: '내용을 입력해 주세요. (최대 7000byte)',
       }),
     ],
-    content: value,
+    content: value || {
+      type: 'doc',
+      content: [{ type: 'paragraph' }],
+    },
     contentType: 'markdown',
     editorProps: {
       attributes: {
@@ -308,11 +318,21 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
       },
     },
     onUpdate: ({ editor }) => {
-      if (editor.isEmpty) {
-        onChange('');
+      const rawMarkdown = editor.getMarkdown().replace(/&nbsp;/g, ' ');
+      const markdown = rawMarkdown.trim().length === 0 ? '' : rawMarkdown;
+      const byteLength = getByteLength(markdown);
+
+      if (byteLength > MAX_EDITOR_BYTE) {
+        editor.commands.setContent(
+          value || {
+            type: 'doc',
+            content: [{ type: 'paragraph' }],
+          },
+          { contentType: value ? 'markdown' : undefined, emitUpdate: false },
+        );
         return;
       }
-      const markdown = editor.getMarkdown().replace(/&nbsp;/g, ' ');
+
       onChange(markdown);
     },
     immediatelyRender: false,
@@ -443,18 +463,29 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        insertImage(reader.result, file.name);
-      }
-    };
-    reader.readAsDataURL(file);
+    createImage(file.type, {
+      onSuccess: async ({ presignedUrl, objectUrl }) => {
+        try {
+          await axios.put(presignedUrl, file, {
+            headers: { 'Content-Type': file.type },
+          });
+
+          insertImage(objectUrl, file.name);
+        } catch (error) {
+          console.error('이미지 파일 업로드 실패:', error);
+          window.alert('이미지 업로드에 실패했어요.');
+        }
+      },
+      onError: (error) => {
+        console.error(error);
+        window.alert('이미지 업로드 URL 생성에 실패했어요.');
+      },
+    });
   };
 
   return (
-    <div className="relative h-[47.1rem] w-full">
-      <div className="flex h-[6.4rem] items-center gap-[2.4rem] rounded-tl-[0.8rem] rounded-tr-[0.8rem] border-x border-t border-black-30 bg-black-10 px-[1.8rem] py-[1.4rem]">
+    <div className="relative h-[46.2rem] w-full">
+      <div className="flex h-[6.4rem] items-center gap-[2.4rem] rounded-tl-[0.8rem] rounded-tr-[0.8rem] border-x border-t border-black-30 bg-black-10 px-[1.8rem] py-[1.7rem]">
         <div className="flex gap-[0.2rem]">
           <IconWrapper
             color="transparent"
@@ -554,8 +585,13 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
           />
         </div>
       </div>
-      <div className="h-[39.9rem] w-full rounded-bl-[0.8rem] rounded-br-[0.8rem] border-x border-b border-black-30 bg-black-5 px-[1.8rem] py-[1.7rem] text-[1.6rem] font-medium">
-        <EditorContent editor={editor} className="prose-list h-full" />
+      <div className="h-[39.8rem] w-full rounded-bl-[0.8rem] rounded-br-[0.8rem] border-x border-b border-black-30 bg-black-5 px-[1.8rem] py-[1.7rem] text-[1.6rem] font-medium">
+        <EditorContent editor={editor} className="prose-list h-[34.3rem]" />
+        <div className="flex justify-end">
+          <span className="text-[1.4rem] font-medium text-black-40">
+            {currentByte}/{MAX_EDITOR_BYTE}byte
+          </span>
+        </div>
       </div>
       {isLinkModalOpen && (
         <div

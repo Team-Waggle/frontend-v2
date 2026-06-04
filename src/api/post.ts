@@ -4,8 +4,8 @@ import {
   POST_DETAIL_URL,
   POST_URL,
   POST_STATUS_URL,
+  POST_PRESIGNED_URL,
 } from '../constants/endpoint';
-
 
 import type {
   GetPostsParams,
@@ -30,6 +30,14 @@ export const patchPostClose = async (
   status: RecruitmentStatusType,
 ): Promise<void> => {
   await axiosInstance.patch(POST_STATUS_URL(postId), { status });
+};
+
+// 모집글 본문 이미지 업로드용 Presigned URL 생성
+export const postPostImage = async (contentType: string) => {
+  const { data } = await axiosInstance.post(POST_PRESIGNED_URL, {
+    contentType,
+  });
+  return data;
 };
 
 // 모집글 목록 커서 기반 조회
