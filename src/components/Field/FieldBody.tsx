@@ -270,8 +270,6 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
   const MAX_EDITOR_BYTE = 7000;
   const currentByte = getByteLength(value ?? '');
 
-  console.log(currentByte);
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
