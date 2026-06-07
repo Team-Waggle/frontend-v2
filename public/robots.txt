@@ -14,4 +14,4 @@ Disallow: /profile
 Disallow: /message
 Disallow: /oauth/callback
 
-Sitemap: https://waggle.lol/sitemap.xml
+Sitemap: https://waggle.lol/waggle-sitemap.xml
