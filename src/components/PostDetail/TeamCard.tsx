@@ -59,11 +59,11 @@ const TeamCard = ({
 
   return (
     <div
-      className="flex w-[68.8rem] items-center gap-[2.4rem] rounded-[1rem] border border-solid border-black-30 bg-black-5 p-[1.6rem] hover:cursor-pointer hover:bg-hover-5"
+      className="flex w-[68.8rem] items-center gap-[2.4rem] rounded-[1rem] border border-solid border-black-30 bg-black-5 p-[1.6rem] hover:cursor-pointer hover:bg-hover-5 max-sm:w-auto max-sm:flex-1"
       onClick={onClick}
     >
       {/** 팀 이미지 */}
-      <div className="relative flex aspect-[40/21] w-[15.4rem] flex-shrink-0 flex-col items-center justify-center gap-[1rem] self-stretch rounded-[1rem] bg-blue-5 py-[1.9rem]">
+      <div className="relative flex aspect-[40/21] w-[15.4rem] flex-shrink-0 flex-col items-center justify-center gap-[1rem] self-stretch rounded-[1rem] bg-blue-5 py-[1.9rem] max-471:hidden">
         {teamImageUrl && !imageError ? (
           <img
             alt={'팀 대표 이미지'}
