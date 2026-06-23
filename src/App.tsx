@@ -6,6 +6,8 @@ import { useStompClient } from './hooks/useStompClient';
 import { usePageTracking } from './hooks/usePageTracking';
 import Sidebar from './components/Sidebar';
 import FloatingMessageButton from './components/Message/FloatingMessageButton';
+import BottomNavigation from './components/BottomNavigation';
+import MobileHeader from './components/MobileHeader';
 
 function App() {
   const { mutateAsync: silentRefresh } = usePostRefresh();
@@ -38,12 +40,18 @@ function App() {
   }
 
   return (
-    <div className="flex min-h-screen w-full min-w-[144rem]">
-      <Sidebar />
+    <div className="flex min-h-screen w-full min-w-[144rem] max-sm:min-w-0">
+      <div className="max-sm:hidden">
+        <Sidebar />
+      </div>
       <main className="mx-auto flex h-full w-full min-w-0 flex-col">
+        <MobileHeader />
         <Outlet />
       </main>
       <FloatingMessageButton />
+      <div className="hidden max-sm:block">
+        <BottomNavigation />
+      </div>
       <ScrollRestoration />
     </div>
   );
