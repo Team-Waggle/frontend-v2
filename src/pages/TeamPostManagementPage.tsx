@@ -12,17 +12,17 @@ const TeamPostManagementPage = () => {
   const { data: posts = [] } = useGetTeamPosts(Number(teamId));
 
   return (
-    <div className="flex flex-col items-center gap-[6rem] self-stretch pt-[5.4rem]">
+    <div className="flex flex-col items-center gap-[6rem] self-stretch pt-[5.4rem] max-sm:pt-0 max-sm:gap-[3.2rem]">
       <TeamNav />
-      <div className="flex w-[clamp(98.2rem,70vw,130rem)] flex-col items-start">
+      <div className="flex w-[clamp(98.2rem,70vw,130rem)] flex-col items-start max-sm:w-full max-sm:px-[2rem]">
         {posts.length > 0 && (
           <div className="flex items-center gap-[1rem] self-stretch border-b border-solid border-black-40 py-[1rem]">
-            <span className="text-[2rem] font-[600] leading-[1.5] tracking-[-0.04rem] text-black-100">
+            <span className="text-[2rem] font-[600] leading-[1.5] tracking-[-0.04rem] text-black-100 max-sm:text-[1.8rem] max-sm:font-[700]">
               총 {posts.length}개의 글
             </span>
           </div>
         )}
-        <div className={`mb-[29.1rem] flex flex-col items-start self-stretch`}>
+        <div className={`mb-[29.1rem] flex flex-col items-start self-stretch max-sm:mb-[8rem]`}>
           {posts.length === 0 ? (
             <PostEmptyPage title="등록된 모집글이 없습니다." subTitle="새로운 팀원을 찾아보세요!" btnText="모집글 작성" onBtnClick={() => navigate('/post/new')} />
           ) : (

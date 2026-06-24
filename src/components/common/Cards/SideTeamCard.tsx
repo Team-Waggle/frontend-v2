@@ -34,6 +34,7 @@ interface SideTeamCardProps {
   canManage?: boolean;
   isActive?: boolean;
   disabled?: boolean;
+  className?: string;
   onClick?: () => void;
   onAssignManager?: (memberId: number) => void;
   onDemoteManager?: (memberId: number) => void;
@@ -84,6 +85,7 @@ const SideTeamCard = ({
   isActive = false,
   disabled = false,
   status = 'ACTIVE',
+  className,
   onClick,
   onAssignManager,
   onDemoteManager,
@@ -133,7 +135,7 @@ const SideTeamCard = ({
   }, [isSelectBoxOpen]);
 
   const baseStyle =
-    'relative flex min-h-[27.2rem] w-[23.4rem] flex-col items-center gap-[2.4rem] rounded-[1.2rem] border border-solid border-black-30 bg-black-5 p-[2.8rem]';
+    'relative flex min-h-[27.2rem] max-sm:min-h-0 w-[23.4rem] flex-col items-center gap-[2.4rem] rounded-[1.2rem] border border-solid border-black-30 bg-black-5 p-[2.8rem] max-sm:py-[4.05rem]';
 
   // TeamHome에서만 사용하는 SideTeamCard Style (hover, active, disabled)
   // const hoverStyle = 'hover:bg-black-20';
@@ -149,12 +151,13 @@ const SideTeamCard = ({
           variant === 'team' && !disabled,
           isActive && activeStyle,
           disabled && disabledStyle,
+          className,
         ]
           .filter(Boolean)
           .join(' ')}
         onClick={() => navigate(`/profile/${userId ?? memberId}`)}
       >
-        <div className="absolute flex w-[17.8rem] items-center justify-between">
+        <div className="absolute flex w-[17.8rem] max-731:w-full max-731:pl-[2.4rem] items-center justify-between">
           <div className="flex items-center gap-[0.4rem]">
             {variant === 'post' && <IcCrown />}
             {variant === 'team' && (
@@ -220,7 +223,7 @@ const SideTeamCard = ({
         </div>
         <div
           className={[
-            'flex flex-col items-center self-stretch rounded-[0.6rem] pt-[1.2rem]',
+            'flex flex-col items-center self-stretch rounded-[0.6rem] pt-[1.2rem] max-sm:items-start max-sm:pl-[3.6rem] max-sm:pt-0',
             disabled && 'opacity-[0.4]',
           ]
             .filter(Boolean)
@@ -231,13 +234,13 @@ const SideTeamCard = ({
               <img
                 alt={'프로필 이미지'}
                 src={profileImageUrl}
-                className="h-[6.1rem] w-[6.1rem] rounded-[9.9rem] object-cover"
+                className="h-[6.1rem] w-[6.1rem] rounded-[9.9rem] object-cover max-sm:hidden"
                 onError={() => setImgError(true)}
               />
             ) : (
-              <IcCharacter className="h-[6.1rem] w-[6.1rem] rounded-[9.9rem]" />
+              <IcCharacter className="h-[6.1rem] w-[6.1rem] rounded-[9.9rem] max-sm:hidden" />
             )}
-            <div className="flex flex-col items-center gap-[0.4rem]">
+            <div className="flex flex-col items-center gap-[0.4rem] max-sm:items-start">
               <span className="text-[1.6rem] font-[600] leading-[1.5] text-black-100">
                 {title}
               </span>
@@ -245,7 +248,7 @@ const SideTeamCard = ({
                 {positionLabel}
               </span>
             </div>
-            <div className="flex items-start gap-[0.6rem]">
+            <div className="flex items-start gap-[0.6rem] max-sm:hidden">
               {skillsIcon.slice(0, 3).map((skill) => (
                 <div
                   key={skill}
@@ -272,6 +275,7 @@ const SideTeamCard = ({
                 });
               }
             }}
+            className="max-731:w-full"
           >
             문의하기
           </BaseButton>
@@ -285,6 +289,7 @@ const SideTeamCard = ({
               e.stopPropagation();
               setIsReviewModalOpen(true);
             }}
+            className="max-731:w-full"
           >
             리뷰 쓰기
           </BaseButton>

@@ -5,7 +5,7 @@ import type {
   TagSize,
 } from '../../../types/tag';
 
-export const BASE_TAG_STYLES = 'flex items-center justify-center';
+export const BASE_TAG_STYLES = 'flex items-center justify-center whitespace-nowrap';
 
 export const TAG_SIZE_STYLES: Record<TagSize, string> = {
   xs: 'h-[2rem] gap-[0.2rem] text-[1rem] px-[0.8rem]',

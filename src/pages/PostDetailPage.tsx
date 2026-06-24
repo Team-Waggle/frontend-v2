@@ -58,7 +58,7 @@ const POSITION_ITEMS: Array<{
 ];
 
 const LABEL_BASE_STYLE =
-  'text-[1.4rem] font-[500] leading-[1.5] tracking-[-0.028rem] text-black-100';
+  'text-[1.4rem] font-[500] leading-[1.5] tracking-[-0.028rem] text-black-100 whitespace-nowrap';
 const LABEL_NOWRAP_STYLE =
   'text-[1.4rem] font-[500] leading-[1.5] tracking-[-0.028rem] text-black-100 whitespace-nowrap';
 const VALUE_STYLE =
@@ -150,13 +150,13 @@ const PostDetailPage = () => {
         url={`https://waggle.lol/post/${postDetail?.id}`}
         canonical={`https://waggle.lol/post/${postId}`}
       />
-      <div className="flex flex-1 items-start justify-center gap-[7.2rem] self-stretch pt-[11.2rem]">
+      <div className="flex flex-1 items-start justify-center gap-[7.2rem] self-stretch pt-[11.2rem] max-sm:flex-col max-sm:gap-0 max-sm:pt-0">
         {/** 모집글 상세조회 구간 */}
         <div
           ref={leftColRef}
-          className={`flex w-[68.8rem] flex-col items-center gap-[6rem] ${!isMyPost ? 'mb-[21.2rem]' : ''}`}
+          className={`flex w-[68.8rem] flex-col items-center gap-[6rem] max-sm:w-full max-sm:px-[2rem] max-sm:pt-[1rem] ${!isMyPost ? 'mb-[21.2rem] max-sm:mb-[16rem]' : ''}`}
         >
-          {/** 모집글 상세조회 제목 및 핈수 정보 */}
+          {/** 모집글 상세조회 제목 및 필수 정보 */}
           <div className="flex flex-col items-start gap-[1rem] self-stretch">
             <div className="flex flex-col items-start gap-[3.2rem] self-stretch">
               <div className="flex flex-col items-start gap-[2rem] self-stretch">
@@ -197,16 +197,16 @@ const PostDetailPage = () => {
                   </span>
                 </div>
               </div>
-              <div className="flex items-start justify-between self-stretch">
+              <div className="flex items-stretch justify-between self-stretch max-sm:gap-[1.4rem] max-731:flex-col">
                 {/** 왼쪽: 모집인원 */}
-                <div className="flex w-[39.5rem] flex-col items-start gap-[1.6rem] rounded-[0.8rem] border border-solid border-black-30 px-[2.2rem] pb-[2.8rem] pt-[2rem]">
+                <div className="flex w-[39.5rem] flex-col items-start gap-[1.6rem] rounded-[0.8rem] border border-solid border-black-30 px-[2.2rem] pb-[2.8rem] pt-[2rem] max-sm:w-[43.5rem] max-731:w-full">
                   <div className="flex items-center gap-[0.4rem]">
                     <IcPersons className="h-[1.6rem] w-[1.6rem] rounded-[0.4rem]" />
                     <span className="text-[1.3rem] font-[600] leading-[1.5] text-black-100">
                       모집 인원
                     </span>
                   </div>
-                  <div className="inline-grid h-[6.2rem] gap-x-[48px] gap-y-[2rem] px-[1rem] [grid-template-columns:repeat(3,fit-content(100%))] [grid-template-rows:repeat(2,fit-content(100%))]">
+                  <div className="grid w-full gap-y-[2rem] px-[1rem] [grid-template-columns:repeat(3,1fr)] [grid-template-rows:repeat(2,fit-content(100%))]">
                     {sortedPositions.map((position) => {
                       const count = apiCounts[position.key] ?? 0;
 
@@ -232,7 +232,7 @@ const PostDetailPage = () => {
                 </div>
 
                 {/** 오른쪽: 사용스킬 */}
-                <div className="flex min-h-[14.9rem] w-[27.9rem] flex-col items-start gap-[1.6rem] rounded-[0.8rem] border border-solid border-black-30 px-[2.2rem] pb-[2.8rem] pt-[2rem]">
+                <div className="flex min-h-[14.9rem] w-[27.9rem] flex-col items-start gap-[1.6rem] rounded-[0.8rem] border border-solid border-black-30 px-[2.2rem] pb-[2.8rem] pt-[2rem] max-731:min-h-0 max-731:w-full">
                   <div className="flex items-center gap-[0.4rem]">
                     <IcFolder className="h-[1.6rem] w-[1.6rem]" />
                     <span className="text-[1.3rem] font-[600] leading-[1.5] tracking-[-0.026rem] text-black-100">
@@ -244,7 +244,7 @@ const PostDetailPage = () => {
                       <SkillIconLarge
                         key={skill}
                         name={skill}
-                        className="!h-[2.4rem] !w-[2.4rem]"
+                        className="h-[2.4rem] w-[2.4rem]"
                       />
                     ))}
                   </div>
@@ -261,29 +261,43 @@ const PostDetailPage = () => {
               .filter(Boolean)
               .join(' ')}
           >
-            <TeamCard
-              teamImageUrl={postDetail?.team?.profileImageUrl}
-              title={postDetail?.team?.name}
-              memberCount={postDetail?.team?.memberCount}
-              workMode={postDetail?.team?.workMode}
-              createdAt={postDetail?.team?.createdAt}
-              description={postDetail?.team?.description}
-              onClick={() => {
-                if (!postDetail?.team?.id) {
-                  return;
-                }
+            <div className="flex w-full items-stretch gap-[1.4rem] max-731:flex-col">
+              <TeamCard
+                teamImageUrl={postDetail?.team?.profileImageUrl}
+                title={postDetail?.team?.name}
+                memberCount={postDetail?.team?.memberCount}
+                workMode={postDetail?.team?.workMode}
+                createdAt={postDetail?.team?.createdAt}
+                description={postDetail?.team?.description}
+                onClick={() => {
+                  if (!postDetail?.team?.id) {
+                    return;
+                  }
 
-                navigate(`/team/${postDetail.team.id}`);
-              }}
-            />
-            <div className="w-[68.8rem]">
+                  navigate(`/team/${postDetail.team.id}`);
+                }}
+              />
+              <div className="hidden flex-shrink-0 max-sm:block max-731:w-full max-731:flex-shrink-0">
+                <SideTeamCard
+                  memberId={postDetail?.user?.id}
+                  title={postDetail?.user?.username}
+                  position={postDetail?.user?.position}
+                  profileImageUrl={postDetail?.user?.profileImageUrl}
+                  skills={postDetail?.user?.skills}
+                  variant="post"
+                  isMe={isMyPost}
+                  className="max-731:w-full"
+                />
+              </div>
+            </div>
+            <div className="w-[68.8rem] max-sm:w-full">
               <FieldViewer content={postDetail?.content} />
             </div>
           </div>
 
           {/** 작성자 기준 화면: 마감하기, 수정하기 버튼 */}
           {isMyPost && postDetail?.recruiting && (
-            <div className="flex w-[32rem] items-start gap-[1.2rem] pb-[6.6rem] pt-[1.2rem]">
+            <div className="flex w-[32rem] items-start gap-[1.2rem] pb-[6.6rem] pt-[1.2rem] max-sm:pb-[15.4rem] max-731:w-full">
               <BaseButton
                 size="lg"
                 color="secondary"
@@ -307,7 +321,7 @@ const PostDetailPage = () => {
         </div>
 
         {/** 팀 구간 */}
-        <div className="flex self-start pt-[12.7rem]">
+        <div className="flex self-start pt-[12.7rem] max-sm:hidden">
           <div ref={sideWrapRef} className="self-start will-change-transform">
             <SideTeamCard
               memberId={postDetail?.user?.id}
@@ -329,7 +343,7 @@ const PostDetailPage = () => {
             (myApplicationStatus !== 'APPROVED' &&
               myApplicationStatus !== 'REJECTED')) && (
             <div
-              className="fixed bottom-[3.6rem] z-50 -translate-x-1/2"
+              className="fixed bottom-[3.6rem] z-50 -translate-x-1/2 max-sm:bottom-[8.4rem]"
               style={{ left: applyButtonPx ?? undefined }}
             >
               <div className="relative w-[32rem]">
