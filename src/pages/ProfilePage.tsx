@@ -33,11 +33,11 @@ const MyPage = () => {
   return (
     <>
       <div className="mb-[16rem] flex h-full w-full justify-center">
-        <div className="mt-[9.2rem] flex w-[clamp(98.2rem,2.8rem_+_66.25vw,130rem)] flex-col items-start gap-[7.2rem]">
+        <div className="mt-[9.2rem] flex w-[clamp(98.2rem,2.8rem_+_66.25vw,130rem)] flex-col items-start gap-[7.2rem] max-sm:mt-0 max-sm:w-full max-sm:gap-[2rem]">
           {/** 프로필 및 온도 */}
-          <div className="relative flex items-start gap-[3rem] self-stretch rounded-[1.6rem] border border-solid border-black-30 bg-black-5 p-[3rem]">
+          <div className="relative flex items-start gap-[3rem] self-stretch rounded-[1.6rem] border border-solid border-black-30 bg-black-5 p-[3rem] max-sm:flex-col max-sm:gap-[2rem] max-sm:rounded-none max-sm:border-0 max-sm:px-[2rem] max-sm:pt-0 max-sm:pb-[3rem]">
             {/** 프로필 정보 */}
-            <div className="relative flex w-[clamp(27.7rem,3.97rem_+_16.48vw,36.6rem)] flex-col items-start gap-[1.2rem] pt-[1rem]">
+            <div className="relative flex w-[clamp(27.7rem,3.97rem_+_16.48vw,36.6rem)] flex-col items-start gap-[1.2rem] pt-[1rem] max-sm:w-full">
               {/** 프로필 아이콘 */}
               <ProfileImageUpload
                 isMyProfile={isMyProfile}
@@ -54,9 +54,9 @@ const MyPage = () => {
               )}
 
               {/** 프로필 상세설명 */}
-              <div className="flex flex-col items-center gap-[1.4rem] self-stretch">
+              <div className="flex flex-col items-center gap-[1.4rem] self-stretch max-sm:items-start">
                 {/** 프로필 이름 / 직무 */}
-                <div className="flex flex-col items-center gap-[0.3rem] self-stretch">
+                <div className="flex flex-col items-center gap-[0.3rem] self-stretch max-sm:items-start">
                   {/** 프로필 이름 */}
                   <h1 className="self-stretch text-[2rem] font-[700] leading-[1.5] tracking-[-0.04rem] text-black-100">
                     {userDetail?.username}
@@ -93,7 +93,7 @@ const MyPage = () => {
                   </div>
                 </div>
                 {/** 스킬 / 한 줄 소개 */}
-                <div className="flex flex-col items-center gap-[4.5rem] self-stretch">
+                <div className="flex flex-col items-center gap-[4.5rem] self-stretch max-sm:items-start max-sm:gap-[3.2rem]">
                   {/** 스킬 */}
                   <div className="flex items-start gap-[0.8rem] self-stretch">
                     {userDetail?.skills?.slice(0, 3).map((skill: string) => (
@@ -119,16 +119,17 @@ const MyPage = () => {
               </div>
             </div>
 
-            <IcVerticalBar />
+            <IcVerticalBar className="max-sm:hidden" />
+            <div className="hidden max-sm:block h-px self-stretch bg-black-20" />
 
             {/** 온도 및 해시태그 */}
-            <div className="flex flex-1 flex-col items-start gap-[4rem] pt-[1rem]">
+            <div className="flex flex-1 flex-col items-start gap-[4rem] pt-[1rem] max-sm:flex-none max-sm:w-full max-sm:gap-[3rem]">
               <CollabTemperatureBar temperature={userDetail?.temperature} />
               <ReviewTagList topLikeTags={userDetail?.topLikeTags} />
             </div>
           </div>
           {/** 참여 중인 팀, 지원 목록 */}
-          <div className="flex flex-col items-start gap-[2.4rem] self-stretch">
+          <div className="flex flex-col items-start gap-[2.4rem] self-stretch max-sm:px-[2rem]">
             {isMyProfile ? (
               <>
                 <ProfileNav />

@@ -49,7 +49,7 @@ const ProfileTeamSection = ({ userId, isMyProfile }: ProfileTeamSectionProps) =>
   }
 
   return (
-    <div className="grid grid-cols-3 flex-wrap content-start items-start gap-[1.4rem] self-stretch max-1440:grid-cols-2">
+    <div className="grid grid-cols-3 flex-wrap content-start items-start gap-[1.4rem] self-stretch max-1440:grid-cols-2 max-sm:grid-cols-1">
       {isMyProfile
         ? myTeams?.map((team) => (
             <MyPageCard
