@@ -25,7 +25,7 @@ const FloatingMessageButton = () => {
 
   return (
     <>
-      <div className="fixed bottom-[3.6rem] right-[6rem] z-50 flex flex-col items-end gap-[1rem]">
+      <div className="fixed bottom-[3.6rem] right-[6rem] z-50 flex flex-col items-end gap-[1rem] max-sm:hidden">
         {isOpen && <MessageModal />}
         {!isOpen && (
           <IconWrapper
