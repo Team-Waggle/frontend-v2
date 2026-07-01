@@ -9,6 +9,7 @@ import { useGetIsUserProfileComplete } from '../hooks/useUser';
 import { useGetTerms } from '../hooks/useTerms';
 
 import MainSearch from '../components/Main/MainSearch/MainSearch';
+import MobileSearch from '../components/Main/MobileSearch/MobileSearch';
 import ProfileModal from '../components/Modal/ProfileModal';
 import LoginModal from '../components/Modal/LoginModal';
 import TermsModal from '../components/Modal/TermsModal';
@@ -17,10 +18,8 @@ import { formatPostListCreatedAt } from '../utils/kst-time';
 import type { PostDetailResponse } from '../types/api/posts';
 import { useAuthStore } from '../stores/authStore';
 import { trackEvent } from '../lib/ga';
+import { useSearchFilters } from '../hooks/useSearchFilters';
 
-import IcBannerCircle from '../assets/icons/image/ic_character_banner_circle.svg?react';
-import IcBannerSquare from '../assets/icons/image/ic_character_banner_square.svg?react';
-import IcBannerTriangle from '../assets/icons/image/ic_character_banner_triangle.svg?react';
 import SEO from '../components/seo';
 
 /**
@@ -31,20 +30,19 @@ import SEO from '../components/seo';
  *
  */
 
-type AppliedSearchFilters = {
-  q: string;
-  positions: string[];
-  skills: string[];
-};
-
 const MainPage = () => {
   const navigate = useNavigate();
 
   const [sort, setSort] = useState<PostsSort>('NEWEST');
-  const [appliedFilters, setAppliedFilters] = useState<AppliedSearchFilters>({
+  const [appliedFilters, setAppliedFilters] = useState({
     q: '',
-    positions: [],
-    skills: [],
+    positions: [] as string[],
+    skills: [] as string[],
+  });
+
+  const searchFilterProps = useSearchFilters({
+    onApplyFilters: setAppliedFilters,
+    onChangeSort: setSort,
   });
 
   const {
@@ -120,34 +118,35 @@ const MainPage = () => {
         title="사이드 프로젝트 팀원 찾기는 와글에서!"
         description="사이드 프로젝트·창업·스터디 팀원을 가장 쉽게 찾는 곳. 직무와 스킬로 매칭하고, 모집글을 올리고, 바로 지원하세요. 개발자·디자이너·기획자 팀빌딩은 와글에서."
       />
-      <div className="flex w-full justify-center">
-        <div className="flex w-full max-w-[152.6rem] flex-col gap-[5.6rem] px-[4.8rem] pt-[5.4rem]">
-          <div className="relative aspect-[763/177] w-full self-stretch overflow-hidden rounded-[2.4rem] bg-blue-60 [container-type:inline-size]">
-            {/** 문구 */}
-            <div className="pl-[4.476cqw] pt-[4.476cqw]">
-              <p className="font-mulmaru text-[4.799cqw] font-[500] text-black-5">
-                나랑 같이 사.프하러
-              </p>
-              <p className="font-mulmaru text-[4.799cqw] font-[500] text-black-5">
-                가지 않을래?
-              </p>
-            </div>
-            {/** 캐릭터 이미지 */}
-            <div className="absolute bottom-[2.72cqw] right-[5.178cqw] z-10 flex items-end gap-[1.663cqw]">
-              <IcBannerCircle className="h-[7.94cqw] w-[7.94cqw]" />
-              <IcBannerTriangle className="h-[7.94cqw] w-[7.94cqw]" />
-              <IcBannerSquare className="h-[7.94cqw] w-[7.94cqw]" />
-            </div>
-            {/** 하단 색상 바 */}
-            <div className="absolute bottom-0 h-[4.019cqw] w-full bg-blue-50" />
-          </div>
+      <div className="flex w-full justify-center max-sm:pt-[1rem]">
+        <div className="flex w-full max-w-[152.6rem] flex-col gap-[5.6rem] px-[4.8rem] pt-[5.4rem] max-sm:pt-0 max-sm:px-[2rem] max-sm:gap-[1.6rem]">
+          <picture className="w-full">
+            <source
+              media="(max-width: 767px)"
+              srcSet="/assets/images/banner/banner_mobile.png"
+            />
+            <img
+              src="/assets/images/banner/banner_desktop.png"
+              alt="와글 배너"
+              className="w-full rounded-[2.4rem]"
+            />
+          </picture>
 
           <div className="flex w-full flex-col items-start gap-[2rem]">
-            <MainSearch
-              sort={sort}
-              onChangeSort={setSort}
-              onApplyFilters={setAppliedFilters}
-            />
+            <div className="max-sm:hidden w-full">
+              <MainSearch
+                sort={sort}
+                onChangeSort={setSort}
+                {...searchFilterProps}
+              />
+            </div>
+            <div className="hidden max-sm:block w-full">
+              <MobileSearch
+                sort={sort}
+                onChangeSort={setSort}
+                {...searchFilterProps}
+              />
+            </div>
           </div>
 
           {!isLoading && posts.length === 0 ? (
@@ -161,7 +160,7 @@ const MainPage = () => {
               }
             />
           ) : (
-            <div className="inline-grid w-full max-w-[152.6rem] auto-rows-max grid-cols-[repeat(auto-fill,minmax(33.6rem,1fr))] gap-x-[1.8rem] gap-y-[1.8rem] max-1440:max-w-full">
+            <div className="inline-grid w-full max-w-[152.6rem] auto-rows-max grid-cols-[repeat(auto-fill,minmax(33.6rem,1fr))] max-sm:grid-cols-[repeat(auto-fill,minmax(32rem,1fr))] gap-x-[1.8rem] gap-y-[1.8rem] max-1440:max-w-full">
               {posts.map((post: PostDetailResponse) => {
                 const positionList: string[] = Array.from(
                   new Set(
