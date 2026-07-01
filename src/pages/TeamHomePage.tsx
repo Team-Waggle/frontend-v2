@@ -149,7 +149,7 @@ const TeamHomePage = () => {
       <SEO title={teamDetail?.name || ''} />
       <div
         className={[
-          'flex flex-1 flex-col items-center gap-[6rem] self-stretch',
+          'flex flex-1 flex-col items-center gap-[6rem] self-stretch max-sm:pt-0 max-sm:gap-0',
           isLeaderOrManager ? 'pt-[5.4rem]' : 'pt-[9.2rem]',
         ]
           .filter(Boolean)
@@ -157,22 +157,22 @@ const TeamHomePage = () => {
       >
         {/** pt-[9.2rem] pt-[5.4rem] */}
         {isLeaderOrManager && <TeamNav />}
-        <div className="flex w-full max-w-[clamp(98.2rem,70vw,130rem)] flex-col items-start gap-[4rem]">
+        <div className="flex w-full max-w-[clamp(98.2rem,70vw,130rem)] flex-col items-start gap-[4rem] max-sm:max-w-none max-sm:px-[2rem] max-sm:pt-[2.4rem] max-sm:gap-[9rem]">
           {/** 팀 설명 */}
-          <div className="relative flex items-start gap-[4rem] self-stretch">
+          <div className="relative flex items-start gap-[4rem] self-stretch max-xs:flex-col max-xs:gap-[2.4rem]">
             {/** 팀 이미지: default 값 */}
             {teamDetail?.profileImageUrl && !imgError ? (
-              <div className="flex aspect-[1/1] h-[22.3rem] w-[22.3rem] flex-col items-center justify-center gap-[1rem] rounded-[1em] bg-black-10">
+              <div className="flex aspect-[1/1] h-[22.3rem] w-[22.3rem] flex-col items-center justify-center gap-[1rem] rounded-[1em] bg-black-10 max-sm:h-[25rem] max-sm:w-[25rem] max-xs:h-[13.6rem] max-xs:w-full max-xs:aspect-auto">
                 <img
                   alt={'프로필 이미지'}
                   src={teamDetail?.profileImageUrl}
-                  className="h-[22.3rem] w-[22.3rem] rounded-[1rem] object-cover"
+                  className="h-[22.3rem] w-[22.3rem] rounded-[1rem] object-cover max-sm:h-[25rem] max-sm:w-[25rem] max-xs:h-[9.8rem] max-xs:w-[9.8rem]"
                   onError={() => setImgError(true)}
                 />
               </div>
             ) : (
-              <div className="flex aspect-[1/1] w-full max-w-[22.3rem] flex-col items-center justify-center gap-[1rem] self-stretch rounded-[1rem] bg-blue-5 py-[1.9rem]">
-                <TeamDefaultImg className="h-[18.5rem] w-[18.5rem]" />
+              <div className="flex aspect-[1/1] w-full max-w-[22.3rem] flex-col items-center justify-center gap-[1rem] self-stretch rounded-[1rem] bg-blue-5 py-[1.9rem] max-sm:max-w-[25rem] max-xs:max-w-none max-xs:aspect-auto max-xs:h-[13.6rem] max-xs:py-0">
+                <TeamDefaultImg className="h-[18.5rem] w-[18.5rem] max-sm:h-[21.2rem] max-sm:w-[21.2rem] max-xs:h-[9.8rem] max-xs:w-[9.8rem]" />
               </div>
             )}
             {/** 팀 상세 내용 */}
@@ -232,12 +232,12 @@ const TeamHomePage = () => {
             )}
           </div>
           {/** 팀 모집글 / 팀원 관리 */}
-          <div className="flex flex-col items-start gap-[3.6rem] self-stretch">
+          <div className="flex flex-col items-start gap-[3.6rem] self-stretch max-sm:gap-[9rem]">
             {/** 모집글 */}
             <div className="flex flex-col items-start self-stretch">
               {/** 모집글 타이틀 */}
               <div className="flex items-start gap-[1rem] self-stretch p-[1rem]">
-                <p className="text-[2rem] font-[600] leading-[1.5] tracking-[-0.04rem] text-black">
+                <p className="text-[1.8rem] font-[600] leading-[1.5] tracking-[-0.04rem] text-black max-sm:text-[1.8rem]">
                   모집글
                 </p>
               </div>
@@ -324,12 +324,12 @@ const TeamHomePage = () => {
             <div className="mb-[8rem] flex flex-col items-start self-stretch">
               {/** 팀원 관리 타이틀 */}
               <div className="flex items-start gap-[1rem] self-stretch p-[1rem]">
-                <p className="text-[2rem] font-[600] leading-[1.5] tracking-[-0.04rem] text-black">
+                <p className="text-[1.8rem] font-[600] leading-[1.5] tracking-[-0.04rem] text-black max-sm:text-[1.8rem]">
                   팀원
                 </p>
               </div>
               {/** 팀원 명단 카드 */}
-              <div className="grid w-full gap-x-[1.8rem] gap-y-[2.4rem] self-stretch [grid-template-columns:repeat(auto-fit,23.4rem)]">
+              <div className="grid w-full gap-x-[1.8rem] gap-y-[2.4rem] self-stretch [grid-template-columns:repeat(auto-fit,23.4rem)] max-sm:[grid-template-columns:repeat(auto-fill,minmax(23.4rem,1fr))] max-xs:gap-y-[2.2rem]">
                 {sortedMembers.map((member) => (
                   <SideTeamCard
                     key={member.id}
