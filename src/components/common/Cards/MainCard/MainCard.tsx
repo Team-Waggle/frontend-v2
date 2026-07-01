@@ -42,7 +42,7 @@ const MainCard = ({
   onClick,
 }: MainCardProps) => {
   const baseStyle =
-    'pointer-events-auto flex w-full min-w-[33.6rem] cursor-pointer flex-col items-start gap-[3.2rem] rounded-[1.2rem] border border-solid border-black-30 bg-white px-[2.8rem] py-[2.4rem]';
+    'pointer-events-auto flex w-full min-w-[33.6rem] max-sm:min-w-[32rem] cursor-pointer flex-col items-start gap-[3.2rem] rounded-[1.2rem] border border-solid border-black-30 bg-white px-[2.8rem] py-[2.4rem]';
   const hoverStyle =
     variant === 'main' ? 'hover:shadow-main-card' : 'hover:bg-hover-5';
   const activeStyle = isActive ? 'border-blue-70' : '';
@@ -93,7 +93,7 @@ const MainCard = ({
                 <SkillIconLarge
                   key={`${enumValue}-${iconName}-${index}`}
                   name={iconName}
-                  className="w-[2.8rem]"
+                  className="h-[2.8rem] w-[2.8rem]"
                 />
               );
             })}
@@ -102,7 +102,7 @@ const MainCard = ({
         </div>
         {/* Time */}
         <div className="flex w-full justify-end">
-          <span className="text-[1.2rem] font-[500] text-[#878B96]">
+          <span className="text-[1.2rem] font-[500] text-black-60">
             {mainCardCreatedAt}
           </span>
         </div>
