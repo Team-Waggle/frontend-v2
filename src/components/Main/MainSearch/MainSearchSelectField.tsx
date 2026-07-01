@@ -37,7 +37,7 @@ const MainSearchSelectField = ({
   const baseVariant =
     variant === 'job' ? 'border rounded-l-[0.8rem]' : 'border border-l-0';
 
-  const closedTextBase = 'text-[#878B96]';
+  const closedTextBase = 'text-black-60';
   const closedTextSelected = 'text-[#023075]';
 
   const closedBorderDefault = 'border-[#B7B9C0]';
