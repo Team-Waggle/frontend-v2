@@ -52,15 +52,36 @@ const FilterBottomSheet = ({
     onClose();
   };
 
+  const tabs: Tab[] = ['job', 'skill'];
+
+  const handleTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    const currentIndex = tabs.indexOf(activeTab);
+    const delta = e.key === 'ArrowRight' ? 1 : -1;
+    const nextTab = tabs[(currentIndex + delta + tabs.length) % tabs.length];
+    setActiveTab(nextTab);
+    document.getElementById(`filter-tab-${nextTab}`)?.focus();
+  };
+
   return (
-    <BottomSheet isOpen={isOpen} onClose={onClose}>
+    <BottomSheet isOpen={isOpen} onClose={onClose} aria-label="검색 필터">
       {/* 탭 */}
-      <div className="flex items-start gap-[2.4rem] self-stretch border-b border-solid border-black-20">
-        {(['job', 'skill'] as Tab[]).map((tab) => (
+      <div
+        role="tablist"
+        className="flex items-start gap-[2.4rem] self-stretch border-b border-solid border-black-20"
+      >
+        {tabs.map((tab) => (
           <button
             key={tab}
+            id={`filter-tab-${tab}`}
             type="button"
+            role="tab"
+            aria-selected={activeTab === tab}
+            aria-controls={`filter-tabpanel-${tab}`}
+            tabIndex={activeTab === tab ? 0 : -1}
             onClick={() => setActiveTab(tab)}
+            onKeyDown={handleTabKeyDown}
             className={`flex ${navTabContainerBase} ${navTabTextBase} ${
               activeTab === tab ? `${navTabContainerActive} ${navTabTextActive}` : navTabTextInactive
             }`}
@@ -73,7 +94,12 @@ const FilterBottomSheet = ({
       {/* 콘텐츠 */}
       <div className="flex-1 overflow-y-auto">
         {activeTab === 'job' && (
-          <div className="flex flex-wrap gap-[0.8rem]">
+          <div
+            id="filter-tabpanel-job"
+            role="tabpanel"
+            aria-labelledby="filter-tab-job"
+            className="flex flex-wrap gap-[0.8rem]"
+          >
             {JOBS.map((label) => (
               <BaseChip
                 key={label}
@@ -88,7 +114,12 @@ const FilterBottomSheet = ({
         )}
 
         {activeTab === 'skill' && (
-          <div className="flex flex-wrap gap-[0.8rem]">
+          <div
+            id="filter-tabpanel-skill"
+            role="tabpanel"
+            aria-labelledby="filter-tab-skill"
+            className="flex flex-wrap gap-[0.8rem]"
+          >
             {allSkills.map((label) => {
               const id = SKILL_MAP[label as keyof typeof SKILL_MAP];
               const isSelected = selectedSkillIds.has(id);

@@ -36,6 +36,7 @@ const JobItem = ({
   return (
     <button
       onClick={onClick}
+      aria-pressed={active}
       className={[baseStyle, stateStyle, dividerStyle, roundedStyle].join(' ')}
     >
       <span className="text-[1.4rem] font-[600]">{label}</span>
