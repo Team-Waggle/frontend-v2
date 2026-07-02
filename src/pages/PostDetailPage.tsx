@@ -150,7 +150,7 @@ const PostDetailPage = () => {
         url={`https://waggle.lol/post/${postDetail?.id}`}
         canonical={`https://waggle.lol/post/${postId}`}
       />
-      <div className="flex flex-1 items-start justify-center gap-[7.2rem] self-stretch pt-[11.2rem] max-sm:flex-col max-sm:gap-0 max-sm:pt-0">
+      <div className="flex flex-1 items-start justify-center gap-[7.2rem] self-stretch pt-[11.2rem] max-sm:flex-col max-sm:gap-0 max-sm:pt-[1rem]">
         {/** 모집글 상세조회 구간 */}
         <div
           ref={leftColRef}

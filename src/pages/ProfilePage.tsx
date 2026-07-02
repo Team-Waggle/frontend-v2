@@ -33,7 +33,7 @@ const MyPage = () => {
   return (
     <>
       <div className="mb-[16rem] flex h-full w-full justify-center">
-        <div className="mt-[9.2rem] flex w-[clamp(98.2rem,2.8rem_+_66.25vw,130rem)] flex-col items-start gap-[7.2rem] max-sm:mt-0 max-sm:w-full max-sm:gap-[2rem]">
+        <div className="mt-[9.2rem] flex w-[clamp(98.2rem,2.8rem_+_66.25vw,130rem)] flex-col items-start gap-[7.2rem] max-sm:mt-[1rem] max-sm:w-full max-sm:gap-[2rem]">
           {/** 프로필 및 온도 */}
           <div className="relative flex items-start gap-[3rem] self-stretch rounded-[1.6rem] border border-solid border-black-30 bg-black-5 p-[3rem] max-sm:flex-col max-sm:gap-[2rem] max-sm:rounded-none max-sm:border-0 max-sm:px-[2rem] max-sm:pt-0 max-sm:pb-[3rem]">
             {/** 프로필 정보 */}

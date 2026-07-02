@@ -119,7 +119,7 @@ const MainPage = () => {
         description="사이드 프로젝트·창업·스터디 팀원을 가장 쉽게 찾는 곳. 직무와 스킬로 매칭하고, 모집글을 올리고, 바로 지원하세요. 개발자·디자이너·기획자 팀빌딩은 와글에서."
       />
       <div className="flex w-full justify-center max-sm:pt-[1rem]">
-        <div className="flex w-full max-w-[152.6rem] flex-col gap-[5.6rem] px-[4.8rem] pt-[5.4rem] max-sm:pt-0 max-sm:px-[2rem] max-sm:gap-[1.6rem]">
+        <div className="flex w-full max-w-[152.6rem] flex-col gap-[5.6rem] px-[4.8rem] pt-[5.4rem] max-sm:pt-[1rem] max-sm:px-[2rem] max-sm:gap-[1.6rem]">
           <picture className="w-full">
             <source
               media="(max-width: 767px)"

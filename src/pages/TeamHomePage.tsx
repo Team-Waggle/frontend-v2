@@ -149,7 +149,7 @@ const TeamHomePage = () => {
       <SEO title={teamDetail?.name || ''} />
       <div
         className={[
-          'flex flex-1 flex-col items-center gap-[6rem] self-stretch max-sm:pt-0 max-sm:gap-0',
+          'flex flex-1 flex-col items-center gap-[6rem] self-stretch max-sm:pt-[1rem] max-sm:gap-0',
           isLeaderOrManager ? 'pt-[5.4rem]' : 'pt-[9.2rem]',
         ]
           .filter(Boolean)
