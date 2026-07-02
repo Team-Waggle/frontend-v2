@@ -41,7 +41,7 @@ const ProfileApplicationSection = () => {
     : applications.filter((a) => STATUS_MAP[a.status] === activeFilter);
 
   return (
-    <div className="flex flex-col items-center gap-[7rem] self-stretch">
+    <div className="flex flex-col items-center gap-[7rem] self-stretch max-sm:gap-[2.8rem]">
       <ProfileApplicationStats
         stats={stats}
         activeFilter={activeFilter}
@@ -50,7 +50,7 @@ const ProfileApplicationSection = () => {
       <div className="flex flex-col items-center self-stretch">
         <table className="w-full">
           <caption className="sr-only">지원 내역</caption>
-          <thead>
+          <thead className="max-sm:hidden">
             <tr className="flex items-center justify-between rounded-[1.2rem] bg-black-20 px-[2rem] py-[1.2rem]">
               <th scope="col" className={`${TH_TEXT} w-[40rem] text-center`}>내용</th>
               <th scope="col" className={`${TH_TEXT} w-[7.7rem] text-center`}>직무</th>

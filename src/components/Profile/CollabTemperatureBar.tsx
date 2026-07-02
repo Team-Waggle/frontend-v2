@@ -31,14 +31,15 @@ const CollabTemperatureBar = ({ temperature }: CollabTemperatureBarProps) => {
   const temp = temperature ?? DEFAULT_TEMPERATURE;
   const clampedTemp = Math.min(Math.max(temp, 0), 100);
 
+  const mobileBarWidth =
+    clampedTemp <= DEFAULT_TEMPERATURE
+      ? (clampedTemp / DEFAULT_TEMPERATURE) * 50
+      : 50 + ((clampedTemp - DEFAULT_TEMPERATURE) / (100 - DEFAULT_TEMPERATURE)) * 50;
+
   return (
     <div className="relative flex h-[9.7rem] flex-col items-start gap-[1.2rem] self-stretch">
       <div
-        className="absolute bottom-[2.4rem] flex flex-col items-center justify-center pl-[1.0835rem] pr-[1.0165rem]"
-        style={{
-          left: `${DEFAULT_TEMPERATURE}%`,
-          transform: 'translateX(-50%)',
-        }}
+        className="absolute bottom-[2.4rem] flex flex-col items-center justify-center pl-[1.0835rem] pr-[1.0165rem] left-[36.5%] -translate-x-1/2 max-sm:left-[50%]"
       >
         <span className="text-[1.2rem] font-[500] leading-[1.5] tracking-[-0.024rem] text-black-80">
           기본 온도
@@ -65,11 +66,12 @@ const CollabTemperatureBar = ({ temperature }: CollabTemperatureBarProps) => {
           </div>
           <div className="flex h-[1.4rem] flex-shrink flex-col items-start self-stretch rounded-[9.9rem] bg-black-10">
             <div
-              className="h-[1.4rem] rounded-l-[9.9rem]"
-              style={{
-                width: `${clampedTemp}%`,
-                background: getTemperatureGradient(temp),
-              }}
+              className="max-sm:hidden h-[1.4rem] rounded-l-[9.9rem]"
+              style={{ width: `${clampedTemp}%`, background: getTemperatureGradient(temp) }}
+            />
+            <div
+              className="hidden max-sm:block h-[1.4rem] rounded-l-[9.9rem]"
+              style={{ width: `${mobileBarWidth}%`, background: getTemperatureGradient(temp) }}
             />
           </div>
         </div>

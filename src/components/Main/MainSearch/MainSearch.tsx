@@ -1,11 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import useHorizontalScroll from '../../../hooks/useHorizontalScroll';
 import type { PostsSort } from '../../../types/api/posts';
-import { trackEvent } from '../../../lib/ga';
-
-import { POSITION_CONVERTER } from '../../../utils/position';
-import { SKILL_MAP } from '../../../constants/skillMap';
+import type { Job, Skill, SearchTagItem } from '../../../hooks/useSearchFilters';
 
 import IcBusinessBag from '../../../../src/assets/icons/normal/ic_businessBag.svg?react';
 import IcFolder from '../../../../src/assets/icons/normal/ic_folder.svg?react';
@@ -15,86 +12,58 @@ import ChevronRight from '../../../assets/icons/normal/chevron/ic_chevronRight.s
 
 import MainSearchTag from './MainSearchTag';
 import MainSearchSelectText from './MainSearchSelectText';
-
 import MainSearchSelectField from './MainSearchSelectField';
 import MainSearchKeywordField from './MainSearchKeywordField';
 import SearchKeywordOverlay from './SearchKeywordOverlay';
-
 import SearchSkillSelectBox from './SearchSkillSelectBox';
 import SearchJobSelectBox from './SearchJobSelectBox';
 import IconWrapper from '../../common/IconWrapper';
 
-/**
- *
- * MainSearch
- * : 홈 화면의 Search 컴포넌트
- *
- */
-
 type OpenMenu = 'job' | 'skill' | 'keyword' | null;
 
-type Job = { id: string; label: string };
-type Skill = { id: string; label: string };
-
-type TagType = 'job' | 'skill';
-
-type SearchTagItem = {
-  type: TagType;
-  id: string;
-  title: string;
-};
-
-type AppliedSearchFilters = {
-  q: string;
-  positions: string[];
-  skills: string[];
-};
-
-type MainSearchProps = {
+export type MainSearchProps = {
   sort: PostsSort;
   onChangeSort: (sort: PostsSort) => void;
-  onApplyFilters: (filters: AppliedSearchFilters) => void;
+  keyword: string;
+  setKeyword: (v: string) => void;
+  selectedJobs: Job[];
+  selectedSkills: Skill[];
+  searchTags: SearchTagItem[];
+  onToggleJob: (label: string) => void;
+  onToggleSkill: (skill: Skill) => void;
+  removeSearchTag: (tag: SearchTagItem) => void;
+  applyFilters: () => void;
+  onReset: () => void;
 };
 
 const MainSearch = ({
   sort,
   onChangeSort,
-  onApplyFilters,
+  keyword,
+  setKeyword,
+  selectedJobs,
+  selectedSkills,
+  searchTags,
+  onToggleJob,
+  onToggleSkill,
+  removeSearchTag,
+  applyFilters,
+  onReset,
 }: MainSearchProps) => {
   const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
-  const [selectedJobs, setSelectedJobs] = useState<Job[]>([]);
-  const [selectedSkills, setSelectedSkills] = useState<Skill[]>([]);
-  const [keyword, setKeyword] = useState('');
-  const [debouncedKeyword, setDebouncedKeyword] = useState('');
-
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const lastTrackedKeywordRef = useRef('');
-
-  const trackSearch = (kw: string) => {
-    const trimmed = kw.trim();
-    if (!trimmed || trimmed === lastTrackedKeywordRef.current) return;
-    lastTrackedKeywordRef.current = trimmed;
-    trackEvent({ action: 'search', label: trimmed });
-  };
 
   useEffect(() => {
     const onPointerDown = (e: PointerEvent) => {
       const el = containerRef.current;
       if (!el) return;
-
       const target = e.target as Node | null;
       if (!target) return;
-
-      if (!el.contains(target)) {
-        setOpenMenu(null);
-      }
+      if (!el.contains(target)) setOpenMenu(null);
     };
 
     document.addEventListener('pointerdown', onPointerDown);
-
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown);
-    };
+    return () => document.removeEventListener('pointerdown', onPointerDown);
   }, []);
 
   const buildCountEllipsisLabel = (
@@ -104,151 +73,43 @@ const MainSearch = ({
     placeholder: string,
   ) => {
     if (items.length === 0) return placeholder;
-
-    const head = `${prefix}(${items.length}) `;
-    const body = items.join(', ');
-    const full = `${head}${body}`;
-
+    const full = `${prefix}(${items.length}) ${items.join(', ')}`;
     if (full.length <= maxChars) return full;
-
-    const cut = Math.max(0, maxChars - 3);
-    return `${full.slice(0, cut)}...`;
+    return `${full.slice(0, Math.max(0, maxChars - 3))}...`;
   };
 
-  const jobItems = selectedJobs.map((j) => j.label);
-  const skillItems = selectedSkills.map((s) => s.label);
+  const toggleMenu = (menu: Exclude<OpenMenu, null>) => {
+    setOpenMenu((prev) => (prev === menu ? null : menu));
+  };
+
+  const handleApplyFilters = () => {
+    applyFilters();
+    setOpenMenu(null);
+  };
+
+  const handleReset = (e: React.MouseEvent<HTMLButtonElement>) => {
+    onReset();
+    setOpenMenu(null);
+    const icon = e.currentTarget.querySelector('svg');
+    if (!icon) return;
+    icon.classList.remove('spin-once');
+    void icon.getBoundingClientRect();
+    icon.classList.add('spin-once');
+  };
 
   const jobLabel = buildCountEllipsisLabel(
     '사용직무',
-    jobItems,
+    selectedJobs.map((j) => j.label),
     34,
     '직무를 선택해주세요.',
   );
 
   const skillLabel = buildCountEllipsisLabel(
     '사용스킬',
-    skillItems,
+    selectedSkills.map((s) => s.label),
     34,
     '사용스킬을 선택해주세요.',
   );
-
-  const toggleMenu = (menu: Exclude<OpenMenu, null>) => {
-    setOpenMenu((prev) => (prev === menu ? null : menu));
-  };
-
-  const onToggleJob = (label: string) => {
-    setSelectedJobs((prev) => {
-      const exists = prev.some((j) => j.id === label);
-      if (exists) return prev.filter((j) => j.id !== label);
-      trackEvent({ action: 'filter_job', label });
-      return [...prev, { id: label, label }];
-    });
-  };
-
-  const onToggleSkill = (skill: Skill) => {
-    setSelectedSkills((prev) => {
-      const exists = prev.some((s) => s.id === skill.id);
-      if (exists) return prev.filter((s) => s.id !== skill.id);
-      trackEvent({ action: 'filter_skill', label: skill.label });
-      return [...prev, skill];
-    });
-  };
-
-  const toApiPositions = (jobs: Job[]): string[] => {
-    return Array.from(
-      new Set(
-        jobs
-          .map((job) => POSITION_CONVERTER[job.label] || job.id)
-          .map((value) => value?.trim())
-          .filter(Boolean),
-      ),
-    );
-  };
-
-  const toApiSkills = (skills: Skill[]): string[] => {
-    return Array.from(
-      new Set(
-        skills
-          .map((skill) => SKILL_MAP[skill.label as keyof typeof SKILL_MAP])
-          .map((value) => value?.trim())
-          .filter(Boolean),
-      ),
-    );
-  };
-
-  // debounce 적용 300ms 동안 추가 입력이 없을 시 API 요청
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedKeyword(keyword);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [keyword]);
-
-  useEffect(() => {
-    trackSearch(debouncedKeyword);
-  }, [debouncedKeyword]);
-
-  useEffect(() => {
-    onApplyFilters({
-      q: debouncedKeyword.trim(),
-      positions: toApiPositions(selectedJobs),
-      skills: toApiSkills(selectedSkills),
-    });
-  }, [selectedJobs, selectedSkills, debouncedKeyword]);
-
-  const applyFilters = () => {
-    trackSearch(keyword);
-
-    onApplyFilters({
-      q: keyword.trim(),
-      positions: toApiPositions(selectedJobs),
-      skills: toApiSkills(selectedSkills),
-    });
-
-    setOpenMenu(null);
-  };
-
-  const onReset = () => {
-    setSelectedJobs([]);
-    setSelectedSkills([]);
-    setKeyword('');
-    setOpenMenu(null);
-    onChangeSort('NEWEST');
-
-    onApplyFilters({
-      q: '',
-      positions: [],
-      skills: [],
-    });
-  };
-
-  const hasKeyword = keyword.trim().length > 0;
-
-  const searchTags = useMemo<SearchTagItem[]>(() => {
-    const jobTags = selectedJobs.map((j) => ({
-      type: 'job' as const,
-      id: j.id,
-      title: j.label,
-    }));
-
-    const skillTags = selectedSkills.map((s) => ({
-      type: 'skill' as const,
-      id: s.id,
-      title: s.label,
-    }));
-
-    return [...jobTags, ...skillTags];
-  }, [selectedJobs, selectedSkills]);
-
-  const removeSearchTag = (tag: SearchTagItem) => {
-    if (tag.type === 'job') {
-      setSelectedJobs((prev) => prev.filter((j) => j.id !== tag.id));
-      return;
-    }
-
-    setSelectedSkills((prev) => prev.filter((s) => s.id !== tag.id));
-  };
 
   const { trackRef, canScrollLeft, canScrollRight, scrollByItem } =
     useHorizontalScroll({
@@ -273,7 +134,6 @@ const MainSearch = ({
                 suppressRightBorder={openMenu === 'skill'}
                 highlightRightBorder={selectedSkills.length > 0}
               />
-
               <MainSearchSelectField
                 variant="skill"
                 isSelected={selectedSkills.length > 0}
@@ -281,9 +141,8 @@ const MainSearch = ({
                 valueLabel={skillLabel}
                 isOpen={openMenu === 'skill'}
                 onToggle={() => toggleMenu('skill')}
-                hasKeyword={hasKeyword}
+                hasKeyword={keyword.trim().length > 0}
               />
-
               <MainSearchKeywordField
                 onChange={setKeyword}
                 onFocus={() => setOpenMenu('keyword')}
@@ -295,17 +154,15 @@ const MainSearch = ({
               <SearchKeywordOverlay
                 value={keyword}
                 onChange={setKeyword}
-                onSearch={applyFilters}
+                onSearch={handleApplyFilters}
               />
             )}
-
             {openMenu === 'job' && (
               <SearchJobSelectBox
                 values={selectedJobs.map((j) => j.label)}
                 onToggle={onToggleJob}
               />
             )}
-
             {openMenu === 'skill' && (
               <SearchSkillSelectBox
                 selectedSkills={selectedSkills}
@@ -316,7 +173,7 @@ const MainSearch = ({
 
           <button
             type="button"
-            onClick={applyFilters}
+            onClick={handleApplyFilters}
             className="flex w-[16rem] items-center justify-center gap-[1rem] self-stretch rounded-r-[0.8rem] bg-blue-80 px-[2rem] hover:bg-hover-80"
           >
             <span className="text-[1.6rem] font-[700] text-white">확인</span>
@@ -325,19 +182,10 @@ const MainSearch = ({
 
         <button
           type="button"
-          onClick={(e) => {
-            onReset();
-
-            const icon = e.currentTarget.querySelector('svg');
-            if (!icon) return;
-
-            icon.classList.remove('spin-once');
-            void icon.getBoundingClientRect();
-            icon.classList.add('spin-once');
-          }}
+          onClick={handleReset}
           className="flex w-[5rem] items-center justify-center gap-[1rem] self-stretch rounded-[0.6rem] border border-solid border-[#CFD1D5]"
         >
-          <IcRefresh className="text-[#878B96] transition-none" />
+          <IcRefresh className="text-black-60 transition-none" />
         </button>
       </div>
 
@@ -349,46 +197,33 @@ const MainSearch = ({
                 <IconWrapper
                   shape="circle"
                   color="outline"
-                  children={
-                    <ChevronLeft className="h-[1.7455rem] w-[1.7455rem]" />
-                  }
+                  children={<ChevronLeft className="h-[1.7455rem] w-[1.7455rem]" />}
                   className="pointer-events-auto !h-[3.2rem] !min-h-[3.2rem] !w-[3.2rem] !min-w-[3.2rem] p-0"
-                  onClick={() => {
-                    scrollByItem('left');
-                  }}
+                  onClick={() => scrollByItem('left')}
                 />
               </div>
             </div>
           )}
-
           {canScrollRight && (
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 flex">
               <div className="flex h-full w-[9.2rem] items-center justify-end bg-team-home-right-slide-background pl-[1.2rem] pr-[1.2rem] backdrop-blur-none">
                 <IconWrapper
                   shape="circle"
                   color="outline"
-                  children={
-                    <ChevronRight className="h-[1.7455rem] w-[1.7455rem]" />
-                  }
+                  children={<ChevronRight className="h-[1.7455rem] w-[1.7455rem]" />}
                   className="pointer-events-auto !h-[3.2rem] !min-h-[3.2rem] !w-[3.2rem] !min-w-[3.2rem] p-0"
-                  onClick={() => {
-                    scrollByItem('right');
-                  }}
+                  onClick={() => scrollByItem('right')}
                 />
               </div>
             </div>
           )}
-
           <div
             ref={trackRef}
             className="flex h-full min-w-0 items-center gap-[0.8rem] overflow-x-auto scroll-smooth scrollbar-hide"
           >
             {searchTags.map((t) => (
               <div key={`${t.type}-${t.id}`} data-search-tag="true">
-                <MainSearchTag
-                  TagTitle={t.title}
-                  onRemove={() => removeSearchTag(t)}
-                />
+                <MainSearchTag TagTitle={t.title} onRemove={() => removeSearchTag(t)} />
               </div>
             ))}
           </div>

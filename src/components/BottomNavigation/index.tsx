@@ -117,7 +117,7 @@ const BottomNavigation = () => {
   return (
     <>
       <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-center border-t border-black-20 bg-black-5">
-        <div className="flex h-[4.8rem] w-full max-w-[36rem] px-[2rem] items-center justify-center gap-[2.4rem]">
+        <div className="flex h-[4.8rem] w-full max-sm:px-[8.8rem] max-471:px-[2rem] items-center justify-between">
           {NAV_ITEMS.map((item) => {
             const active = isActive(item.key);
             return (

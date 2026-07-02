@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import IcSearch from '../../../../src/assets/icons/normal/ic_search.svg?react';
+import IcSearch from '../../../../src/assets/icons/normal/ic_normal_search.svg?react';
 
 /**
  * MainSearch: 검색어(Keyword) 입력 컴포넌트 오버레이 (전체적으로 뜨는 검색창)
@@ -38,7 +38,7 @@ export default function SearchKeywordOverlay({
         ].join(' ')}
       >
         <div className="flex h-[2rem] w-[2rem] flex-col items-center justify-center">
-          <IcSearch className="text-[#237BFF]" />
+          <IcSearch className="text-black-60" />
         </div>
 
         <input

@@ -61,7 +61,7 @@ const MyPageCard = ({
   return (
     <Link
       to={teamId !== undefined ? `/team/${teamId}` : '/'}
-      className="block w-full max-w-[49.4rem]"
+      className="block w-full max-w-[49.4rem] max-sm:max-w-full"
       onClick={teamId === undefined ? (e) => e.preventDefault() : undefined}
     >
     <article
@@ -72,11 +72,11 @@ const MyPageCard = ({
         <img
           src={profileImageUrl}
           alt={title ?? '팀 프로필 이미지'}
-          className={`h-[12.4rem] w-[12.4rem] flex-shrink-0 rounded-[0.8rem] object-cover ${!visible && isMyProfile && 'opacity-60'}`}
+          className={`h-[12.4rem] w-[12.4rem] flex-shrink-0 rounded-[0.8rem] object-cover max-xs:h-[8.4rem] max-xs:w-[8.4rem] ${!visible && isMyProfile && 'opacity-60'}`}
           onError={() => setImgError(true)}
         />
       ) : (
-        <IcTeamImg className={`h-[12.4rem] w-[12.4rem] flex-shrink-0 rounded-[0.6rem] bg-blue-5 ${!visible && isMyProfile && 'opacity-60'}`} />
+        <IcTeamImg className={`h-[12.4rem] w-[12.4rem] flex-shrink-0 rounded-[0.6rem] bg-blue-5 max-xs:h-[8.4rem] max-xs:w-[8.4rem] ${!visible && isMyProfile && 'opacity-60'}`} />
       )}
       {/** 팀 상세 설명 */}
       <div className="flex min-w-0 flex-1 flex-col items-start gap-[1.6rem]">
