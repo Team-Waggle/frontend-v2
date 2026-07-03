@@ -159,20 +159,20 @@ const TeamHomePage = () => {
         {isLeaderOrManager && <TeamNav />}
         <div className="flex w-full max-w-[clamp(98.2rem,70vw,130rem)] flex-col items-start gap-[4rem] max-sm:max-w-none max-sm:px-[2rem] max-sm:pt-[2.4rem] max-sm:gap-[9rem]">
           {/** 팀 설명 */}
-          <div className="relative flex items-start gap-[4rem] self-stretch max-xs:flex-col max-xs:gap-[2.4rem]">
+          <div className="relative flex items-start gap-[4rem] self-stretch max-471:flex-col max-471:gap-[2.4rem]">
             {/** 팀 이미지: default 값 */}
             {teamDetail?.profileImageUrl && !imgError ? (
-              <div className="flex aspect-[1/1] h-[22.3rem] w-[22.3rem] flex-col items-center justify-center gap-[1rem] rounded-[1em] bg-black-10 max-sm:h-[25rem] max-sm:w-[25rem] max-xs:h-[13.6rem] max-xs:w-full max-xs:aspect-auto">
+              <div className="flex aspect-[1/1] h-[22.3rem] w-[22.3rem] flex-col items-center justify-center gap-[1rem] rounded-[1em] bg-black-10 max-sm:h-[25rem] max-sm:w-[25rem] max-471:h-[13.6rem] max-471:w-full max-471:aspect-auto">
                 <img
                   alt={'프로필 이미지'}
                   src={teamDetail?.profileImageUrl}
-                  className="h-[22.3rem] w-[22.3rem] rounded-[1rem] object-cover max-sm:h-[25rem] max-sm:w-[25rem] max-xs:h-[9.8rem] max-xs:w-[9.8rem]"
+                  className="h-[22.3rem] w-[22.3rem] rounded-[1rem] object-cover max-sm:h-[25rem] max-sm:w-[25rem] max-471:h-[9.8rem] max-471:w-[9.8rem]"
                   onError={() => setImgError(true)}
                 />
               </div>
             ) : (
-              <div className="flex aspect-[1/1] w-full max-w-[22.3rem] flex-col items-center justify-center gap-[1rem] self-stretch rounded-[1rem] bg-blue-5 py-[1.9rem] max-sm:max-w-[25rem] max-xs:max-w-none max-xs:aspect-auto max-xs:h-[13.6rem] max-xs:py-0">
-                <TeamDefaultImg className="h-[18.5rem] w-[18.5rem] max-sm:h-[21.2rem] max-sm:w-[21.2rem] max-xs:h-[9.8rem] max-xs:w-[9.8rem]" />
+              <div className="flex aspect-[1/1] w-full max-w-[22.3rem] flex-col items-center justify-center gap-[1rem] self-stretch rounded-[1rem] bg-blue-5 py-[1.9rem] max-sm:max-w-[25rem] max-471:max-w-none max-471:aspect-auto max-471:h-[13.6rem] max-471:py-0">
+                <TeamDefaultImg className="h-[18.5rem] w-[18.5rem] max-sm:h-[21.2rem] max-sm:w-[21.2rem] max-471:h-[9.8rem] max-471:w-[9.8rem]" />
               </div>
             )}
             {/** 팀 상세 내용 */}
