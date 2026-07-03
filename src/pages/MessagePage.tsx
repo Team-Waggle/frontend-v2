@@ -9,11 +9,15 @@ const MessagePage = () => {
   const { partnerId } = useParams<{ partnerId: string }>();
 
   return (
-    <div className="flex h-screen flex-row overflow-hidden">
-      <MessageList />
+    <div className="flex h-screen flex-row overflow-hidden max-sm:h-[calc(100dvh_-_4.8rem)]">
+      <div
+        className={`min-w-0 ${partnerId ? 'max-sm:hidden' : 'max-sm:w-full'}`}
+      >
+        <MessageList />
+      </div>
 
       {!partnerId ? (
-        <div className="flex min-h-screen flex-1 flex-col items-center justify-center gap-[1rem] self-stretch bg-black-10">
+        <div className="flex min-h-screen flex-1 flex-col items-center justify-center gap-[1rem] self-stretch bg-black-10 max-sm:hidden">
           <div className="flex flex-1 flex-col items-center justify-center gap-[2.8rem] self-stretch">
             <div className="flex flex-col items-center gap-[1.8rem]">
               <IcEmptyCharacter />
@@ -33,6 +37,7 @@ const MessagePage = () => {
       )}
     </div>
   );
+
 };
 
 export default MessagePage;

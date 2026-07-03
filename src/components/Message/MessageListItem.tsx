@@ -26,7 +26,7 @@ const MessageListItem = ({
         className={`group flex w-full cursor-pointer items-center justify-between rounded-[0.8rem] px-[1.2rem] py-[1.4rem] hover:bg-hover-5 ${isSelected ? 'bg-hover-5' : ''}`}
         onClick={onClick}
       >
-        <div className="flex flex-1 items-center gap-[1rem]">
+        <div className="flex min-w-0 flex-1 items-center gap-[1rem] max-sm:pr-[1.6rem]">
           {partner.profileImageUrl && !imgError ? (
             <img
               src={partner.profileImageUrl}
@@ -37,7 +37,7 @@ const MessageListItem = ({
           ) : (
             <IcProfileImg className="h-[5.2rem] w-[5.2rem] flex-shrink-0 rounded-full" />
           )}
-          <div className="flex min-w-0 max-w-[22.6rem] flex-1 flex-col items-start gap-[0.2rem]">
+          <div className="flex min-w-0 max-w-[22.6rem] flex-1 flex-col items-start gap-[0.2rem] max-sm:max-w-full">
             <span className="text-[1.4rem] font-[500] leading-[1.5] tracking-[-0.028rem]">
               {partner.username ?? '알 수 없음'} |{' '}
               {POSITION_CONVERTER[partner.position] ?? partner.position}
