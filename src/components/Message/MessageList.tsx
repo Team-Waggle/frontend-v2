@@ -51,7 +51,7 @@ const MessageList = () => {
   };
 
   return (
-    <div className="flex h-full min-h-screen w-[38rem] flex-shrink-0 flex-col items-start gap-[1.7rem] border-r border-solid border-black-20 bg-black-5 p-[2.2rem]">
+    <div className="flex h-full w-[38rem] min-w-0 flex-shrink-0 flex-col items-start gap-[1.7rem] border-r border-solid border-black-20 bg-black-5 p-[2.2rem] max-sm:w-full max-sm:border-0">
       <h1 className="text-[1.6rem] font-[600] leading-[1.5] tracking-[-0.032rem] text-black-100">
         메시지
       </h1>
