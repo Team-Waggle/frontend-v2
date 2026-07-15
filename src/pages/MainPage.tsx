@@ -119,28 +119,28 @@ const MainPage = () => {
         description="사이드 프로젝트·창업·스터디 팀원을 가장 쉽게 찾는 곳. 직무와 스킬로 매칭하고, 모집글을 올리고, 바로 지원하세요. 개발자·디자이너·기획자 팀빌딩은 와글에서."
       />
       <div className="flex w-full justify-center max-sm:pt-[1rem]">
-        <div className="flex w-full max-w-[152.6rem] flex-col gap-[5.6rem] px-[4.8rem] pt-[5.4rem] max-sm:pt-[1rem] max-sm:px-[2rem] max-sm:gap-[1.6rem]">
+        <div className="flex w-full max-w-[152.6rem] flex-col gap-[5.6rem] px-[4.8rem] pt-[5.4rem] max-sm:gap-[1.6rem] max-sm:px-[2rem] max-sm:pt-[1rem]">
           <picture className="w-full">
             <source
               media="(max-width: 767px)"
-              srcSet="/assets/images/banner/banner_mobile.png"
+              srcSet="/assets/images/banner/banner_mobile.svg"
             />
             <img
-              src="/assets/images/banner/banner_desktop.png"
+              src="/assets/images/banner/banner_desktop.svg"
               alt="와글 배너"
               className="w-full rounded-[2.4rem]"
             />
           </picture>
 
           <div className="flex w-full flex-col items-start gap-[2rem]">
-            <div className="max-sm:hidden w-full">
+            <div className="w-full max-sm:hidden">
               <MainSearch
                 sort={sort}
                 onChangeSort={setSort}
                 {...searchFilterProps}
               />
             </div>
-            <div className="hidden max-sm:block w-full">
+            <div className="hidden w-full max-sm:block">
               <MobileSearch
                 sort={sort}
                 onChangeSort={setSort}
@@ -160,7 +160,7 @@ const MainPage = () => {
               }
             />
           ) : (
-            <div className="inline-grid w-full max-w-[152.6rem] auto-rows-max grid-cols-[repeat(auto-fill,minmax(33.6rem,1fr))] max-sm:grid-cols-[repeat(auto-fill,minmax(32rem,1fr))] gap-x-[1.8rem] gap-y-[1.8rem] max-1440:max-w-full">
+            <div className="inline-grid w-full max-w-[152.6rem] auto-rows-max grid-cols-[repeat(auto-fill,minmax(33.6rem,1fr))] gap-x-[1.8rem] gap-y-[1.8rem] max-1440:max-w-full max-sm:grid-cols-[repeat(auto-fill,minmax(32rem,1fr))]">
               {posts.map((post: PostDetailResponse) => {
                 const positionList: string[] = Array.from(
                   new Set(
