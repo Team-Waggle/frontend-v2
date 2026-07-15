@@ -1039,7 +1039,7 @@ export const FieldPositionSkill = ({
         </div>
       </div>
 
-      {items && items.length > 0 && (
+      {items.length > 0 && (
         <div className="mt-[1rem] flex flex-col gap-[0.4rem] border-t border-black-40 py-[1.3rem]">
           {items.map((item, itemIdx) => (
             <div

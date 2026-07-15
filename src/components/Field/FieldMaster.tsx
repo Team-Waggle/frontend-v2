@@ -29,7 +29,7 @@ import RequireIcon from '../../assets/icons/ic_require.svg?react';
   textareaProps: textarea에 쓰이는 placeholder, register
 */
 
-interface FiledMasterProps {
+interface FieldMasterProps {
   title: string;
   id?: string;
   className?: string;
@@ -104,7 +104,7 @@ const FieldMaster = ({
   positionProps,
   positionSkillProps,
   tabProps,
-}: FiledMasterProps) => {
+}: FieldMasterProps) => {
   const renderBody = {
     input: () => (
       <FieldInput
