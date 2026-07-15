@@ -5,7 +5,7 @@ import { SkillIcon } from '../../../utils/SkillIcon';
 import { allSkills } from '../MainSearch/skill-data';
 import { JOBS } from '../MainSearch/JobSelectList';
 import type { Job, Skill } from '../../../hooks/useSearchFilters';
-import BottomSheet from './BottomSheet';
+import BottomSheet from '../../common/BottomSheet';
 import { useState } from 'react';
 import {
   navTabContainerBase,
@@ -83,7 +83,9 @@ const FilterBottomSheet = ({
             onClick={() => setActiveTab(tab)}
             onKeyDown={handleTabKeyDown}
             className={`flex ${navTabContainerBase} ${navTabTextBase} ${
-              activeTab === tab ? `${navTabContainerActive} ${navTabTextActive}` : navTabTextInactive
+              activeTab === tab
+                ? `${navTabContainerActive} ${navTabTextActive}`
+                : navTabTextInactive
             }`}
           >
             {tab === 'job' ? '직무' : '사용스킬'}

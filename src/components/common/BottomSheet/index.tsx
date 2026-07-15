@@ -47,7 +47,9 @@ const BottomSheet = ({
       }
       if (e.key !== 'Tab' || !panel) return;
 
-      const focusable = Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
+      const focusable = Array.from(
+        panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+      );
       if (focusable.length === 0) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
@@ -90,7 +92,7 @@ const BottomSheet = ({
         aria-modal="true"
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
-        className={`absolute bottom-0 left-0 right-0 flex flex-col rounded-t-[2.4em] pt-[2rem] pb-[2rem] px-[2rem] gap-[2.8rem] bg-white transition-transform duration-300 ease-in-out ${
+        className={`absolute bottom-0 left-0 right-0 flex flex-col gap-[2.8rem] rounded-t-[2.4em] bg-white px-[2rem] pb-[2rem] pt-[2rem] transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
