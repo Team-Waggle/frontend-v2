@@ -4,18 +4,19 @@ import { useLocation, useNavigate } from 'react-router';
 import { useAuthStore } from '../../stores/authStore';
 import {
   useGetIsUserProfileComplete,
-  useGetNotificationsCount,
   useGetUserMe,
   useGetUserMeTeam,
 } from '../../hooks/useUser';
 import LoginModal from '../Modal/LoginModal';
+import WriteBottomSheet from './WriteBottomSheet';
+import TeamBottomSheet from './TeamBottomSheet';
 
 import HomeIcon from '../../assets/icons/normal/ic_home.svg?react';
 import HomeFillIcon from '../../assets/icons/normal/ic_home_fill.svg?react';
 import FaceSmileIcon from '../../assets/icons/normal/ic_faceSmile.svg?react';
 import FaceSmileFillIcon from '../../assets/icons/normal/ic_faceSmile_fill.svg?react';
-import BellIcon from '../../assets/icons/normal/ic_bell.svg?react';
-import BellFillIcon from '../../assets/icons/normal/ic_bell_fill.svg?react';
+import PencilIcon from '../../assets/icons/normal/ic_pencil.svg?react';
+import PencilFillIcon from '../../assets/icons/normal/ic_pencil_fill.svg?react';
 import MessageIcon from '../../assets/icons/normal/ic_message.svg?react';
 import MessageFillIcon from '../../assets/icons/normal/ic_message_fill.svg?react';
 import PersonIcon from '../../assets/icons/normal/ic_person.svg?react';
@@ -37,10 +38,10 @@ const NAV_ITEMS: NavItemConfig[] = [
     activeIcon: <HomeFillIcon />,
   },
   {
-    key: 'notification',
-    label: '알림',
-    icon: <BellIcon />,
-    activeIcon: <BellFillIcon />,
+    key: 'message',
+    label: '메시지',
+    icon: <MessageIcon />,
+    activeIcon: <MessageFillIcon />,
     requiresAuth: true,
   },
   {
@@ -51,10 +52,10 @@ const NAV_ITEMS: NavItemConfig[] = [
     requiresAuth: true,
   },
   {
-    key: 'message',
-    label: '메시지',
-    icon: <MessageIcon />,
-    activeIcon: <MessageFillIcon />,
+    key: 'write',
+    label: '글쓰기',
+    icon: <PencilIcon />,
+    activeIcon: <PencilFillIcon />,
     requiresAuth: true,
   },
   {
@@ -70,6 +71,8 @@ const BottomNavigation = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isWriteSheetOpen, setIsWriteSheetOpen] = useState(false);
+  const [isTeamSheetOpen, setIsTeamSheetOpen] = useState(false);
 
   const { accessToken } = useAuthStore();
   const isLoggedIn = !!accessToken;
@@ -77,10 +80,11 @@ const BottomNavigation = () => {
   const { data: isProfileCompleteData } = useGetIsUserProfileComplete();
   const { data: myData } = useGetUserMe();
   const { data: myteamData } = useGetUserMeTeam();
-  const { data: notificationCountData } = useGetNotificationsCount();
-  const unreadCount = notificationCountData?.unread ?? 0;
 
   const isProfileVisible = isLoggedIn && !!isProfileCompleteData?.complete;
+  const hasWritableTeam = !!myteamData?.some(
+    (team) => team.role !== 'MEMBER' && team.status !== 'COMPLETED',
+  );
 
   const getPath = (key: string) => {
     switch (key) {
@@ -88,8 +92,6 @@ const BottomNavigation = () => {
         return '/';
       case 'team':
         return myteamData?.[0]?.id ? `/team/${myteamData[0].id}` : '/team/new';
-      case 'notification':
-        return '/notification';
       case 'message':
         return '/message';
       case 'profile':
@@ -101,6 +103,8 @@ const BottomNavigation = () => {
 
   const isActive = (key: string) => {
     if (key === 'home') return pathname === '/';
+    if (key === 'write')
+      return pathname === '/team/new' || pathname === '/post/new';
     return (
       pathname.includes(key) && !(key === 'team' && pathname === '/team/new')
     );
@@ -111,13 +115,21 @@ const BottomNavigation = () => {
       setIsLoginModalOpen(true);
       return;
     }
+    if (item.key === 'write') {
+      setIsWriteSheetOpen(true);
+      return;
+    }
+    if (item.key === 'team' && myteamData && myteamData.length > 0) {
+      setIsTeamSheetOpen(true);
+      return;
+    }
     navigate(getPath(item.key));
   };
 
   return (
     <>
       <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-center border-t border-black-20 bg-black-5">
-        <div className="flex h-[4.8rem] w-full max-sm:px-[8.8rem] max-471:px-[2rem] items-center justify-between">
+        <div className="flex h-[4.8rem] w-full items-center justify-between max-sm:px-[8.8rem] max-471:px-[2rem]">
           {NAV_ITEMS.map((item) => {
             const active = isActive(item.key);
             return (
@@ -130,9 +142,6 @@ const BottomNavigation = () => {
                   className={`relative ${active ? 'text-blue-100' : 'text-black-60'} flex aspect-square h-[4.8rem] w-[4.8] flex-shrink-0 flex-col items-center justify-center gap-[1rem] rounded-[0.8rem] bg-white`}
                 >
                   {active ? item.activeIcon : item.icon}
-                  {item.key === 'notification' && unreadCount > 0 && (
-                    <div className="absolute right-[1.1rem] top-[0.7rem] h-[0.6rem] w-[0.6rem] rounded-full bg-blue-80" />
-                  )}
                 </span>
               </button>
             );
@@ -143,6 +152,18 @@ const BottomNavigation = () => {
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
+      />
+
+      <WriteBottomSheet
+        isOpen={isWriteSheetOpen}
+        onClose={() => setIsWriteSheetOpen(false)}
+        hasWritableTeam={hasWritableTeam}
+      />
+
+      <TeamBottomSheet
+        isOpen={isTeamSheetOpen}
+        onClose={() => setIsTeamSheetOpen(false)}
+        teams={myteamData ?? []}
       />
     </>
   );
