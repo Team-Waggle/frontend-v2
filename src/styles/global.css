@@ -23,6 +23,11 @@ html {
   scrollbar-gutter: stable;
 }
 
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
 *,
 body {
   font-family: 'Pretendard';

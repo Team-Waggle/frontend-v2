@@ -40,7 +40,7 @@ function App() {
   }
 
   return (
-    <div className="flex min-h-screen w-full min-w-[144rem] max-sm:min-w-0">
+    <div className="flex min-h-dvh w-full min-w-[144rem] max-sm:min-w-0">
       <div className="max-sm:hidden">
         <Sidebar />
       </div>
