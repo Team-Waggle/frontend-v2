@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useGetUserMeTeam } from '../hooks/useUser';
@@ -89,6 +89,20 @@ const TeamStatusPage = () => {
 
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isOpenTeamDeleteModal, setIsOpenTeamDeleteModal] = useState(false);
+  const dragStartX = useRef(0);
+  const dragMoved = useRef(false);
+  const currentStatus = currentTeam?.status ?? 'PREPARING';
+  const activeStatusIndex = Math.max(
+    STATUS_CONFIG.findIndex((item) => item.type === currentStatus),
+    0,
+  );
+  const [mobileStatusIndex, setMobileStatusIndex] = useState(activeStatusIndex);
+  const [dragOffsetX, setDragOffsetX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+
+  useEffect(() => {
+    setMobileStatusIndex(activeStatusIndex);
+  }, [activeStatusIndex]);
 
   const handleClick = () => {
     if (currentTeam?.status === 'PREPARING') {
@@ -100,38 +114,142 @@ const TeamStatusPage = () => {
     }
   };
 
+  const handleCarouselPointerDown = (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => {
+    if (!event.isPrimary) return;
+
+    dragStartX.current = event.clientX;
+    dragMoved.current = false;
+    setIsDragging(true);
+    setDragOffsetX(0);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handleCarouselPointerMove = (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => {
+    if (!isDragging) return;
+
+    const nextOffsetX = event.clientX - dragStartX.current;
+    dragMoved.current = Math.abs(nextOffsetX) > 8;
+    setDragOffsetX(nextOffsetX);
+  };
+
+  const handleCarouselPointerEnd = (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => {
+    if (!isDragging) return;
+
+    const finalOffsetX = event.clientX - dragStartX.current;
+    const threshold = event.currentTarget.clientWidth * 0.2;
+    const nextIndex =
+      Math.abs(finalOffsetX) > threshold
+        ? mobileStatusIndex + (finalOffsetX < 0 ? 1 : -1)
+        : mobileStatusIndex;
+
+    setMobileStatusIndex(
+      Math.min(Math.max(nextIndex, 0), STATUS_CONFIG.length - 1),
+    );
+    setIsDragging(false);
+    setDragOffsetX(0);
+  };
+
+  const handleCarouselClickCapture = (
+    event: React.MouseEvent<HTMLDivElement>,
+  ) => {
+    if (!dragMoved.current) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    dragMoved.current = false;
+  };
+
   return (
     <>
-      <div className="flex flex-col items-center gap-[6rem] pt-[5.4rem]">
+      <div className="flex flex-col items-center gap-[6rem] pt-[5.4rem] max-sm:pt-[1rem]">
         {currentTeam?.role !== 'MEMBER' && <TeamNav />}
-        <div className="flex w-full max-w-[clamp(98.2rem,70vw,130rem)] flex-col gap-[3.5rem]">
-          <div className="flex flex-col gap-[2.8rem]">
-            <div className="flex flex-col gap-[2.8rem]">
-              <div className="flex justify-between gap-[clamp(2.6rem,calc(-7.3rem+6.875vw),5.9rem)]">
-                {STATUS_CONFIG.map((item) => (
-                  <TeamStatusCard
+        <div className="flex w-full max-w-[clamp(98.2rem,70vw,130rem)] flex-col gap-[3.5rem] max-sm:px-[2rem] max-sm:pb-[8rem]">
+          <div className="flex flex-col gap-[2.8rem] max-sm:gap-[3.5rem]">
+            <div className="flex justify-between gap-[clamp(2.6rem,calc(-7.3rem+6.875vw),5.9rem)] max-sm:hidden">
+              {STATUS_CONFIG.map((item) => (
+                <TeamStatusCard
+                  key={item.type}
+                  type={item.type}
+                  currentStatus={currentStatus}
+                  title={item.title}
+                  description={item.description}
+                  ActiveIcon={item.ActiveIcon}
+                  InactiveIcon={item.InactiveIcon}
+                  buttonText={item.buttonText}
+                  onClick={() => {
+                    handleClick();
+                  }}
+                />
+              ))}
+            </div>
+            <div className="hidden flex-col gap-[1.8rem] max-sm:flex">
+              <div
+                className="cursor-grab overflow-hidden active:cursor-grabbing"
+                onPointerDown={handleCarouselPointerDown}
+                onPointerMove={handleCarouselPointerMove}
+                onPointerUp={handleCarouselPointerEnd}
+                onPointerCancel={handleCarouselPointerEnd}
+                onClickCapture={handleCarouselClickCapture}
+                style={{ touchAction: 'pan-y' }}
+              >
+                <div
+                  className={`flex ${
+                    isDragging
+                      ? 'transition-none'
+                      : 'transition-transform duration-300 ease-out'
+                  }`}
+                  style={{
+                    transform: `translateX(calc(-${mobileStatusIndex * 100}% + ${dragOffsetX}px))`,
+                  }}
+                >
+                  {STATUS_CONFIG.map((item) => (
+                    <div
+                      key={item.type}
+                      className="flex min-w-full justify-center"
+                    >
+                      <TeamStatusCard
+                        type={item.type}
+                        currentStatus={currentStatus}
+                        title={item.title}
+                        description={item.description}
+                        ActiveIcon={item.ActiveIcon}
+                        InactiveIcon={item.InactiveIcon}
+                        buttonText={item.buttonText}
+                        onClick={() => {
+                          handleClick();
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="flex justify-center gap-[0.8rem]">
+                {STATUS_CONFIG.map((item, index) => (
+                  <button
                     key={item.type}
-                    type={item.type}
-                    currentStatus={currentTeam?.status ?? 'PREPARING'}
-                    title={item.title}
-                    description={item.description}
-                    ActiveIcon={item.ActiveIcon}
-                    InactiveIcon={item.InactiveIcon}
-                    buttonText={item.buttonText}
-                    onClick={() => {
-                      handleClick();
-                    }}
+                    type="button"
+                    aria-label={`${item.title} 상태 보기`}
+                    onClick={() => setMobileStatusIndex(index)}
+                    className={`h-[0.8rem] w-[0.8rem] rounded-full ${
+                      mobileStatusIndex === index ? 'bg-blue-80' : 'bg-black-30'
+                    }`}
                   />
                 ))}
               </div>
-              <div className="flex gap-[1.6rem] rounded-[1.2rem] bg-blue-5 p-[2rem]">
-                <CircleInfoIcon className="text-blue-100" />
-                <div className="flex flex-col gap-[0.8rem]">
-                  <span className="text-[1.8rem] font-semibold text-black-100">
-                    현재 상태 안내
-                  </span>
-                  {STATUS_INFO[currentTeam?.status as keyof typeof STATUS_INFO]}
-                </div>
+            </div>
+            <div className="flex gap-[1.6rem] rounded-[1.2rem] bg-blue-5 p-[2rem]">
+              <CircleInfoIcon className="shrink-0 text-blue-100" />
+              <div className="flex flex-col gap-[0.8rem]">
+                <span className="text-[1.8rem] font-semibold text-black-100">
+                  현재 상태 안내
+                </span>
+                {STATUS_INFO[currentStatus]}
               </div>
             </div>
           </div>

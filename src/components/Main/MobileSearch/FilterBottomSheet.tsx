@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import BaseButton from '../../common/Button';
 import BaseChip from '../../common/Chip/BaseChip';
 import { SKILL_MAP } from '../../../constants/skillMap';
@@ -6,12 +7,11 @@ import { allSkills } from '../MainSearch/skill-data';
 import { JOBS } from '../MainSearch/JobSelectList';
 import type { Job, Skill } from '../../../hooks/useSearchFilters';
 import BottomSheet from '../../common/BottomSheet';
-import { useState } from 'react';
 import {
-  navTabContainerBase,
   navTabContainerActive,
-  navTabTextBase,
+  navTabContainerBase,
   navTabTextActive,
+  navTabTextBase,
   navTabTextInactive,
 } from '../../common/Tap/NavTab';
 
@@ -26,6 +26,12 @@ type FilterBottomSheetProps = {
   onToggleSkill: (skill: Skill) => void;
   onReset: () => void;
   onApply: () => void;
+  jobTabLabel?: string;
+  jobOptions?: string[];
+  skillOptions?: Skill[];
+  initialTab?: Tab;
+  isSkillDisabled?: boolean;
+  ariaLabel?: string;
 };
 
 const FilterBottomSheet = ({
@@ -37,11 +43,28 @@ const FilterBottomSheet = ({
   onToggleSkill,
   onReset,
   onApply,
+  jobTabLabel = '직무',
+  jobOptions = JOBS,
+  skillOptions = allSkills.map((label) => ({
+    id: SKILL_MAP[label as keyof typeof SKILL_MAP],
+    label,
+  })),
+  initialTab = 'job',
+  isSkillDisabled = false,
+  ariaLabel = '검색 필터',
 }: FilterBottomSheetProps) => {
-  const [activeTab, setActiveTab] = useState<Tab>('job');
+  const [activeTab, setActiveTab] = useState<Tab>(initialTab);
 
   const selectedJobLabels = new Set(selectedJobs.map((j) => j.label));
   const selectedSkillIds = new Set(selectedSkills.map((s) => s.id));
+
+  useEffect(() => {
+    if (isOpen) setActiveTab(initialTab);
+  }, [initialTab, isOpen]);
+
+  useEffect(() => {
+    if (isSkillDisabled && activeTab === 'skill') setActiveTab('job');
+  }, [activeTab, isSkillDisabled]);
 
   const handleReset = () => {
     onReset();
@@ -54,46 +77,63 @@ const FilterBottomSheet = ({
 
   const tabs: Tab[] = ['job', 'skill'];
 
+  const handleTabChange = (tab: Tab) => {
+    if (tab === 'skill' && isSkillDisabled) return;
+    setActiveTab(tab);
+  };
+
   const handleTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
     e.preventDefault();
-    const currentIndex = tabs.indexOf(activeTab);
+
+    const enabledTabs = tabs.filter(
+      (tab) => !(tab === 'skill' && isSkillDisabled),
+    );
+    const currentIndex = enabledTabs.indexOf(activeTab);
     const delta = e.key === 'ArrowRight' ? 1 : -1;
-    const nextTab = tabs[(currentIndex + delta + tabs.length) % tabs.length];
+    const nextTab =
+      enabledTabs[
+        (currentIndex + delta + enabledTabs.length) % enabledTabs.length
+      ];
+
     setActiveTab(nextTab);
     document.getElementById(`filter-tab-${nextTab}`)?.focus();
   };
 
   return (
-    <BottomSheet isOpen={isOpen} onClose={onClose} aria-label="검색 필터">
-      {/* 탭 */}
+    <BottomSheet isOpen={isOpen} onClose={onClose} aria-label={ariaLabel}>
       <div
         role="tablist"
         className="flex items-start gap-[2.4rem] self-stretch border-b border-solid border-black-20"
       >
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            id={`filter-tab-${tab}`}
-            type="button"
-            role="tab"
-            aria-selected={activeTab === tab}
-            aria-controls={`filter-tabpanel-${tab}`}
-            tabIndex={activeTab === tab ? 0 : -1}
-            onClick={() => setActiveTab(tab)}
-            onKeyDown={handleTabKeyDown}
-            className={`flex ${navTabContainerBase} ${navTabTextBase} ${
-              activeTab === tab
-                ? `${navTabContainerActive} ${navTabTextActive}`
-                : navTabTextInactive
-            }`}
-          >
-            {tab === 'job' ? '직무' : '사용스킬'}
-          </button>
-        ))}
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab;
+          const isDisabled = tab === 'skill' && isSkillDisabled;
+
+          return (
+            <button
+              key={tab}
+              id={`filter-tab-${tab}`}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={`filter-tabpanel-${tab}`}
+              aria-disabled={isDisabled}
+              tabIndex={isActive ? 0 : -1}
+              onClick={() => handleTabChange(tab)}
+              onKeyDown={handleTabKeyDown}
+              className={`flex ${navTabContainerBase} ${navTabTextBase} ${
+                isActive
+                  ? `${navTabContainerActive} ${navTabTextActive}`
+                  : navTabTextInactive
+              } ${isDisabled ? 'cursor-not-allowed opacity-40' : ''}`}
+            >
+              {tab === 'job' ? jobTabLabel : '사용스킬'}
+            </button>
+          );
+        })}
       </div>
 
-      {/* 콘텐츠 */}
       <div className="flex-1 overflow-y-auto">
         {activeTab === 'job' && (
           <div
@@ -102,7 +142,7 @@ const FilterBottomSheet = ({
             aria-labelledby="filter-tab-job"
             className="flex flex-wrap gap-[0.8rem]"
           >
-            {JOBS.map((label) => (
+            {jobOptions.map((label) => (
               <BaseChip
                 key={label}
                 isSelected={selectedJobLabels.has(label)}
@@ -120,21 +160,20 @@ const FilterBottomSheet = ({
             id="filter-tabpanel-skill"
             role="tabpanel"
             aria-labelledby="filter-tab-skill"
-            className="flex flex-wrap gap-[0.8rem]"
+            className="flex max-h-[29.6rem] flex-wrap gap-[0.8rem]"
           >
-            {allSkills.map((label) => {
-              const id = SKILL_MAP[label as keyof typeof SKILL_MAP];
-              const isSelected = selectedSkillIds.has(id);
+            {skillOptions.map((skill) => {
+              const isSelected = selectedSkillIds.has(skill.id);
 
               return (
                 <BaseChip
-                  key={id}
+                  key={skill.id}
                   isSelected={isSelected}
-                  mainIcon={<SkillIcon name={label} />}
-                  onClick={() => onToggleSkill({ id, label })}
+                  mainIcon={<SkillIcon name={skill.label} />}
+                  onClick={() => onToggleSkill(skill)}
                   aria-pressed={isSelected}
                 >
-                  {label}
+                  {skill.label}
                 </BaseChip>
               );
             })}
@@ -142,7 +181,6 @@ const FilterBottomSheet = ({
         )}
       </div>
 
-      {/* 하단 버튼 */}
       <div className="flex gap-[0.8rem]">
         <BaseButton
           color="secondary"
