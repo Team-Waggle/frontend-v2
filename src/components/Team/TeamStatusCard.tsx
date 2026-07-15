@@ -49,9 +49,7 @@ const TeamStatusCard = ({
           {isActive || !InactiveIcon ? (
             <ActiveIcon className="w-[clamp(10rem,7vw,13.8rem)] max-1440:h-[10rem] max-1440:w-[10rem]" />
           ) : (
-            // <ActiveIcon className="w-[clamp(10rem,7vw,13.8rem)]" />
             <InactiveIcon className="w-[clamp(10rem,7vw,13.8rem)] max-1440:h-[10rem] max-1440:w-[10rem]" />
-            // <InactiveIcon className="w-[clamp(10rem,7vw,13.8rem)]" />
           )}
         </div>
         <span

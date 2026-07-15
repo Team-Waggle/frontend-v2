@@ -157,28 +157,6 @@ const FieldMaster = ({
 
       {variant && renderBody[variant]?.()}
     </div>
-    // <div className="flex flex-col gap-[1rem]">
-    //   <div className="flex items-center gap-[0.2rem]">
-    //     <div className="flex items-center gap-[0.4rem]">
-    //       <label
-    //         htmlFor={id}
-    //         className="text-[1.6rem] font-semibold text-black-100"
-    //       >
-    //         {title}
-    //       </label>
-    //       <div className="flex h-[1.8rem] w-[1.2rem] items-center empty:hidden">
-    //         {isRequired && <RequireIcon />}
-    //       </div>
-    //     </div>
-    //     {errorMessage && (
-    //       <span className="text-[1.2rem] font-medium text-error">
-    //         {errorMessage}
-    //       </span>
-    //     )}
-    //   </div>
-
-    //   {variant && renderBody[variant]?.()}
-    // </div>
   );
 };
 
