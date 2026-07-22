@@ -27,7 +27,7 @@ const TeamDeleteModal = ({ isOpen, onClose, handleDone }: ModalProps) => {
                   '팀을 삭제하면 팀 정보, 모집글/지원자 정보,\n팀내 데이터가 모두 삭제되며 복구할수 없어요.'
                 }
               </span>
-              <span className="hidden whitespace-pre-line text-center text-[1.8rem] font-medium text-black-80 max-sm:block">
+              <span className="hidden whitespace-pre-line text-center text-[1.8rem] font-medium text-black-80 max-xs:block">
                 {
                   '팀을 삭제하면 팀 정보,\n모집글/지원자 정보,\n팀내 데이터가 모두 삭제되며\n복구할수 없어요.'
                 }

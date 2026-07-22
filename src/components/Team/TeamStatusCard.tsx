@@ -26,6 +26,17 @@ const TeamStatusCard = ({
 }: TeamStatusCardProps) => {
   const isActive = currentStatus === type;
 
+  const handleButtonPointerDown = (
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => {
+    event.stopPropagation();
+  };
+
+  const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    onClick();
+  };
+
   return (
     <div
       className={`flex aspect-[310/325] w-full min-w-[31rem] max-w-[39.4rem] flex-col gap-[3.2rem] rounded-[1.6rem] border p-[2rem] max-sm:h-[32.5rem] max-sm:min-w-full ${
@@ -62,7 +73,9 @@ const TeamStatusCard = ({
       </div>
       <BaseButton
         size="lg"
-        onClick={onClick}
+        onClick={handleButtonClick}
+        onPointerDown={handleButtonPointerDown}
+        onMouseDown={handleButtonPointerDown}
         disabled={!isActive}
         className="mx-auto w-full min-w-[27rem] max-w-[32.2rem] max-sm:max-w-full"
       >

@@ -126,7 +126,7 @@ export const FieldInput = memo(
             ref={ref}
             id={id}
             autoComplete="off"
-            className={`w-full text-[1.6rem] font-medium`}
+            className={`w-full truncate text-[1.6rem] font-medium`}
             {...props}
           />
           {maxLength && !props.disabled && (
@@ -202,8 +202,11 @@ export const FieldThumbnail = memo(
             <>
               <ImageIcon className="h-[3.2rem] w-[3.2rem] shrink-0 text-black-40" />
               <div className="flex flex-col gap-[0.2rem]">
-                <span className="text-[1.6rem] font-semibold text-black-90">
+                <span className="text-[1.6rem] font-semibold text-black-90 max-xs:hidden">
                   클릭하거나 파일을 드래그 하여 업로드 해주세요.
+                </span>
+                <span className="hidden whitespace-pre-line text-[1.6rem] font-semibold text-black-90 max-xs:inline">
+                  {`클릭하거나 파일을 드래그\n하여 업로드 해주세요.`}
                 </span>
                 <span className="text-[1.6rem] font-medium text-black-60">
                   권장 사이즈: 1080x1080 (PNG, JPG)
@@ -674,13 +677,13 @@ export const FieldPosition = ({
   };
 
   return (
-    <div className="flex gap-[0.6rem]">
+    <div className="flex flex-wrap gap-[0.6rem]">
       {availablePositions?.map((pos) => (
         <BaseChip
           key={pos}
           isSelected={value === pos}
           onClick={() => handleChange(pos)}
-          className="w-[9.2rem]"
+          className="w-[9.2rem] max-xs:w-[13.7rem]"
         >
           {POSITION_CONVERTER[pos]}
         </BaseChip>

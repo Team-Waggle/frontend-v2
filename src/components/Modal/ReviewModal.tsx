@@ -101,7 +101,7 @@ const ReviewModal = ({
         <ModalOverlay onClose={onClose} />
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="relative w-[56.9rem] overflow-y-scroll rounded-[2rem] bg-black-5 px-[4rem] pt-[3.6rem] scrollbar-hide max-sm:h-[59.2rem] max-sm:w-[32rem]"
+          className="relative w-[56.9rem] overflow-y-scroll rounded-[2rem] bg-black-5 px-[4rem] pt-[3.6rem] scrollbar-hide max-xs:h-[59.2rem] max-xs:w-[32rem]"
         >
           <div className="flex flex-col gap-[4rem]">
             <div className="flex flex-col gap-[3.4rem]">
@@ -170,19 +170,19 @@ const ReviewModal = ({
                             : DISLIKE_OPTIONS,
                         type: watchReviewType,
                       }}
-                      className="max-sm:gap-[2rem]"
-                      headerClassName="max-sm:flex-col max-sm:items-start"
+                      className="max-xs:gap-[2rem]"
+                      headerClassName="max-xs:flex-col max-xs:items-start"
                     />
                   )}
                 />
               </div>
             </div>
-            <div className="flex justify-center pb-[3.8rem] max-sm:sticky max-sm:bottom-0 max-sm:bg-white/90 max-sm:py-[2.2rem] max-sm:backdrop-blur-[0.5px]">
+            <div className="flex justify-center pb-[3.8rem] max-xs:sticky max-xs:bottom-0 max-xs:bg-white/90 max-xs:py-[2.2rem] max-xs:backdrop-blur-[0.5px]">
               <BaseButton
                 type="submit"
                 size="xl"
                 disabled={!isValid}
-                className="w-[25rem] max-sm:h-[5.4rem]"
+                className="w-[25rem] max-xs:h-[5.4rem]"
               >
                 평가 제출하기
               </BaseButton>

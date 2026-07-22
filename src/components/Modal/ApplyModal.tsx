@@ -137,11 +137,11 @@ const ApplyModal = ({
         <ModalOverlay onClose={onClose} />
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="relative h-[65rem] w-[73.8rem] rounded-[2rem] bg-black-5 px-[4rem] pt-[3.6rem]"
+          className="relative h-[62.5rem] w-[73.8rem] overflow-y-scroll rounded-[2rem] bg-black-5 px-[4rem] pt-[3.6rem] scrollbar-hide max-sm:h-[50.6rem] max-sm:w-[46rem] max-xs:w-[32rem] max-xs:px-[2rem] max-xs:pt-[2.6rem]"
         >
           <div className="flex flex-col gap-[4rem]">
             <div className="flex flex-col gap-[3.4rem]">
-              <span className="text-[3rem] font-bold">
+              <span className="text-[3rem] font-bold max-sm:text-[2.6rem]">
                 {postData?.team?.name} 팀에 지원합니다.
               </span>
               <div className="flex flex-col gap-[3.4rem]">
@@ -192,14 +192,16 @@ const ApplyModal = ({
                 />
               </div>
             </div>
-            <BaseButton
-              type="submit"
-              size="xl"
-              disabled={!isValid}
-              className="mx-auto w-[25rem]"
-            >
-              지원하기
-            </BaseButton>
+            <div className="pb-[3.2rem]">
+              <BaseButton
+                type="submit"
+                size="xl"
+                disabled={!isValid}
+                className="mx-auto w-[25rem]"
+              >
+                지원하기
+              </BaseButton>
+            </div>
           </div>
         </form>
       </div>

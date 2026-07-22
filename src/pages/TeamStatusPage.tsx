@@ -132,7 +132,6 @@ const TeamStatusPage = () => {
     if (!isDragging) return;
 
     const nextOffsetX = event.clientX - dragStartX.current;
-    dragMoved.current = Math.abs(nextOffsetX) > 8;
     setDragOffsetX(nextOffsetX);
   };
 
@@ -143,21 +142,29 @@ const TeamStatusPage = () => {
 
     const finalOffsetX = event.clientX - dragStartX.current;
     const threshold = event.currentTarget.clientWidth * 0.2;
-    const nextIndex =
-      Math.abs(finalOffsetX) > threshold
-        ? mobileStatusIndex + (finalOffsetX < 0 ? 1 : -1)
-        : mobileStatusIndex;
+    const isSwipeGesture = Math.abs(finalOffsetX) > threshold;
+    const nextIndex = isSwipeGesture
+      ? mobileStatusIndex + (finalOffsetX < 0 ? 1 : -1)
+      : mobileStatusIndex;
 
     setMobileStatusIndex(
       Math.min(Math.max(nextIndex, 0), STATUS_CONFIG.length - 1),
     );
     setIsDragging(false);
     setDragOffsetX(0);
+    dragMoved.current = isSwipeGesture;
   };
 
   const handleCarouselClickCapture = (
     event: React.MouseEvent<HTMLDivElement>,
   ) => {
+    const target = event.target as HTMLElement | null;
+
+    if (target?.closest('button')) {
+      dragMoved.current = false;
+      return;
+    }
+
     if (!dragMoved.current) return;
 
     event.preventDefault();
