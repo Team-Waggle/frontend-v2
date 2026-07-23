@@ -81,6 +81,7 @@ export default {
         'max-1440': { max: '1440px' },
         'max-sm': { max: '768px' },
         'max-731': { max: '731px' },
+        'max-495': { max: '495px' },
         'max-471': { max: '471px' },
         'max-xs': { max: '360px' },
       },

@@ -98,12 +98,12 @@ const TermsModal = ({ isOpen, onClose, terms }: TermsModalProps) => {
       >
         <ModalOverlay onClose={onClose} isOnboarding />
 
-        <div className="relative flex h-[69rem] w-[73.8rem] justify-center rounded-[2rem] bg-black-5 px-[4rem] pt-[4rem]">
+        <div className="relative flex h-[69rem] w-full min-w-[32rem] max-w-[73.8rem] justify-center overflow-y-scroll rounded-[2rem] bg-black-5 px-[4rem] pt-[4rem] scrollbar-hide max-sm:h-[59.2rem] max-sm:w-[32rem]">
           <div className="flex w-[65.8rem] flex-col gap-[3.4rem]">
             <span className="whitespace-pre-line text-[3rem] font-bold text-black-100">
               {'서비스 이용을 위해\n약관에 동의해 주세요'}
             </span>
-            <div className="flex flex-1 flex-col justify-between">
+            <div className="flex flex-1 flex-col justify-between max-sm:gap-[2rem]">
               <div className="flex flex-col gap-[1rem]">
                 <div className="border-b border-black-20 pb-[4rem]">
                   <input
@@ -128,7 +128,7 @@ const TermsModal = ({ isOpen, onClose, terms }: TermsModalProps) => {
                       <span className="text-[2rem] font-bold text-black-90">
                         모두 동의
                       </span>
-                      <span className="text-[1.6rem] font-medium text-black-70">
+                      <span className="line-clamp-4 text-[1.6rem] font-medium text-black-70">
                         전체 동의는 필수 및 선택 정보에 대한 동의도 포함되어
                         있으며, 개별적으로도 동의를 선택하실 수 있습니다.
                         선택항목에 대한 동의를 거부하시는 경우에도 서비스는
@@ -165,9 +165,10 @@ const TermsModal = ({ isOpen, onClose, terms }: TermsModalProps) => {
                             <CheckboxIcon width={20} height={20} />
                           )}
                         </span>
-                        <span className="text-[1.8rem] font-medium text-black-90">
-                          [{mandatory ? '필수' : '선택'}] {TERM_LABELS[type]}
-                        </span>
+                        <div className="flex gap-[0.4rem] text-[1.8rem] font-medium text-black-90 max-sm:flex-col max-sm:text-[1.4rem]">
+                          <span>[{mandatory ? '필수' : '선택'}]</span>
+                          <span>{TERM_LABELS[type]}</span>
+                        </div>
                       </label>
                       <a
                         href={contentUrl}

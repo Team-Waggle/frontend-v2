@@ -29,9 +29,11 @@ import RequireIcon from '../../assets/icons/ic_require.svg?react';
   textareaProps: textarea에 쓰이는 placeholder, register
 */
 
-interface FiledMasterProps {
+interface FieldMasterProps {
   title: string;
   id?: string;
+  className?: string;
+  headerClassName?: string;
   variant?:
     | 'input'
     | 'textarea'
@@ -91,6 +93,8 @@ const FieldMaster = ({
   isError = false,
   errorMessage,
   maxLength,
+  className,
+  headerClassName,
   inputProps,
   textareaProps,
   thumbnailProps,
@@ -100,7 +104,7 @@ const FieldMaster = ({
   positionProps,
   positionSkillProps,
   tabProps,
-}: FiledMasterProps) => {
+}: FieldMasterProps) => {
   const renderBody = {
     input: () => (
       <FieldInput
@@ -129,24 +133,26 @@ const FieldMaster = ({
   };
 
   return (
-    <div className="flex flex-col gap-[1rem]">
-      <div className="flex items-center gap-[0.2rem]">
-        <div className="flex items-center gap-[0.4rem]">
-          <label
-            htmlFor={id}
-            className="text-[1.6rem] font-semibold text-black-100"
-          >
-            {title}
-          </label>
+    <div className={`flex flex-col gap-[1rem] ${className || ''}`}>
+      <div
+        className={`flex items-center gap-[0.4rem] ${headerClassName || ''}`}
+      >
+        <label
+          htmlFor={id}
+          className="text-[1.6rem] font-semibold text-black-100"
+        >
+          {title}
+        </label>
+        <div className="flex items-center gap-[0.2rem]">
           <div className="flex h-[1.8rem] w-[1.2rem] items-center empty:hidden">
             {isRequired && <RequireIcon />}
           </div>
+          {errorMessage && (
+            <span className="text-[1.2rem] font-medium text-error">
+              {errorMessage}
+            </span>
+          )}
         </div>
-        {errorMessage && (
-          <span className="text-[1.2rem] font-medium text-error">
-            {errorMessage}
-          </span>
-        )}
       </div>
 
       {variant && renderBody[variant]?.()}

@@ -119,8 +119,8 @@ const PostFormPage = () => {
   };
 
   return (
-    <div className="flex w-full flex-col items-center gap-[7rem]">
-      <div className="relative flex h-[20rem] w-full justify-center bg-blue-10">
+    <div className="flex w-full flex-col items-center gap-[7rem] max-sm:mb-[4.4rem] max-sm:mt-[1rem] max-sm:px-[2rem]">
+      <div className="relative flex h-[20rem] w-full justify-center bg-blue-10 max-sm:hidden">
         <NewTeamIcon className="absolute top-[8.887rem] max-w-full" />
       </div>
       <form

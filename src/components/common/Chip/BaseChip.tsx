@@ -51,7 +51,7 @@ const BaseChip = memo(
         >
           {mainIcon && (
             <span
-              className={`${CHIP_ICON_SIZE[variant]} ${iconColorClass} empty:hidden`}
+              className={`${CHIP_ICON_SIZE[variant]} ${iconColorClass}shrink-0 empty:hidden`}
             >
               {typeof mainIcon === 'string' ? (
                 <img
@@ -63,7 +63,7 @@ const BaseChip = memo(
               )}
             </span>
           )}
-          {children}
+          <span className="truncate">{children}</span>
           {subIcon && (
             <span className={`${CHIP_ICON_SIZE[variant]} empty:hidden`}>
               {subIcon}

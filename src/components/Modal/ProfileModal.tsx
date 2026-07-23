@@ -247,13 +247,12 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
         {step === 'edit' && (
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="relative flex h-[63.2rem] w-[73.8rem] flex-col gap-[4rem] overflow-y-scroll scroll-smooth rounded-[2rem] bg-white px-[4rem] pt-[4.4rem] scrollbar-hide max-1440:h-[59.8rem]"
+            className="relative flex h-[63.2rem] w-[73.8rem] flex-col gap-[4rem] overflow-y-scroll scroll-smooth rounded-[2rem] bg-white px-[4rem] pt-[4rem] scrollbar-hide max-1440:h-[59.8rem] max-sm:h-[59.2rem] max-sm:w-[32rem] max-sm:px-[2rem]"
           >
             <div className="flex w-full flex-col gap-[3.4rem]">
               {mode === 'onboarding' && (
-                <div className="flex flex-col text-[3rem] font-bold">
-                  <span className="">반가워요.</span>
-                  <span className="">어떤 분인지 알려주세요!</span>
+                <div className="flex flex-col whitespace-pre-line text-[3rem] font-bold">
+                  <span>{'반가워요.\n어떤 분인지 알려주세요!'}</span>
                 </div>
               )}
               <div className="flex flex-col gap-[3.4rem]">
@@ -292,7 +291,7 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                   maxLength={15}
                 />
                 <div className="flex flex-col gap-[1rem]">
-                  <div className="flex items-center gap-[0.2rem]">
+                  <div className="flex items-center gap-[0.2rem] max-sm:flex-col max-sm:items-start">
                     <div className="flex items-center gap-[0.4rem]">
                       <span className="text-[1.6rem] font-semibold">
                         직무 및 사용 스킬
@@ -306,7 +305,7 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                     </span>
                   </div>
                   <div className="flex flex-col gap-[2rem]">
-                    <div className="flex gap-[0.6rem]">
+                    <div className="flex flex-wrap gap-[0.6rem]">
                       {positions.map((pos) => (
                         <BaseChip
                           variant="filled"
@@ -319,6 +318,7 @@ const ProfileModal = ({ isOpen, onClose, mode, myData }: ProfileModalProps) => {
                               shouldDirty: true,
                             });
                           }}
+                          className="max-sm:w-auto"
                         >
                           {pos}
                         </BaseChip>

@@ -26,9 +26,20 @@ const TeamStatusCard = ({
 }: TeamStatusCardProps) => {
   const isActive = currentStatus === type;
 
+  const handleButtonPointerDown = (
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => {
+    event.stopPropagation();
+  };
+
+  const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    onClick();
+  };
+
   return (
     <div
-      className={`flex aspect-[310/325] w-full min-w-[31rem] max-w-[39.4rem] flex-col gap-[3.2rem] rounded-[1.6rem] border p-[2rem] ${
+      className={`flex aspect-[310/325] w-full min-w-[31rem] max-w-[39.4rem] flex-col gap-[3.2rem] rounded-[1.6rem] border p-[2rem] max-sm:h-[32.5rem] max-sm:min-w-full ${
         isActive ? 'border-blue-70' : 'border-black-30'
       }`}
     >
@@ -47,9 +58,9 @@ const TeamStatusCard = ({
         </div>
         <div className="flex w-full items-center justify-center">
           {isActive || !InactiveIcon ? (
-            <ActiveIcon className="w-[clamp(10rem,7vw,13.8rem)]" />
+            <ActiveIcon className="w-[clamp(10rem,7vw,13.8rem)] max-1440:h-[10rem] max-1440:w-[10rem]" />
           ) : (
-            <InactiveIcon className="w-[clamp(10rem,7vw,13.8rem)]" />
+            <InactiveIcon className="w-[clamp(10rem,7vw,13.8rem)] max-1440:h-[10rem] max-1440:w-[10rem]" />
           )}
         </div>
         <span
@@ -62,9 +73,11 @@ const TeamStatusCard = ({
       </div>
       <BaseButton
         size="lg"
-        onClick={onClick}
+        onClick={handleButtonClick}
+        onPointerDown={handleButtonPointerDown}
+        onMouseDown={handleButtonPointerDown}
         disabled={!isActive}
-        className="mx-auto w-full min-w-[27rem] max-w-[32.2rem]"
+        className="mx-auto w-full min-w-[27rem] max-w-[32.2rem] max-sm:max-w-full"
       >
         {buttonText}
       </BaseButton>

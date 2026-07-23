@@ -7,6 +7,7 @@ import BaseTag from '../common/Tag';
 import IconWrapper from '../common/IconWrapper';
 import { SkillIcon } from '../../utils/SkillIcon';
 import { positionSkillData } from '../../constants/positionSkill';
+import FilterBottomSheet from '../Main/MobileSearch/FilterBottomSheet';
 import { POSITION_CONVERTER, type PositionKey } from '../../utils/position';
 import { getByteLength } from '../../utils/getByteLength';
 import type { TeamResponse } from '../../types/api/team';
@@ -125,12 +126,12 @@ export const FieldInput = memo(
             ref={ref}
             id={id}
             autoComplete="off"
-            className={`w-full text-[1.6rem] font-medium`}
+            className={`w-full truncate text-[1.6rem] font-medium`}
             {...props}
           />
           {maxLength && !props.disabled && (
             <span className="text-[1.4rem] font-medium text-black-60">
-              {currentByte}/{maxLength}
+              {currentByte}/{maxLength}byte
             </span>
           )}
         </div>
@@ -199,10 +200,13 @@ export const FieldThumbnail = memo(
             </div>
           ) : (
             <>
-              <ImageIcon className="h-[3.2rem] w-[3.2rem] text-black-40" />
+              <ImageIcon className="h-[3.2rem] w-[3.2rem] shrink-0 text-black-40" />
               <div className="flex flex-col gap-[0.2rem]">
-                <span className="text-[1.6rem] font-semibold text-black-90">
+                <span className="text-[1.6rem] font-semibold text-black-90 max-xs:hidden">
                   클릭하거나 파일을 드래그 하여 업로드 해주세요.
+                </span>
+                <span className="hidden whitespace-pre-line text-[1.6rem] font-semibold text-black-90 max-xs:inline">
+                  {`클릭하거나 파일을 드래그\n하여 업로드 해주세요.`}
                 </span>
                 <span className="text-[1.6rem] font-medium text-black-60">
                   권장 사이즈: 1080x1080 (PNG, JPG)
@@ -247,7 +251,10 @@ export const FieldWorkmode = ({
         className="h-[13.6rem] w-[29.4rem]"
         onClick={() => onChange?.('HYBRID')}
       >
-        온라인 + 오프라인
+        <>
+          <span className="max-sm:hidden">온라인 + 오프라인</span>
+          <span className="hidden max-sm:inline">온/오프라인</span>
+        </>
       </BaseChip>
     </div>
   );
@@ -485,7 +492,7 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
 
   return (
     <div className="relative h-[46.2rem] w-full">
-      <div className="flex h-[6.4rem] items-center gap-[2.4rem] rounded-tl-[0.8rem] rounded-tr-[0.8rem] border-x border-t border-black-30 bg-black-10 px-[1.8rem] py-[1.7rem]">
+      <div className="flex items-center gap-[2.4rem] rounded-tl-[0.8rem] rounded-tr-[0.8rem] border-x border-t border-black-30 bg-black-10 px-[1.8rem] py-[1.4rem] max-495:flex-col max-495:items-start">
         <div className="flex gap-[0.2rem]">
           <IconWrapper
             color="transparent"
@@ -493,7 +500,7 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
               editor.chain().focus().toggleHeading({ level: 1 }).run()
             }
             isSelected={editor.isActive('heading', { level: 1 })}
-            className="h-[3.6rem] w-[3.6rem]"
+            className="!h-[3.6rem] !w-[3.6rem]"
           >
             <Heading1Icon />
           </IconWrapper>
@@ -503,7 +510,7 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
               editor.chain().focus().toggleHeading({ level: 2 }).run()
             }
             isSelected={editor.isActive('heading', { level: 2 })}
-            className="h-[3.6rem] w-[3.6rem]"
+            className="!h-[3.6rem] !w-[3.6rem]"
           >
             <Heading2Icon />
           </IconWrapper>
@@ -513,7 +520,7 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
               editor.chain().focus().toggleHeading({ level: 3 }).run()
             }
             isSelected={editor.isActive('heading', { level: 3 })}
-            className="h-[3.6rem] w-[3.6rem]"
+            className="!h-[3.6rem] !w-[3.6rem]"
           >
             <Heading3Icon />
           </IconWrapper>
@@ -523,7 +530,7 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
               editor.chain().focus().toggleHeading({ level: 4 }).run()
             }
             isSelected={editor.isActive('heading', { level: 4 })}
-            className="h-[3.6rem] w-[3.6rem]"
+            className="!h-[3.6rem] !w-[3.6rem]"
           >
             <Heading4Icon />
           </IconWrapper>
@@ -533,7 +540,7 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
             color="transparent"
             onClick={() => editor.chain().focus().toggleBold().run()}
             isSelected={editor.isActive('bold')}
-            className="h-[3.6rem] w-[3.6rem]"
+            className="!h-[3.6rem] !w-[3.6rem]"
           >
             <BoldIcon />
           </IconWrapper>
@@ -541,7 +548,7 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
             color="transparent"
             onClick={() => editor.chain().focus().toggleItalic().run()}
             isSelected={editor.isActive('italic')}
-            className="h-[3.6rem] w-[3.6rem]"
+            className="!h-[3.6rem] !w-[3.6rem]"
           >
             <ItalicIcon />
           </IconWrapper>
@@ -549,7 +556,7 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
             color="transparent"
             onClick={() => editor.chain().focus().toggleBulletList().run()}
             isSelected={editor.isActive('bulletList')}
-            className="h-[3.6rem] w-[3.6rem]"
+            className="!h-[3.6rem] !w-[3.6rem]"
           >
             <List1Icon />
           </IconWrapper>
@@ -557,7 +564,7 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
             color="transparent"
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
             isSelected={editor.isActive('orderedList')}
-            className="h-[3.6rem] w-[3.6rem]"
+            className="!h-[3.6rem] !w-[3.6rem]"
           >
             <ListOrderedIcon />
           </IconWrapper>
@@ -565,14 +572,14 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
             color="transparent"
             onClick={openLinkModal}
             isSelected={isLinkActiveUI}
-            className="h-[3.6rem] w-[3.6rem]"
+            className="!h-[3.6rem] !w-[3.6rem]"
           >
             <LinkIcon />
           </IconWrapper>
           <IconWrapper
             color="transparent"
             onClick={() => imageInputRef.current?.click()}
-            className="h-[3.6rem] w-[3.6rem]"
+            className="!h-[3.6rem] !w-[3.6rem]"
           >
             <ImageIcon />
           </IconWrapper>
@@ -585,8 +592,11 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
           />
         </div>
       </div>
-      <div className="h-[39.8rem] w-full rounded-bl-[0.8rem] rounded-br-[0.8rem] border-x border-b border-black-30 bg-black-5 px-[1.8rem] py-[1.7rem] text-[1.6rem] font-medium">
-        <EditorContent editor={editor} className="prose-list h-[34.3rem]" />
+      <div className="w-full rounded-bl-[0.8rem] rounded-br-[0.8rem] border-x border-b border-black-30 bg-black-5 px-[1.8rem] py-[1.7rem] text-[1.6rem] font-medium">
+        <EditorContent
+          editor={editor}
+          className="prose-list h-[34.3rem] max-sm:h-[28.3rem]"
+        />
         <div className="flex justify-end">
           <span className="text-[1.4rem] font-medium text-black-40">
             {currentByte}/{MAX_EDITOR_BYTE}byte
@@ -641,7 +651,7 @@ export const FieldTeamName = ({
     : data;
 
   return (
-    <div className="grid grid-cols-4 gap-[1rem]">
+    <div className="grid grid-cols-4 gap-[1rem] max-xs:grid-cols-2">
       {teamList?.map((team) => (
         <BaseChip
           key={team.id}
@@ -667,13 +677,13 @@ export const FieldPosition = ({
   };
 
   return (
-    <div className="flex gap-[0.6rem]">
+    <div className="flex flex-wrap gap-[0.6rem]">
       {availablePositions?.map((pos) => (
         <BaseChip
           key={pos}
           isSelected={value === pos}
           onClick={() => handleChange(pos)}
-          className="w-[9.2rem]"
+          className="w-[9.2rem] max-xs:w-[13.7rem]"
         >
           {POSITION_CONVERTER[pos]}
         </BaseChip>
@@ -692,6 +702,12 @@ export const FieldPositionSkill = ({
   const [selectedSkill, setSelectedSkill] = useState<string[]>([]);
   const [positionDropdownOpen, setPositionDropdownOpen] = useState(false);
   const [skillDropdownOpen, setSkillDropdownOpen] = useState(false);
+  const [filterBottomSheetOpen, setFilterBottomSheetOpen] = useState(false);
+  const [filterInitialTab, setFilterInitialTab] = useState<'job' | 'skill'>(
+    'job',
+  );
+  const [draftPosition, setDraftPosition] = useState<PositionKey | null>(null);
+  const [draftSkills, setDraftSkills] = useState<string[]>([]);
   const [selectedCount, setSelectedCount] = useState(1);
 
   const items = value ?? [];
@@ -708,6 +724,39 @@ export const FieldPositionSkill = ({
     '기타',
   ];
 
+  const isMobileViewport = () =>
+    typeof window !== 'undefined' &&
+    window.matchMedia('(max-width: 768px)').matches;
+
+  const openFilterBottomSheet = (tab: 'job' | 'skill') => {
+    setDraftPosition(selectedPosition);
+    setDraftSkills(selectedSkill);
+    setFilterInitialTab(tab);
+    setFilterBottomSheetOpen(true);
+  };
+
+  const handlePositionFieldClick = () => {
+    if (isMobileViewport()) {
+      setPositionDropdownOpen(false);
+      openFilterBottomSheet('job');
+      return;
+    }
+
+    setPositionDropdownOpen((prev) => !prev);
+  };
+
+  const handleSkillFieldClick = () => {
+    if (!selectedPosition) return;
+
+    if (isMobileViewport()) {
+      setSkillDropdownOpen(false);
+      openFilterBottomSheet('skill');
+      return;
+    }
+
+    setSkillDropdownOpen((prev) => !prev);
+  };
+
   const handlePositionSelect = (e: React.MouseEvent, pos: PositionKey) => {
     e.stopPropagation();
     if (items.some((item) => item.position === pos)) return;
@@ -721,6 +770,33 @@ export const FieldPositionSkill = ({
     setSelectedSkill((prev) =>
       prev.includes(skill) ? prev.filter((s) => s !== skill) : [...prev, skill],
     );
+  };
+
+  const handleDraftPositionToggle = (pos: string) => {
+    const nextPosition = pos as PositionKey;
+    if (items.some((item) => item.position === nextPosition)) return;
+
+    setDraftPosition(nextPosition);
+    setDraftSkills([]);
+  };
+
+  const handleDraftSkillToggle = (skill: { id: string; label: string }) => {
+    setDraftSkills((prev) =>
+      prev.includes(skill.label)
+        ? prev.filter((s) => s !== skill.label)
+        : [...prev, skill.label],
+    );
+  };
+
+  const handleFilterReset = () => {
+    setDraftPosition(null);
+    setDraftSkills([]);
+  };
+
+  const handleFilterApply = () => {
+    setSelectedPosition(draftPosition);
+    setSelectedSkill(draftSkills);
+    setFilterBottomSheetOpen(false);
   };
 
   const handleSkillRemove = (itemIndex: number, skillName: string) => {
@@ -815,25 +891,25 @@ export const FieldPositionSkill = ({
 
   return (
     <>
-      <div className="relative flex gap-[1.2rem]">
+      <div className="relative flex gap-[1.2rem] max-xs:flex-col max-xs:items-end">
         <div
           ref={positionRef}
-          onClick={() => setPositionDropdownOpen((prev) => !prev)}
-          className={`relative flex h-[6rem] w-[31.8rem] cursor-pointer items-center gap-[1rem] rounded-[0.8rem] border px-[1.8rem] ${
+          onClick={handlePositionFieldClick}
+          className={`relative flex h-[6rem] w-full min-w-0 cursor-pointer items-center gap-[1rem] rounded-[0.8rem] border px-[1.8rem] ${
             selectedPosition ? 'border-blue-70' : 'border-black-30'
           }`}
         >
-          <div
-            className={`h-[2.6rem] w-[24.8rem] text-[1.6rem] font-medium ${selectedPosition ? 'text-blue-100' : 'text-black-60'}`}
+          <span
+            className={`line-clamp-1 h-[2.6rem] w-full text-[1.6rem] font-medium ${selectedPosition ? 'text-blue-100' : 'text-black-60'}`}
           >
             {selectedPosition || '모집 직무를 선택해주세요.'}
-          </div>
+          </span>
           <ChevronDownIcon
             className={`text-black-60 transition-transform ${positionDropdownOpen ? 'rotate-180' : ''}`}
           />
 
           {positionDropdownOpen && (
-            <div className="absolute left-0 top-[7rem] grid h-[6rem] w-[61.8rem] grid-cols-6 items-center gap-[0.6rem] rounded-[0.8rem] border border-black-30 bg-black-5 px-[1.8rem]">
+            <div className="absolute left-0 top-[7rem] z-10 grid h-[6rem] w-[61.8rem] grid-cols-6 items-center gap-[0.6rem] rounded-[0.8rem] border border-black-30 bg-black-5 px-[1.8rem] max-sm:hidden">
               {positions.map((pos) => {
                 const isAlreadyAdded = items.some(
                   (item) => item.position === pos,
@@ -853,15 +929,45 @@ export const FieldPositionSkill = ({
             </div>
           )}
         </div>
+
+        <FilterBottomSheet
+          isOpen={filterBottomSheetOpen}
+          onClose={() => setFilterBottomSheetOpen(false)}
+          selectedJobs={
+            draftPosition ? [{ id: draftPosition, label: draftPosition }] : []
+          }
+          selectedSkills={draftSkills.map((skill) => ({
+            id: skill,
+            label: skill,
+          }))}
+          onToggleJob={handleDraftPositionToggle}
+          onToggleSkill={handleDraftSkillToggle}
+          onReset={handleFilterReset}
+          onApply={handleFilterApply}
+          jobTabLabel="모집 직무"
+          jobOptions={positions}
+          skillOptions={
+            draftPosition
+              ? positionSkillData[draftPosition].map((skill) => ({
+                  id: skill,
+                  label: skill,
+                }))
+              : []
+          }
+          initialTab={filterInitialTab}
+          isSkillDisabled={!draftPosition}
+          ariaLabel="모집 직무 및 사용스킬 선택"
+        />
+
         <div
           ref={skillRef}
-          onClick={() => setSkillDropdownOpen((prev) => !prev)}
-          className={`relative flex h-[6rem] w-[31.8rem] items-center gap-[1rem] rounded-[0.8rem] border px-[1.8rem] ${
+          onClick={handleSkillFieldClick}
+          className={`relative flex h-[6rem] w-full min-w-0 items-center gap-[1rem] rounded-[0.8rem] border px-[1.8rem] ${
             selectedSkill.length !== 0 ? 'border-blue-70' : 'border-black-30'
           } ${selectedPosition && 'cursor-pointer'}`}
         >
           <div
-            className={`h-[2.6rem] w-[24.8rem] truncate text-[1.6rem] font-medium ${selectedSkill.length !== 0 ? 'text-blue-100' : 'text-black-60'}`}
+            className={`line-clamp-1 h-[2.6rem] w-full text-[1.6rem] font-medium ${selectedSkill.length !== 0 ? 'text-blue-100' : 'text-black-60'}`}
           >
             {selectedSkill.length
               ? `사용 스킬(${selectedSkill.length}) ${selectedSkill.join(', ')}`
@@ -936,76 +1042,78 @@ export const FieldPositionSkill = ({
         </div>
       </div>
 
-      <div className="mt-[1rem] flex flex-col gap-[0.4rem] border-t border-black-40 py-[1.3rem]">
-        {items.map((item, itemIdx) => (
-          <div
-            key={`item-${itemIdx}`}
-            className="flex gap-[1rem] py-[1.6rem] pl-[1.6rem]"
-          >
-            <div className="flex w-[63.4rem] gap-[1rem]">
-              <BaseTag
-                size="lg"
-                shape="circle"
-                color="black80"
-                className="w-[8.4rem]"
-              >
-                {item.position}
-              </BaseTag>
-              <div className="flex flex-wrap gap-x-[0.8rem] gap-y-[1rem]">
-                {item.skills.map((skill: string) => (
-                  <BaseTag
-                    key={skill}
-                    size="lg"
-                    shape="circle"
-                    color="black80"
-                    isInverted
-                    leftIcon={<SkillIcon name={skill} />}
-                    rightIcon={
-                      <CloseSmallIcon
-                        width="16"
-                        height="16"
-                        className="cursor-pointer text-black-70"
-                        onClick={() => handleSkillRemove(itemIdx, skill)}
-                      />
-                    }
-                  >
-                    {skill}
-                  </BaseTag>
-                ))}
-              </div>
-            </div>
-            <div className="flex gap-[3.6rem]">
-              <div className="flex gap-[0.8rem]">
-                <IconWrapper
-                  color="outline"
+      {items.length > 0 && (
+        <div className="mt-[1rem] flex flex-col gap-[0.4rem] border-t border-black-40 py-[1.3rem]">
+          {items.map((item, itemIdx) => (
+            <div
+              key={`item-${itemIdx}`}
+              className="flex gap-[1rem] py-[1.6rem] pl-[1.6rem]"
+            >
+              <div className="flex w-[63.4rem] gap-[1rem]">
+                <BaseTag
+                  size="lg"
                   shape="circle"
-                  className="!h-[3.2rem] !w-[3.2rem]"
-                  onClick={() => handleCountDecrease(itemIdx)}
+                  color="black80"
+                  className="w-[8.4rem]"
                 >
-                  <MinusIcon className="h-[1.745rem] w-[1.745rem]" />
-                </IconWrapper>
-                <div className="flex h-[3.2rem] w-[3.2rem] items-center justify-center px-[0.8rem] text-[2rem] font-semibold text-blue-80">
-                  {item.count}
+                  {item.position}
+                </BaseTag>
+                <div className="flex flex-wrap gap-[0.8rem]">
+                  {item.skills.map((skill: string) => (
+                    <BaseTag
+                      key={skill}
+                      size="lg"
+                      shape="circle"
+                      color="black80"
+                      isInverted
+                      leftIcon={<SkillIcon name={skill} />}
+                      rightIcon={
+                        <CloseSmallIcon
+                          width="16"
+                          height="16"
+                          className="cursor-pointer text-black-70"
+                          onClick={() => handleSkillRemove(itemIdx, skill)}
+                        />
+                      }
+                    >
+                      {skill}
+                    </BaseTag>
+                  ))}
                 </div>
-                <IconWrapper
-                  color="outline"
-                  shape="circle"
-                  className="!h-[3.2rem] !w-[3.2rem]"
-                  onClick={() => handleCountIncrease(itemIdx)}
-                >
-                  <PlusIcon className="h-[1.745rem] w-[1.745rem]" />
-                </IconWrapper>
               </div>
-              <div className="flex w-[6.8rem] justify-center">
-                <CloseIcon
-                  className="cursor-pointer text-black-60"
-                  onClick={() => handleRemove(itemIdx)}
-                />
+              <div className="flex gap-[3.6rem]">
+                <div className="flex gap-[0.8rem]">
+                  <IconWrapper
+                    color="outline"
+                    shape="circle"
+                    className="!h-[3.2rem] !w-[3.2rem]"
+                    onClick={() => handleCountDecrease(itemIdx)}
+                  >
+                    <MinusIcon className="h-[1.745rem] w-[1.745rem]" />
+                  </IconWrapper>
+                  <div className="flex h-[3.2rem] w-[3.2rem] items-center justify-center px-[0.8rem] text-[2rem] font-semibold text-blue-80">
+                    {item.count}
+                  </div>
+                  <IconWrapper
+                    color="outline"
+                    shape="circle"
+                    className="!h-[3.2rem] !w-[3.2rem]"
+                    onClick={() => handleCountIncrease(itemIdx)}
+                  >
+                    <PlusIcon className="h-[1.745rem] w-[1.745rem]" />
+                  </IconWrapper>
+                </div>
+                <div className="flex w-[6.8rem] justify-center">
+                  <CloseIcon
+                    className="cursor-pointer text-black-60"
+                    onClick={() => handleRemove(itemIdx)}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </>
   );
 };
@@ -1034,7 +1142,7 @@ export const FieldTab = ({
     onChange?.([...value, item]);
   };
   return (
-    <div className="flex h-[10.8rem] flex-wrap content-start gap-[1rem] pr-[2rem]">
+    <div className="flex flex-wrap content-start gap-[1rem]">
       {options?.map((item, idx) => {
         const isSelected = value.includes(item);
         const isDisabled = !isSelected && value.length >= 3;
