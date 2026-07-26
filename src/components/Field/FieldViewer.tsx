@@ -41,7 +41,7 @@ export const FieldViewer = memo(({ content }: FieldViewerProps) => {
   if (!editor) return null;
 
   return (
-    <div className="w-full text-[1.6rem] font-semibold text-black-100">
+    <div className="w-full text-[1.6rem] font-normal text-black-100">
       <EditorContent editor={editor} className="prose-list min-h-[5rem]" />
     </div>
   );
