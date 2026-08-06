@@ -257,7 +257,7 @@ const SideTeamCard = ({
                   key={skill}
                   className="flex aspect-square h-[3.2rem] w-[3.2rem] items-center justify-center gap-[1rem] rounded-[9.9rem] bg-black-10 p-[0.6rem]"
                 >
-                  <SkillIcon name={skill} className="" />
+                  <SkillIcon name={skill} className="h-[1.6rem] w-[1.6rem]" />
                 </div>
               ))}
             </div>
