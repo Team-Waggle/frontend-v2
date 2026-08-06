@@ -1,10 +1,12 @@
 import { useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import { useGetPostDetail, usePatchPostClose } from '../hooks/usePost';
 import { useGetUserMe } from '../hooks/useUser';
 import usePostDetailApplyButtonPosition from '../hooks/usePostDetailApplyButtonPosition';
 import usePostDetailFloatingSideCard from '../hooks/usePostDetailFloatingSideCard';
+import useMediaQuery from '../hooks/useMediaQuery';
 
 import { SkillIconLarge } from '../utils/SkillIcon';
 import { toSkillLabel } from '../utils/skill';
@@ -91,6 +93,7 @@ const PostDetailPage = () => {
   const sideWrapRef = useRef<HTMLDivElement | null>(null);
 
   const applyButtonPx = usePostDetailApplyButtonPosition(leftColRef);
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   usePostDetailFloatingSideCard(leftColRef, sideWrapRef);
 
@@ -165,36 +168,56 @@ const PostDetailPage = () => {
                     {postDetail?.title}
                   </h1>
                 </div>
-                <div className="flex items-center gap-[0.8rem]">
-                  <div
-                    className="flex cursor-pointer items-center gap-[0.8rem]"
-                    onClick={() => {
-                      if (postDetail?.user?.id) {
-                        navigate(`/profile/${postDetail.user.id}`);
+                <div className="flex items-center justify-between self-stretch">
+                  <div className="flex items-center gap-[0.8rem]">
+                    <div className="w-[0.1rem] h-[1.7rem] bg-black-40" />
+                    <div className="flex items-center gap-[1.7rem] flex-shrink">
+                      <div
+                        className="flex cursor-pointer items-center gap-[0.8rem]"
+                        onClick={() => {
+                          if (postDetail?.user?.id) {
+                            navigate(`/profile/${postDetail.user.id}`);
+                          }
+                        }}
+                      >
+                        {postDetail?.user?.profileImageUrl ? (
+                          <div className="shadow-insetBorderBlack10 flex aspect-[1/1] h-[2.4rem] w-[2.4rem] flex-col items-center justify-center gap-[1rem] rounded-[0.6rem] bg-black-10">
+                            <img
+                              alt={'프로필 이미지'}
+                              src={postDetail?.user?.profileImageUrl}
+                              className="h-[2.4rem] w-[2.4rem] rounded-[0.6rem] object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <IcProfileBasic className="h-[2.4rem] w-[2.4rem]" />
+                        )}
+                        <span className="text-[1.6rem] font-[600] leading-[1.5] tracking-[-0.032rem] text-black-100">
+                          {postDetail?.user?.username}
+                        </span>
+                      </div>
+                      <div className="h-[1.7rem] w-[0.1rem] bg-black-40" />
+                      <span className="text-[1.6rem] font-[400] leading-[1.5] tracking-[-0.032rem] text-black-60">
+                        {postDetail?.createdAt
+                          ? formatPostDetailCreatedAt(postDetail.createdAt)
+                          : ''}
+                      </span>
+                    </div>
+                  </div>
+                  <BaseButton
+                    size="sm"
+                    color="secondary"
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(window.location.href);
+                        toast.success('주소가 복사되었습니다.');
+                      } catch (error) {
+                        console.error(error);
+                        toast.error('주소 복사 중 오류가 발생했습니다.');
                       }
                     }}
                   >
-                    {postDetail?.user?.profileImageUrl ? (
-                      <div className="shadow-insetBorderBlack10 flex aspect-[1/1] h-[2.4rem] w-[2.4rem] flex-col items-center justify-center gap-[1rem] rounded-[0.6rem] bg-black-10">
-                        <img
-                          alt={'프로필 이미지'}
-                          src={postDetail?.user?.profileImageUrl}
-                          className="h-[2.4rem] w-[2.4rem] rounded-[0.6rem] object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <IcProfileBasic className="h-[2.4rem] w-[2.4rem]" />
-                    )}
-                    <span className="text-[1.6rem] font-[600] leading-[1.5] tracking-[-0.032rem] text-black-100">
-                      {postDetail?.user?.username}
-                    </span>
-                  </div>
-                  <div className="h-[1.7rem] w-[0.1rem] bg-black-40" />
-                  <span className="text-[1.6rem] font-[400] leading-[1.5] tracking-[-0.032rem] text-black-60">
-                    {postDetail?.createdAt
-                      ? formatPostDetailCreatedAt(postDetail.createdAt)
-                      : ''}
-                  </span>
+                    주소 복사
+                  </BaseButton>
                 </div>
               </div>
               <div className="flex items-stretch justify-between self-stretch max-sm:gap-[1.4rem] max-731:flex-col">
@@ -277,18 +300,20 @@ const PostDetailPage = () => {
                   navigate(`/team/${postDetail.team.id}`);
                 }}
               />
-              <div className="hidden flex-shrink-0 max-sm:block max-731:w-full max-731:flex-shrink-0">
-                <SideTeamCard
-                  memberId={postDetail?.user?.id}
-                  title={postDetail?.user?.username}
-                  position={postDetail?.user?.position}
-                  profileImageUrl={postDetail?.user?.profileImageUrl}
-                  skills={postDetail?.user?.skills}
-                  variant="post"
-                  isMe={isMyPost}
-                  className="max-731:w-full"
-                />
-              </div>
+              {isMobile && (
+                <div className="flex-shrink-0 max-731:w-full max-731:flex-shrink-0">
+                  <SideTeamCard
+                    memberId={postDetail?.user?.id}
+                    title={postDetail?.user?.username}
+                    position={postDetail?.user?.position}
+                    profileImageUrl={postDetail?.user?.profileImageUrl}
+                    skills={postDetail?.user?.skills}
+                    variant="post"
+                    isMe={isMyPost}
+                    className="max-731:w-full"
+                  />
+                </div>
+              )}
             </div>
             <div className="w-[68.8rem] max-sm:w-full">
               <FieldViewer content={postDetail?.content} />
@@ -321,19 +346,21 @@ const PostDetailPage = () => {
         </div>
 
         {/** 팀 구간 */}
-        <div className="flex self-start pt-[12.7rem] max-sm:hidden">
-          <div ref={sideWrapRef} className="self-start will-change-transform">
-            <SideTeamCard
-              memberId={postDetail?.user?.id}
-              title={postDetail?.user?.username}
-              position={postDetail?.user?.position}
-              profileImageUrl={postDetail?.user?.profileImageUrl}
-              skills={postDetail?.user?.skills}
-              variant="post"
-              isMe={isMyPost}
-            />
+        {!isMobile && (
+          <div className="flex self-start pt-[12.7rem]">
+            <div ref={sideWrapRef} className="self-start will-change-transform">
+              <SideTeamCard
+                memberId={postDetail?.user?.id}
+                title={postDetail?.user?.username}
+                position={postDetail?.user?.position}
+                profileImageUrl={postDetail?.user?.profileImageUrl}
+                skills={postDetail?.user?.skills}
+                variant="post"
+                isMe={isMyPost}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         {/** 지원자 기준 화면: 지원하기 버튼 */}
         {/** 추후 기획에 따라 변경 될 예정 */}
