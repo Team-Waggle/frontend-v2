@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -26,6 +26,7 @@ import WaitingModal from '../components/Modal/WaitingModal';
 import LoginModal from '../components/Modal/LoginModal';
 
 import { useAuthStore } from '../stores/authStore';
+import { useToastCenterStore } from '../stores/toastCenterStore';
 import { trackEvent } from '../lib/ga';
 import SEO from '../components/seo';
 
@@ -94,8 +95,19 @@ const PostDetailPage = () => {
 
   const applyButtonPx = usePostDetailApplyButtonPosition(leftColRef);
   const isMobile = useMediaQuery('(max-width: 768px)');
+  const isBelowSonnerMobileBreakpoint = useMediaQuery('(max-width: 600px)');
 
   usePostDetailFloatingSideCard(leftColRef, sideWrapRef);
+
+  const setToastCenterX = useToastCenterStore((state) => state.setCenterX);
+
+  useEffect(() => {
+    setToastCenterX(isBelowSonnerMobileBreakpoint ? null : applyButtonPx);
+  }, [applyButtonPx, isBelowSonnerMobileBreakpoint, setToastCenterX]);
+
+  useEffect(() => {
+    return () => setToastCenterX(null);
+  }, [setToastCenterX]);
 
   const myApplicationStatus = postDetail?.applicationStatus ?? null;
 
