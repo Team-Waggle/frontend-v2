@@ -19,6 +19,7 @@ const SelectBox = ({ items }: SelectBoxProps) => {
           key={index}
           className="flex h-[4.4rem] w-full items-center gap-[0.4rem] rounded-[0.8rem] bg-black-5 px-[1.2rem] hover:bg-hover-5"
           onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
             item.onClick();
           }}
