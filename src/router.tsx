@@ -1,3 +1,4 @@
+import { lazy } from 'react';
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -16,21 +17,24 @@ import {
   withAuth,
 } from './loaders/routeLoaders';
 
-// Pages
+// Pages — 즉시 필요한 페이지만 eager import, 나머지는 방문 시점에 청크 로드
 import RouteErrorPage from './pages/RouteErrorPage';
-import MainPage from './pages/MainPage';
-import TeamFormPage from './pages/TeamFormPage';
-import TeamHomePage from './pages/TeamHomePage';
-import TeamPostManagementPage from './pages/TeamPostManagementPage';
-import TeamApplicantPage from './pages/TeamApplicantPage';
-import TeamStatusPage from './pages/TeamStatusPage';
-import PostFormPage from './pages/PostFormPage';
-import PostDetailPage from './pages/PostDetailPage';
-import ProfileRedirect from './components/Profile/ProfileRedirect';
-import ProfilePage from './pages/ProfilePage';
-import MessagePage from './pages/MessagePage';
 import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
+import ProfileRedirect from './components/Profile/ProfileRedirect';
+
+const MainPage = lazy(() => import('./pages/MainPage'));
+const TeamFormPage = lazy(() => import('./pages/TeamFormPage'));
+const TeamHomePage = lazy(() => import('./pages/TeamHomePage'));
+const TeamPostManagementPage = lazy(
+  () => import('./pages/TeamPostManagementPage'),
+);
+const TeamApplicantPage = lazy(() => import('./pages/TeamApplicantPage'));
+const TeamStatusPage = lazy(() => import('./pages/TeamStatusPage'));
+const PostFormPage = lazy(() => import('./pages/PostFormPage'));
+const PostDetailPage = lazy(() => import('./pages/PostDetailPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const MessagePage = lazy(() => import('./pages/MessagePage'));
 
 export const router = createBrowserRouter(
   createRoutesFromElements(

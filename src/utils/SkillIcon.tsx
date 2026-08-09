@@ -40,6 +40,7 @@ const SKILL_ICON_LARGE_BY_FILENAME: Record<string, SVGComponent> =
 const SKILL_NAME_MAP: Record<string, string> = {
   SNS마케팅: 'SNSMarketing',
   콘텐츠제작: 'ContentCreation',
+  UnrealEngine: 'UE',
 };
 
 // 스킬명 파일명 규칙에 맞게 정규화

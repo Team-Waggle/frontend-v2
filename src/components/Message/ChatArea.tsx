@@ -94,7 +94,7 @@ const ChatArea = ({ partnerId }: { partnerId: string }) => {
             placeholder="메시지 입력..."
             aria-label="메시지 입력"
             rows={1}
-            className="flex max-h-[12rem] min-h-[4.4rem] flex-1 resize-none items-center gap-[1rem] overflow-y-auto rounded-[1.2rem] bg-black-10 py-[1.2rem] pl-[2.8rem] pr-[2.4rem] text-[1.4rem] font-[500] leading-[1.5] text-black-100 outline-none placeholder:text-black-50"
+            className="flex max-h-[12rem] min-h-[4.4rem] flex-1 resize-none items-center gap-[1rem] overflow-y-auto rounded-[1.2rem] bg-black-10 py-[1.2rem] pl-[2.8rem] pr-[2.4rem] text-[1.4rem] font-[500] leading-[1.5] text-black-100 outline-none placeholder:text-black-50 max-sm:text-[1.6rem]"
           />
           <MsgSendBtn onClick={handleSend} aria-label="메시지 전송">
             <IcSend />

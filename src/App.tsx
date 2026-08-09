@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Outlet, ScrollRestoration, useMatch } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 import { usePostRefresh } from './hooks/useAuth';
@@ -46,7 +46,9 @@ function App() {
       </div>
       <main className="mx-auto flex h-full w-full min-w-0 flex-col">
         <MobileHeader />
-        <Outlet />
+        <Suspense fallback={null}>
+          <Outlet />
+        </Suspense>
       </main>
       <FloatingMessageButton />
       <div className="hidden max-sm:block">
