@@ -149,7 +149,7 @@ const TeamApplicantPage = () => {
             </div>
             <div className="flex h-[71.2rem] w-[36.3rem] flex-col overflow-y-scroll rounded-[0.8rem] border border-black-20 p-[1rem] scrollbar-hide max-1440:w-[25.6rem] max-sm:h-[12.6rem] max-sm:w-full max-sm:flex-row max-sm:gap-[0.8rem] max-sm:overflow-y-hidden max-sm:overflow-x-scroll max-sm:border-0 max-sm:p-0">
               {!postData || postData.length === 0 ? (
-                <div className="flex h-[8.2rem] cursor-pointer items-center border-b border-black-20 py-[1.8rem] pl-[1.1rem] text-[1.5rem] font-medium text-black-100 hover:bg-black-10 max-sm:h-[12.6rem] max-sm:w-[29rem] max-sm:rounded-[0.8rem] max-sm:border">
+                <div className="flex h-[8.2rem] items-center border-b border-black-20 py-[1.8rem] pl-[1.1rem] text-[1.5rem] font-medium text-black-100 max-sm:h-[12.6rem] max-sm:w-[29rem] max-sm:rounded-[0.8rem] max-sm:border">
                   등록된 모집글이 없어요.
                 </div>
               ) : (
