@@ -149,7 +149,7 @@ const TeamApplicantPage = () => {
             </div>
             <div className="flex h-[71.2rem] w-[36.3rem] flex-col overflow-y-scroll rounded-[0.8rem] border border-black-20 p-[1rem] scrollbar-hide max-1440:w-[25.6rem] max-sm:h-[12.6rem] max-sm:w-full max-sm:flex-row max-sm:gap-[0.8rem] max-sm:overflow-y-hidden max-sm:overflow-x-scroll max-sm:border-0 max-sm:p-0">
               {!postData || postData.length === 0 ? (
-                <div className="flex h-[8.2rem] cursor-pointer items-center border-b border-black-20 py-[1.8rem] pl-[1.1rem] text-[1.5rem] font-medium text-black-100 hover:bg-black-10">
+                <div className="flex h-[8.2rem] items-center border-b border-black-20 py-[1.8rem] pl-[1.1rem] text-[1.5rem] font-medium text-black-100 max-sm:h-[12.6rem] max-sm:w-[29rem] max-sm:rounded-[0.8rem] max-sm:border">
                   등록된 모집글이 없어요.
                 </div>
               ) : (
@@ -406,16 +406,16 @@ const TeamApplicantPage = () => {
             </div>
             {/* max-sm 이하 사이즈 */}
             <div className="hidden max-sm:block max-sm:px-[2rem] max-sm:pb-[3.2rem]">
-              <div className="flex h-[70.4rem] w-full flex-col overflow-y-auto rounded-[0.8rem] py-[1rem] shadow-applicants-card max-sm:h-full max-sm:px-[1.4rem] max-sm:py-[0.8rem]">
+              <div className="flex h-[70.4rem] w-full flex-col overflow-y-auto rounded-[0.8rem] py-[1rem] shadow-applicants-card max-sm:h-[54.4rem] max-sm:px-[1.4rem] max-sm:py-[0.8rem]">
                 {!applicantData ||
                 applicantData.pages.every((page) => page.data.length === 0) ? (
                   <div className="my-auto flex flex-col items-center gap-[1.8rem]">
-                    <NoApplicantIcon />
+                    <NoApplicantIcon className="h-[5.175rem] w-[5.55rem]" />
                     <div className="flex flex-col items-center gap-[0.8rem]">
-                      <span className="text-[2rem] font-semibold text-black-90">
+                      <span className="text-[2rem] font-semibold text-black-90 max-sm:text-[1.8rem]">
                         지원한 동료가 아직 없어요.
                       </span>
-                      <span className="text-center text-[1.6rem] font-medium text-black-80">
+                      <span className="text-center text-[1.6rem] font-medium text-black-80 max-sm:text-[1.4rem]">
                         우리 팀에 딱 맞는 동료를 기다리고 있어요.
                       </span>
                     </div>
