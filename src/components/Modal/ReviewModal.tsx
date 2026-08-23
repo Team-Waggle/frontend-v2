@@ -148,9 +148,6 @@ const ReviewModal = ({
                 <Controller
                   name="tags"
                   control={control}
-                  rules={{
-                    validate: (value) => value.length <= 3,
-                  }}
                   render={({ field }) => (
                     <FieldMaster
                       title={

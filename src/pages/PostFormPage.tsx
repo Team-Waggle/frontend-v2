@@ -160,9 +160,6 @@ const PostFormPage = () => {
           <Controller
             name="deadline"
             control={control}
-            rules={{
-              validate: (value) => value.length <= 1,
-            }}
             render={({ field }) => (
               <FieldMaster
                 title="모집 마감기간"
