@@ -80,8 +80,9 @@ interface FieldMasterProps {
   tabProps?: {
     value?: string[];
     onChange?: (value: string[]) => void;
-    options: string[];
+    options?: string[];
     type?: 'LIKE' | 'DISLIKE';
+    isDeadline?: boolean;
   };
 }
 

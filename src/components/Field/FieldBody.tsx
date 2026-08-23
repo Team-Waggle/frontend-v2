@@ -102,6 +102,7 @@ interface FieldTabProps {
   onChange?: (value: string[]) => void;
   options?: string[];
   type?: 'LIKE' | 'DISLIKE';
+  isDeadline?: boolean;
 }
 
 export const FieldInput = memo(
@@ -1123,8 +1124,10 @@ export const FieldTab = ({
   onChange,
   options,
   type,
+  isDeadline = false,
 }: FieldTabProps) => {
   const isInverted = type === 'DISLIKE';
+  const maxSelectionCount = isDeadline ? 1 : 3;
 
   const handleClick = (item: string) => {
     const isSelected = value.includes(item);
@@ -1136,7 +1139,7 @@ export const FieldTab = ({
     }
 
     // 3개 초과 방지
-    if (value.length >= 3) return;
+    if (value.length >= maxSelectionCount) return;
 
     // 선택 추가
     onChange?.([...value, item]);
@@ -1145,16 +1148,19 @@ export const FieldTab = ({
     <div className="flex flex-wrap content-start gap-[1rem]">
       {options?.map((item, idx) => {
         const isSelected = value.includes(item);
-        const isDisabled = !isSelected && value.length >= 3;
+        const isDisabled = !isSelected && value.length >= maxSelectionCount;
+
         return (
           <BaseChip
             key={idx}
             isSelected={isSelected}
             disabled={isDisabled}
             onClick={() => handleClick(item)}
-            className={`${isSelected && isInverted ? 'border-error bg-error-2' : ''}`}
+            className={`${
+              isDeadline && 'w-[8.8rem]'
+            } ${isSelected && isInverted ? 'border-error bg-error-2' : ''}`}
           >
-            #{item}
+            {isDeadline ? item : `#${item}`}
           </BaseChip>
         );
       })}
