@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "lol.waggle.app",
+      "sha256_cert_fingerprints": [
+        "C7:F0:D2:A5:6B:DC:87:60:25:5D:5C:C1:33:E1:F7:1C:19:EB:8F:77:B4:16:5A:8D:CC:99:16:CD:2A:E8:B4:FC"
+      ]
+    }
+  }
+]
