@@ -89,15 +89,13 @@ export const usePostsInfinite = (filters: UsePostsFilters = {}) => {
 
   return useInfiniteQuery<CursorResponsePostDetailResponse>({
     queryKey: ['posts', keywordKey, positionsKey, skillsKey, sortKey],
-    initialPageParam: undefined as number | undefined,
+    initialPageParam: undefined as string | undefined,
     queryFn: ({ pageParam }) => {
-      const cursor = typeof pageParam === 'number' ? pageParam : undefined;
-
       return getPosts({
         q: keyword || undefined,
         positions: positionValues.length ? positionValues : undefined,
         skills: skillValues.length ? skillValues : undefined,
-        cursor,
+        cursor: pageParam as string | undefined,
         sort,
         size: pageSize,
       });
@@ -107,8 +105,7 @@ export const usePostsInfinite = (filters: UsePostsFilters = {}) => {
         return undefined;
       }
 
-      const next = lastPage.nextCursor;
-      return typeof next === 'number' ? next : undefined;
+      return lastPage.nextCursor ?? undefined;
     },
     refetchOnWindowFocus: false,
   });
