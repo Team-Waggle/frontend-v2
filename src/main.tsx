@@ -63,6 +63,8 @@ createRoot(document.getElementById('root')!).render(
       persistOptions={{
         persister,
         maxAge: 1000 * 60 * 60 * 24,
+        // 커서가 숫자에서 문자열로 바뀌어 이전 배포의 캐시에 든 nextCursor를 재사용하면 안 됨
+        buster: 'cursor-token',
       }}
     >
       <HelmetProvider>

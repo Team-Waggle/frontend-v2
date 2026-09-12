@@ -7,7 +7,7 @@ import type {
 } from '../types/api/message';
 
 // 대화 목록 조회
-export const getConversations = async (cursor?: number, q?: string) => {
+export const getConversations = async (cursor?: string, q?: string) => {
   const { data } = await axiosInstance.get<CursorResponse<ConversationResponse>>(
     '/conversations',
     { params: { ...(cursor !== undefined ? { cursor } : {}), ...(q ? { q } : {}) } },
@@ -18,7 +18,7 @@ export const getConversations = async (cursor?: number, q?: string) => {
 // 특정 상대방과의 메시지 목록 조회
 export const getMessages = async (
   partnerId: string,
-  cursor?: number,
+  cursor?: string,
   direction: 'BEFORE' | 'AFTER' = 'BEFORE',
 ) => {
   const { data } = await axiosInstance.get<CursorResponse<MessageResponse>>(

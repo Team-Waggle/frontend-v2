@@ -50,7 +50,7 @@ export type ApplicantResponse = {
 
 export type CursorResponseApplicantResponse = {
   data: ApplicantResponse[];
-  nextCursor: number | null;
+  nextCursor: string | null;
   hasNext: boolean;
 };
 
@@ -91,14 +91,14 @@ export type NotificationResponse = {
 
 export type CursorNotificationResponse = {
   data: NotificationResponse[];
-  nextCursor: number | null;
+  nextCursor: string | null;
   hasNext: boolean;
 };
 
 export type GetApplicationsParams = {
   teamId: number;
   postId?: number;
-  cursor?: number;
+  cursor?: string;
   size?: number;
   direction?: 'BEFORE' | 'AFTER';
 };

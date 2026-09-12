@@ -29,7 +29,7 @@ export interface ConversationResponse {
 
 export interface CursorResponse<T> {
   data: T[];
-  nextCursor: number | null;
+  nextCursor: string | null;
   hasNext: boolean;
 }
 
