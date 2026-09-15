@@ -44,7 +44,7 @@ const PostFormPage = () => {
     mode: 'onChange',
     defaultValues: {
       teamId: undefined,
-      deadline: null,
+      deadline: '',
       title: '',
       recruitments: [],
       skills: [],
