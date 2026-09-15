@@ -18,11 +18,9 @@ import { getByteLength } from '../utils/getByteLength';
 // Icons
 import NewTeamIcon from '../assets/icons/ic_character_new_post.svg?react';
 
-const DEADLINE_OPTIONS = ['7일', '14일', '30일', '무기한'];
-
 interface FormValues {
   teamId: number;
-  deadline: string[];
+  deadline: string | null;
   title: string;
   recruitments: RecruitmentsValue[];
   skills: string[];
@@ -46,7 +44,7 @@ const PostFormPage = () => {
     mode: 'onChange',
     defaultValues: {
       teamId: undefined,
-      deadline: [],
+      deadline: '',
       title: '',
       recruitments: [],
       skills: [],
@@ -72,6 +70,7 @@ const PostFormPage = () => {
     if (isEditMode && myPostData) {
       reset({
         teamId: myPostData.team.id,
+        deadline: myPostData.deadline,
         title: myPostData.title,
         recruitments: myPostData.recruitments.map((item) => ({
           ...item,
@@ -160,17 +159,13 @@ const PostFormPage = () => {
           <Controller
             name="deadline"
             control={control}
+            rules={{ required: true }}
             render={({ field }) => (
               <FieldMaster
                 title="모집 마감기간"
-                variant="tab"
+                variant="deadline"
                 isRequired
-                tabProps={{
-                  value: field.value,
-                  onChange: field.onChange,
-                  options: DEADLINE_OPTIONS,
-                  isDeadline: true,
-                }}
+                deadlineProps={{ value: field.value, onChange: field.onChange }}
               />
             )}
           />

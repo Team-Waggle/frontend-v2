@@ -67,6 +67,7 @@ export type PostDetailResponse = {
   id: number;
   title: string;
   content: string;
+  deadline: string | null;
   team: TeamResponse;
   user: PostUser;
   recruiting: boolean;

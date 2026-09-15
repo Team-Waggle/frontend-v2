@@ -10,6 +10,7 @@ import {
   type RecruitmentsValue,
   FieldTab,
   FieldPosition,
+  FieldDeadline,
 } from './FieldBody';
 import type { DropzoneInputProps, DropzoneRootProps } from 'react-dropzone';
 import type { TeamResponse } from '../../types/api/team';
@@ -43,7 +44,8 @@ interface FieldMasterProps {
     | 'teamname'
     | 'position'
     | 'positionSkill'
-    | 'tab';
+    | 'tab'
+    | 'deadline';
   isRequired?: boolean;
   isError?: boolean;
   errorMessage?: string;
@@ -82,7 +84,10 @@ interface FieldMasterProps {
     onChange?: (value: string[]) => void;
     options?: string[];
     type?: 'LIKE' | 'DISLIKE';
-    isDeadline?: boolean;
+  };
+  deadlineProps?: {
+    value?: string | null;
+    onChange?: (value: string | null) => void;
   };
 }
 
@@ -105,6 +110,7 @@ const FieldMaster = ({
   positionProps,
   positionSkillProps,
   tabProps,
+  deadlineProps,
 }: FieldMasterProps) => {
   const renderBody = {
     input: () => (
@@ -131,6 +137,7 @@ const FieldMaster = ({
     positionSkill: () =>
       positionSkillProps && <FieldPositionSkill {...positionSkillProps} />,
     tab: () => tabProps && <FieldTab {...tabProps} />,
+    deadline: () => deadlineProps && <FieldDeadline {...deadlineProps} />,
   };
 
   return (
