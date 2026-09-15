@@ -159,6 +159,7 @@ const PostFormPage = () => {
           <Controller
             name="deadline"
             control={control}
+            rules={{ required: true }}
             render={({ field }) => (
               <FieldMaster
                 title="모집 마감기간"
