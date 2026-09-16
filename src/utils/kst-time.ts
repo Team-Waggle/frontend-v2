@@ -6,7 +6,6 @@ type KstParts = {
   minutes: number;
 };
 
-
 const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
 
 const pad2 = (value: number): string => {
@@ -59,6 +58,18 @@ export const formatKstYyMmDd = (utcIso: string): string => {
   const dd = pad2(day);
 
   return `${yy}.${mm}.${dd}`;
+};
+
+// UTC -> KST 기준 YYYY-MM-DD 로 변환
+export const formatKstYyyyMmDdDash = (utcIso: string): string => {
+  const utcMs = parseUtcIsoToMs(utcIso);
+  const { year, month, day } = utcMsToKstParts(utcMs);
+
+  const yyyy = year;
+  const mm = pad2(month);
+  const dd = pad2(day);
+
+  return `${yyyy}-${mm}-${dd}`;
 };
 
 // UTC -> KST 기준 YY.MM.DD HH:MM 로 변환

@@ -10,6 +10,7 @@ import { positionSkillData } from '../../constants/positionSkill';
 import FilterBottomSheet from '../Main/MobileSearch/FilterBottomSheet';
 import { POSITION_CONVERTER, type PositionKey } from '../../utils/position';
 import { getByteLength } from '../../utils/getByteLength';
+import { formatKstYyyyMmDdDash } from '../../utils/kst-time';
 import type { TeamResponse } from '../../types/api/team';
 import type { PositionType } from '../../types/api/posts';
 import { useCreatePostImage } from '../../hooks/usePost';
@@ -102,7 +103,11 @@ interface FieldTabProps {
   onChange?: (value: string[]) => void;
   options?: string[];
   type?: 'LIKE' | 'DISLIKE';
-  isDeadline?: boolean;
+}
+
+interface FieldDeadlineProps {
+  value?: string | null;
+  onChange?: (value: string | null) => void;
 }
 
 export const FieldInput = memo(
@@ -1124,10 +1129,8 @@ export const FieldTab = ({
   onChange,
   options,
   type,
-  isDeadline = false,
 }: FieldTabProps) => {
   const isInverted = type === 'DISLIKE';
-  const maxSelectionCount = isDeadline ? 1 : 3;
 
   const handleClick = (item: string) => {
     const isSelected = value.includes(item);
@@ -1139,7 +1142,7 @@ export const FieldTab = ({
     }
 
     // 3개 초과 방지
-    if (value.length >= maxSelectionCount) return;
+    if (value.length >= 3) return;
 
     // 선택 추가
     onChange?.([...value, item]);
@@ -1148,7 +1151,7 @@ export const FieldTab = ({
     <div className="flex flex-wrap content-start gap-[1rem]">
       {options?.map((item, idx) => {
         const isSelected = value.includes(item);
-        const isDisabled = !isSelected && value.length >= maxSelectionCount;
+        const isDisabled = !isSelected && value.length >= 3;
 
         return (
           <BaseChip
@@ -1156,11 +1159,46 @@ export const FieldTab = ({
             isSelected={isSelected}
             disabled={isDisabled}
             onClick={() => handleClick(item)}
-            className={`${
-              isDeadline && 'w-[8.8rem]'
-            } ${isSelected && isInverted ? 'border-error bg-error-2' : ''}`}
+            className={`${isSelected && isInverted ? 'border-error bg-error-2' : ''}`}
           >
-            {isDeadline ? item : `#${item}`}
+            #{item}
+          </BaseChip>
+        );
+      })}
+    </div>
+  );
+};
+
+export const FieldDeadline = ({ value, onChange }: FieldDeadlineProps) => {
+  const deadlineOptions = [
+    { label: '7일', days: 7 },
+    { label: '14일', days: 14 },
+    { label: '30일', days: 30 },
+    { label: '무기한', days: null },
+  ];
+
+  const getDeadlineValue = (days: number | null) => {
+    if (days === null) return null;
+
+    const deadline = new Date();
+    deadline.setDate(deadline.getDate() + days);
+
+    return formatKstYyyyMmDdDash(deadline.toISOString());
+  };
+
+  return (
+    <div className="flex gap-[1rem]">
+      {deadlineOptions.map(({ label, days }) => {
+        const deadlineValue = getDeadlineValue(days);
+
+        return (
+          <BaseChip
+            key={label}
+            isSelected={value === deadlineValue}
+            onClick={() => onChange?.(deadlineValue)}
+            className="w-[8.8rem]"
+          >
+            {label}
           </BaseChip>
         );
       })}
