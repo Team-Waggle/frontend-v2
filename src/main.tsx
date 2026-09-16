@@ -2,12 +2,12 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './router.tsx';
-import { QueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'sonner';
 import { persister } from './lib/persister';
+import { queryClient } from './lib/queryClient';
 import { CacheErrorBoundary } from './components/CacheErrorBoundary';
 import { initGA } from './lib/ga';
 
@@ -18,8 +18,6 @@ import IcCircleCheckFill from './assets/icons/normal/ic_circleCheck_fill.svg?rea
 import IcCircleExclamationFill from './assets/icons/normal/ic_circleExclamation_fill.svg?react';
 
 initGA();
-
-const queryClient = new QueryClient();
 
 const AppToaster = () => {
   const centerX = useToastCenterStore((state) => state.centerX);

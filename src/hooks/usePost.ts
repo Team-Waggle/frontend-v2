@@ -21,15 +21,22 @@ import type {
 } from '../types/api/posts';
 import { usePatchTeamStatus } from './useTeam';
 
+const POST_DETAIL_STALE_TIME = 1000 * 60 * 5;
+
+export const postDetailQueryOptions = (postId: number) => ({
+  queryKey: ['post-detail', postId] as const,
+  queryFn: () => getPostDetail(postId),
+  staleTime: POST_DETAIL_STALE_TIME,
+  refetchOnWindowFocus: false,
+});
+
 // 모집글 상세조회
 export const useGetPostDetail = (postId: number) => {
   const isValidPostId = Number.isInteger(postId) && postId > 0;
 
   return useQuery({
-    queryKey: ['post-detail', postId],
-    queryFn: () => getPostDetail(postId),
+    ...postDetailQueryOptions(postId),
     enabled: isValidPostId,
-    refetchOnWindowFocus: false,
   });
 };
 
@@ -134,11 +141,14 @@ export const useCreatePosts = () => {
 
 // 모집글 수정
 export const useUpdatePosts = () => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   return useMutation({
     mutationFn: ({ postId, postData }: { postId: number; postData: object }) =>
       updatePosts(postId, postData),
-    onSuccess: (data) => {
+    onSuccess: (data, { postId }) => {
+      queryClient.invalidateQueries({ queryKey: ['post-detail', postId] });
+
       navigate(`/post/${data.id}`);
     },
   });
