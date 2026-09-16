@@ -14,6 +14,7 @@ import { trackEvent } from '../lib/ga';
 import { POSITION_CONVERTER, type PositionKey } from '../utils/position';
 import { toSkillEnum, toSkillLabel } from '../utils/skill';
 import { getByteLength } from '../utils/getByteLength';
+import { normalizePastedText } from '../utils/normalizePastedText';
 
 // Icons
 import NewTeamIcon from '../assets/icons/ic_character_new_post.svg?react';
@@ -101,6 +102,15 @@ const PostFormPage = () => {
     });
   };
 
+  const handleTitlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    handleChange({
+      target: {
+        value: normalizePastedText(e.clipboardData.getData('text/plain')),
+      },
+    } as React.ChangeEvent<HTMLInputElement>);
+  };
+
   const onSubmit = (data: FormValues) => {
     const formattedData = {
       ...data,
@@ -180,6 +190,7 @@ const PostFormPage = () => {
             inputProps={{
               placeholder: '자유롭게 입력해주세요.',
               value: postnameValue,
+              onPaste: handleTitlePaste,
               ...register('title', {
                 required: true,
                 validate: (value) => {

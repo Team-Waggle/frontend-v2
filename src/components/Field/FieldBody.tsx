@@ -43,6 +43,11 @@ import ProfileBasicIcon from '../../assets/icons/ic_profile_basic.svg?react';
 import ChevronDownIcon from '../../assets/icons/normal/chevron/ic_chevronDown.svg?react';
 import CloseIcon from '../../assets/icons/normal/ic_close.svg?react';
 import CloseSmallIcon from '../../assets/icons/normal/ic_close_small.svg?react';
+import { normalizePastedText } from '../../utils/normalizePastedText';
+import {
+  parsePostContent,
+  serializePostContent,
+} from '../../utils/postContent';
 
 interface FieldInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
@@ -320,27 +325,77 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
         placeholder: '내용을 입력해 주세요. (최대 7000byte)',
       }),
     ],
-    content: value || {
-      type: 'doc',
-      content: [{ type: 'paragraph' }],
-    },
+    content: value
+      ? parsePostContent(value)
+      : {
+          type: 'doc',
+          content: [{ type: 'paragraph' }],
+        },
     contentType: 'markdown',
     editorProps: {
       attributes: {
         class: 'focus:outline-none h-full overflow-y-auto',
       },
+      handleKeyDown: (view, event) => {
+        if (
+          event.key !== 'Enter' ||
+          event.shiftKey ||
+          event.ctrlKey ||
+          event.metaKey ||
+          event.altKey
+        ) {
+          return false;
+        }
+
+        const { selection, schema } = view.state;
+        const hardBreak = schema.nodes.hardBreak;
+
+        if (
+          selection.empty &&
+          selection.$from.parent.type.name === 'paragraph' &&
+          hardBreak &&
+          selection.$from.nodeBefore?.type.name !== 'hardBreak'
+        ) {
+          event.preventDefault();
+          view.dispatch(
+            view.state.tr
+              .replaceSelectionWith(hardBreak.create())
+              .scrollIntoView(),
+          );
+          return true;
+        }
+
+        return false;
+      },
+      handlePaste: (view, event) => {
+        const pastedText = event.clipboardData?.getData('text/plain');
+
+        if (pastedText === undefined || pastedText === '') {
+          return true;
+        }
+
+        event.preventDefault();
+        const normalizedText = normalizePastedText(pastedText);
+        view.dispatch(view.state.tr.insertText(normalizedText));
+
+        return true;
+      },
     },
     onUpdate: ({ editor }) => {
-      const rawMarkdown = editor.getMarkdown().replace(/&nbsp;/g, ' ');
+      const rawMarkdown = serializePostContent(
+        editor.getMarkdown().replace(/&nbsp;/g, ' '),
+      );
       const markdown = rawMarkdown.trim().length === 0 ? '' : rawMarkdown;
       const byteLength = getByteLength(markdown);
 
       if (byteLength > MAX_EDITOR_BYTE) {
         editor.commands.setContent(
-          value || {
-            type: 'doc',
-            content: [{ type: 'paragraph' }],
-          },
+          value
+            ? parsePostContent(value)
+            : {
+                type: 'doc',
+                content: [{ type: 'paragraph' }],
+              },
           { contentType: value ? 'markdown' : undefined, emitUpdate: false },
         );
         return;
@@ -354,11 +409,13 @@ export const FieldEditor = memo(({ value, onChange }: FieldEditorProps) => {
   useEffect(() => {
     if (editor && value !== undefined) {
       // 현재 에디터 내부의 텍스트와 외부에서 들어온 value를 비교
-      const currentContent = editor.getMarkdown().replace(/&nbsp;/g, ' ');
+      const currentContent = serializePostContent(
+        editor.getMarkdown().replace(/&nbsp;/g, ' '),
+      );
 
       // 값이 다를 때만 업데이트하여, 타이핑 중 커서가 튀는 현상 방지
       if (value !== currentContent) {
-        editor.commands.setContent(value, {
+        editor.commands.setContent(parsePostContent(value), {
           contentType: 'markdown',
           emitUpdate: false,
         });

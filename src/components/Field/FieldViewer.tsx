@@ -4,6 +4,7 @@ import { Markdown } from '@tiptap/markdown';
 import Link from '@tiptap/extension-link';
 import { memo, useEffect } from 'react';
 import { MarkdownImage } from './markdownExtensions';
+import { parsePostContent } from '../../utils/postContent';
 
 interface FieldViewerProps {
   content?: string;
@@ -24,7 +25,7 @@ export const FieldViewer = memo(({ content }: FieldViewerProps) => {
         },
       }),
     ],
-    content: content || '',
+    content: parsePostContent(content || ''),
     contentType: 'markdown',
     editable: false,
     immediatelyRender: true,
@@ -32,7 +33,7 @@ export const FieldViewer = memo(({ content }: FieldViewerProps) => {
 
   useEffect(() => {
     if (editor) {
-      editor.commands.setContent(content || '', {
+      editor.commands.setContent(parsePostContent(content || ''), {
         contentType: 'markdown',
       });
     }
