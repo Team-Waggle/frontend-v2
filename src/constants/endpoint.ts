@@ -41,7 +41,7 @@ export const LOGOUT_URL = '/auth/logout'; // 로그아웃
 export const REFRESH_TOKEN_URL = '/auth/refresh'; // 액세스 토큰 재발급
 export const OAUTH_REDEEM_URL = '/auth/oauth/redeem'; // OAuth 콜백 OTT를 액세스 토큰으로 교환
 
-// 좋아요
+// 좋아요 API
 export const COMMENTS_LIKE_URL = (comments: number) => '/comments/${comments}/like'; // 댓글 좋아요 / 좋아요 취소
 export const POSTS_LIKE_URL = (postId: number) => '/posts/${postId}/like'; // 모집글 좋아요 / 좋아요 취소
 
