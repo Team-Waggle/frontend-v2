@@ -299,6 +299,8 @@ const TeamHomePage = () => {
                       <MainCard
                         className="!w-[36.8rem]"
                         key={post.id}
+                        postId={post.id}
+                        isLiked={post.liked}
                         variant="team"
                         mainCardTitle={post.title}
                         mainCardPositions={positionList}
@@ -308,6 +310,10 @@ const TeamHomePage = () => {
                             ? formatPostListCreatedAt(post.createdAt)
                             : ''
                         }
+                        mainCardViewCount={post.viewCount}
+                        mainCardLikeCount={post.likeCount}
+                        mainCardDeadline={post.deadline}
+                        isMyPost={Boolean(me?.id) && me?.id === post.user?.id}
                         isActive={activeCard === post.id}
                         onClick={() => {
                           setActiveCard(post.id);
