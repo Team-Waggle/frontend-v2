@@ -72,6 +72,10 @@ export type PostDetailResponse = {
   user: PostUser;
   recruiting: boolean;
   recruitments: RecruitmentResponse[];
+  commentCount: number;
+  viewCount: number;
+  likeCount: number;
+  liked: boolean;
   applicationStatus?: 'PENDING' | 'APPROVED' | 'REJECTED';
   applicantCount: number;
   createdAt: string;

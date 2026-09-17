@@ -5,7 +5,7 @@ import MainCard from '../components/common/Cards/MainCard/MainCard';
 import PostEmptyPage from '../components/common/empty/PostEmptyPage';
 import { usePostsInfinite } from '../hooks/usePost';
 import type { PostsSort } from '../types/api/posts';
-import { useGetIsUserProfileComplete } from '../hooks/useUser';
+import { useGetIsUserProfileComplete, useGetUserMe } from '../hooks/useUser';
 import { useGetTerms } from '../hooks/useTerms';
 
 import MainSearch from '../components/Main/MainSearch/MainSearch';
@@ -60,6 +60,7 @@ const MainPage = () => {
 
   const { accessToken } = useAuthStore();
   const isLoggedIn = !!accessToken;
+  const { data: me } = useGetUserMe();
   const { data: profileData, isSuccess: isProfileSuccess } =
     useGetIsUserProfileComplete();
 
@@ -183,11 +184,17 @@ const MainPage = () => {
                 return (
                   <MainCard
                     key={post.id}
+                    postId={post.id}
+                    isLiked={post.liked}
                     mainCardTitle={post.title}
                     mainCardPositions={positionList}
                     mainCardSkills={skillsList}
                     mainCardCreatedAt={createdAtText}
+                    mainCardViewCount={post.viewCount}
+                    mainCardLikeCount={post.likeCount}
+                    mainCardDeadline={post.deadline}
                     isClosed={!post.recruiting}
+                    isMyPost={Boolean(me?.id) && me?.id === post.user?.id}
                     onClick={() => {
                       trackEvent({
                         action: 'click_post',

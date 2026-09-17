@@ -41,6 +41,10 @@ export const LOGOUT_URL = '/auth/logout'; // 로그아웃
 export const REFRESH_TOKEN_URL = '/auth/refresh'; // 액세스 토큰 재발급
 export const OAUTH_REDEEM_URL = '/auth/oauth/redeem'; // OAuth 콜백 OTT를 액세스 토큰으로 교환
 
+// 좋아요 API
+export const COMMENTS_LIKE_URL = (commentId: number) => `/comments/${commentId}/like`; // 댓글 좋아요 / 좋아요 취소
+export const POSTS_LIKE_URL = (postId: number) => `/posts/${postId}/like`; // 모집글 좋아요 / 좋아요 취소
+
 // 팀 API
 export const TEAMS_URL = '/teams'; // 팀 생성
 export const TEAMS_DETAIL_URL = (teamId: number) => `/teams/${teamId}`; // 팀 상세 조회, 수정, 삭제
