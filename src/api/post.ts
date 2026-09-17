@@ -5,6 +5,7 @@ import {
   POST_URL,
   POST_STATUS_URL,
   POST_PRESIGNED_URL,
+  POSTS_LIKE_URL,
 } from '../constants/endpoint';
 
 import type {
@@ -76,4 +77,14 @@ export const updatePosts = async (postId: number, postData: object) => {
 // 모집글 삭제
 export const deletePost = async (postId: number): Promise<void> => {
   await axiosInstance.delete(POST_DETAIL_URL(postId));
+};
+
+// 모집글 좋아요
+export const likePost = async (postId: number): Promise<void> => {
+  await axiosInstance.put(POSTS_LIKE_URL(postId));
+};
+
+// 모집글 좋아요 취소
+export const unlikePost = async (postId: number): Promise<void> => {
+  await axiosInstance.delete(POSTS_LIKE_URL(postId));
 };

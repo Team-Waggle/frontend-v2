@@ -131,12 +131,12 @@ export const formatPostListCreatedAt = (createdAtUtcIso: string): string => {
 /**
  *
  * 모집글 상세보기 createdAt 표시
- * YY.MM.DD HH:MM
+ * YY.MM.DD
  *
  */
 
 export const formatPostDetailCreatedAt = (createdAtUtcIso: string): string => {
-  return formatKstYyMmDdHm(createdAtUtcIso);
+  return formatKstYyMmDd(createdAtUtcIso);
 };
 
 /**
@@ -180,4 +180,49 @@ export const formatKstYyyyMmDd = (utcIso: string): string => {
   const utcMs = parseUtcIsoToMs(utcIso);
   const { year, month, day } = utcMsToKstParts(utcMs);
   return `${year}.${pad2(month)}.${pad2(day)}`;
+};
+
+/**
+ *
+ * 모집글 마감일 배지 표시
+ *
+ * 미지정 또는 마감 지남: 배지 없음 (null)
+ * 당일: 오늘 마감
+ * 이외: D-N
+ */
+
+export const formatDeadlineBadge = (
+  deadlineDate?: string | null,
+): string | null => {
+  if (!deadlineDate) {
+    return null;
+  }
+
+  const [year, month, day] = deadlineDate.split('-').map(Number);
+
+  if (!year || !month || !day) {
+    return null;
+  }
+
+  const nowKst = new Date(Date.now() + KST_OFFSET_MS);
+  const todayUtcMidnight = Date.UTC(
+    nowKst.getUTCFullYear(),
+    nowKst.getUTCMonth(),
+    nowKst.getUTCDate(),
+  );
+  const deadlineUtcMidnight = Date.UTC(year, month - 1, day);
+
+  const diffDays = Math.round(
+    (deadlineUtcMidnight - todayUtcMidnight) / (24 * 60 * 60 * 1000),
+  );
+
+  if (diffDays < 0) {
+    return null;
+  }
+
+  if (diffDays === 0) {
+    return '오늘 마감';
+  }
+
+  return `D-${diffDays}`;
 };

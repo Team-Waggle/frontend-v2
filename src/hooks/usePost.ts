@@ -10,12 +10,15 @@ import {
   deletePost,
   getPostDetail,
   getPosts,
+  likePost,
   patchPostClose,
   postPostImage,
+  unlikePost,
   updatePosts,
 } from '../api/post';
 import type {
   CursorResponsePostDetailResponse,
+  PostDetailResponse,
   PostsSort,
   RecruitmentStatusType,
 } from '../types/api/posts';
@@ -54,6 +57,49 @@ export const usePatchPostClose = () => {
     }) => patchPostClose(postId, status),
     onSuccess: (_, { postId }) => {
       queryClient.invalidateQueries({ queryKey: ['post-detail', postId] });
+    },
+  });
+};
+
+// 모집글 좋아요
+export const useLikePost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (postId: number) => likePost(postId),
+    onSuccess: (_, postId) => {
+      // post-detail은 조회 시 조회수가 올라가므로 invalidate(재조회) 대신 캐시를 직접 갱신
+      queryClient.setQueryData<PostDetailResponse>(
+        ['post-detail', postId],
+        (prev) =>
+          prev ? { ...prev, liked: true, likeCount: prev.likeCount + 1 } : prev,
+      );
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['team-posts'] });
+    },
+  });
+};
+
+// 모집글 좋아요 취소
+export const useUnlikePost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (postId: number) => unlikePost(postId),
+    onSuccess: (_, postId) => {
+      queryClient.setQueryData<PostDetailResponse>(
+        ['post-detail', postId],
+        (prev) =>
+          prev
+            ? {
+                ...prev,
+                liked: false,
+                likeCount: Math.max(0, prev.likeCount - 1),
+              }
+            : prev,
+      );
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['team-posts'] });
     },
   });
 };
