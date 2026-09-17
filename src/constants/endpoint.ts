@@ -43,7 +43,7 @@ export const OAUTH_REDEEM_URL = '/auth/oauth/redeem'; // OAuth 콜백 OTT를 액
 
 // 좋아요 API
 export const COMMENTS_LIKE_URL = (commentId: number) => `/comments/${commentId}/like`; // 댓글 좋아요 / 좋아요 취소
-export const POSTS_LIKE_URL = (postId: number) => '/posts/${postId}/like'; // 모집글 좋아요 / 좋아요 취소
+export const POSTS_LIKE_URL = (postId: number) => `/posts/${postId}/like`; // 모집글 좋아요 / 좋아요 취소
 
 // 팀 API
 export const TEAMS_URL = '/teams'; // 팀 생성
