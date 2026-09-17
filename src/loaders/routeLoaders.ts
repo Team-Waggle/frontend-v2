@@ -2,6 +2,8 @@ import { redirect, type LoaderFunctionArgs } from 'react-router-dom';
 import { postRefresh } from '../api/auth';
 import { getPostDetail } from '../api/post';
 import { GetTeamDetail } from '../api/team';
+import { postDetailQueryOptions } from '../hooks/usePost';
+import { queryClient } from '../lib/queryClient';
 import { getUserDetail, getUserMe, getUserMeTeam } from '../api/user';
 import { useAuthStore } from '../stores/authStore';
 import type { TeamResponse } from '../types/api/team';
@@ -109,7 +111,9 @@ export const teamLoader = ({ params }: LoaderFunctionArgs) => {
 export const postLoader = ({ params }: LoaderFunctionArgs) => {
   const postId = parsePositiveIntegerParam(params.postId);
 
-  return validateEntity(() => getPostDetail(postId));
+  return validateEntity(() =>
+    queryClient.ensureQueryData(postDetailQueryOptions(postId)),
+  );
 };
 
 export const postCreateLoader = async () => {
