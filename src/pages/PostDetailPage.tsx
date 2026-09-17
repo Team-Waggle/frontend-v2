@@ -2,7 +2,13 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
-import { useGetPostDetail, usePatchPostClose } from '../hooks/usePost';
+import {
+  useDeletePost,
+  useGetPostDetail,
+  useLikePost,
+  usePatchPostClose,
+  useUnlikePost,
+} from '../hooks/usePost';
 import { useGetUserMe } from '../hooks/useUser';
 import usePostDetailApplyButtonPosition from '../hooks/usePostDetailApplyButtonPosition';
 import usePostDetailFloatingSideCard from '../hooks/usePostDetailFloatingSideCard';
@@ -10,12 +16,21 @@ import useMediaQuery from '../hooks/useMediaQuery';
 
 import { SkillIconLarge } from '../utils/SkillIcon';
 import { toSkillLabel } from '../utils/skill';
-import { formatPostDetailCreatedAt } from '../utils/kst-time';
+import {
+  formatPostDetailCreatedAt,
+  formatDeadlineBadge,
+} from '../utils/kst-time';
+import { formatCountBadge } from '../utils/format';
 
 import IcProfileBasic from '../assets/icons/ic_profile_basic.svg?react';
 import IcPersons from '../assets/icons/normal/ic_persons.svg?react';
 import IcFolder from '../assets/icons/normal/ic_folder.svg?react';
 import ButtonBlur from '../assets/blur/RecruitmentDetail_Button_Blur.svg?react';
+import IcShare from '../assets/icons/normal/ic_share.svg?react';
+import IcHeart from '../assets/icons/normal/ic_heart.svg?react';
+import IcHeartFill from '../assets/icons/normal/ic_heart_fill.svg?react';
+import IcEye from '../assets/icons/normal/ic_eye.svg?react';
+import IcDelete from '../assets/icons/normal/ic_trash.svg?react';
 
 import TeamCard from '../components/PostDetail/TeamCard';
 import SideTeamCard from '../components/common/Cards/SideTeamCard';
@@ -24,6 +39,7 @@ import { FieldViewer } from '../components/Field/FieldViewer';
 import ApplyModal from '../components/Modal/ApplyModal';
 import WaitingModal from '../components/Modal/WaitingModal';
 import LoginModal from '../components/Modal/LoginModal';
+import IconWrapper from '../components/common/IconWrapper';
 
 import { useAuthStore } from '../stores/authStore';
 import { useToastCenterStore } from '../stores/toastCenterStore';
@@ -83,12 +99,18 @@ const PostDetailPage = () => {
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [isApplyWaitingModalOpen, setIsApplyWaitingModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
 
   const { accessToken } = useAuthStore();
 
   const { data: postDetail } = useGetPostDetail(parsedPostId);
   const { data: me } = useGetUserMe();
   const { mutate: patchPostClose, isPending: isClosing } = usePatchPostClose();
+  const { mutate: likePostMutate } = useLikePost();
+  const { mutate: unlikePostMutate } = useUnlikePost();
+  const { mutate: deletePostMutate, isPending: isDeletingPost } = useDeletePost(
+    postDetail?.team?.id ?? 0,
+  );
 
   const leftColRef = useRef<HTMLDivElement | null>(null);
   const sideWrapRef = useRef<HTMLDivElement | null>(null);
@@ -108,6 +130,12 @@ const PostDetailPage = () => {
   useEffect(() => {
     return () => setToastCenterX(null);
   }, [setToastCenterX]);
+
+  useEffect(() => {
+    setIsLiked(Boolean(postDetail?.liked));
+  }, [postDetail?.liked]);
+
+  const deadlineLabel = formatDeadlineBadge(postDetail?.deadline);
 
   const myApplicationStatus = postDetail?.applicationStatus ?? null;
 
@@ -180,10 +208,9 @@ const PostDetailPage = () => {
                     {postDetail?.title}
                   </h1>
                 </div>
-                <div className="flex items-center justify-between self-stretch">
+                <div className="flex items-center justify-between self-stretch max-xs:flex-col max-xs:flex-wrap max-xs:items-start max-xs:gap-[0.8rem]">
                   <div className="flex items-center gap-[0.8rem]">
-                    <div className="w-[0.1rem] h-[1.7rem] bg-black-40" />
-                    <div className="flex items-center gap-[1.7rem] flex-shrink">
+                    <div className="flex flex-shrink items-center gap-[0.8rem]">
                       <div
                         className="flex cursor-pointer items-center gap-[0.8rem]"
                         onClick={() => {
@@ -192,6 +219,7 @@ const PostDetailPage = () => {
                           }
                         }}
                       >
+                        {/** 작성자 프로필 이미지 */}
                         {postDetail?.user?.profileImageUrl ? (
                           <div className="shadow-insetBorderBlack10 flex aspect-[1/1] h-[2.4rem] w-[2.4rem] flex-col items-center justify-center gap-[1rem] rounded-[0.6rem] bg-black-10">
                             <img
@@ -203,11 +231,26 @@ const PostDetailPage = () => {
                         ) : (
                           <IcProfileBasic className="h-[2.4rem] w-[2.4rem]" />
                         )}
+                        {/** 작성자 이름 */}
                         <span className="text-[1.6rem] font-[600] leading-[1.5] tracking-[-0.032rem] text-black-100">
                           {postDetail?.user?.username}
                         </span>
                       </div>
+                      {/** 이름과 마감일 사이 라인 */}
                       <div className="h-[1.7rem] w-[0.1rem] bg-black-40" />
+                      {/** 마감일 */}
+                      {postDetail?.recruiting && deadlineLabel && (
+                        <span
+                          className={`whitespace-nowrap text-[1.6rem] font-[500] leading-[1.5] tracking-[-0.032rem] ${
+                            deadlineLabel === '오늘 마감'
+                              ? 'text-error'
+                              : 'text-blue-80'
+                          }`}
+                        >
+                          {deadlineLabel}
+                        </span>
+                      )}
+                      {/** 작성글 게시 날짜 */}
                       <span className="text-[1.6rem] font-[400] leading-[1.5] tracking-[-0.032rem] text-black-60">
                         {postDetail?.createdAt
                           ? formatPostDetailCreatedAt(postDetail.createdAt)
@@ -215,21 +258,104 @@ const PostDetailPage = () => {
                       </span>
                     </div>
                   </div>
-                  <BaseButton
-                    size="sm"
-                    color="secondary"
-                    onClick={async () => {
-                      try {
-                        await navigator.clipboard.writeText(window.location.href);
-                        toast.success('주소가 복사되었습니다.');
-                      } catch (error) {
-                        console.error(error);
-                        toast.error('주소 복사 중 오류가 발생했습니다.');
-                      }
-                    }}
-                  >
-                    주소 복사
-                  </BaseButton>
+                  {/** 조회수/좋아요/공유버튼/좋아요버튼 */}
+                  <div className="flex items-center justify-end gap-[0.8rem] max-xs:w-full">
+                    <div className="flex items-center gap-[0.4rem]">
+                      <div className="flex items-center gap-[0.4rem]">
+                        <IcEye className="flex aspect-square h-[1.6rem] w-[1.6rem] text-black-60" />
+                        <span className="text-[1.6rem] font-[400] leading-[1.5] tracking-[-0.032rem] text-black-60">
+                          {' '}
+                          {formatCountBadge(postDetail?.viewCount)}{' '}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-[0.4rem]">
+                        <IcHeart className="flex aspect-square h-[1.6rem] w-[1.6rem] text-black-60" />
+                        <span className="text-[1.6rem] font-[400] leading-[1.5] tracking-[-0.032rem] text-black-60">
+                          {' '}
+                          {formatCountBadge(postDetail?.likeCount)}{' '}
+                        </span>
+                      </div>
+                    </div>
+                    {/** 추후, IconWrapper의 w, h 사이즈 추가 요청 */}
+                    <IconWrapper
+                      color="outline"
+                      shape="circle"
+                      className="!h-[3.2rem] !w-[3.2rem] cursor-pointer"
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(
+                            window.location.href,
+                          );
+                          toast.success('주소가 복사되었습니다.');
+                        } catch (error) {
+                          console.error(error);
+                          toast.error('주소 복사 중 오류가 발생했습니다.');
+                        }
+                      }}
+                    >
+                      <IcShare className="h-[1.7455rem] w-[1.7455rem] text-black-100" />
+                    </IconWrapper>
+                    {isMyPost ? (
+                      <IconWrapper
+                        color="outline"
+                        shape="circle"
+                        className="!h-[3.2rem] !w-[3.2rem] cursor-pointer"
+                        disabled={isDeletingPost}
+                        onClick={() => {
+                          if (!parsedPostId) return;
+
+                          deletePostMutate(parsedPostId, {
+                            onSuccess: () => {
+                              toast.success('모집글이 삭제되었습니다.');
+                              navigate(
+                                postDetail?.team?.id
+                                  ? `/team/${postDetail.team.id}`
+                                  : '/',
+                              );
+                            },
+                            onError: () => {
+                              toast.error(
+                                '모집글 삭제 중 오류가 발생했습니다.',
+                              );
+                            },
+                          });
+                        }}
+                      >
+                        <IcDelete className="h-[1.7455rem] w-[1.7455rem] text-black-100" />
+                      </IconWrapper>
+                    ) : (
+                      <IconWrapper
+                        color="outline"
+                        shape="circle"
+                        className="!h-[3.2rem] !w-[3.2rem] cursor-pointer"
+                        onClick={() => {
+                          if (!parsedPostId) return;
+
+                          if (!accessToken) {
+                            setIsLoginModalOpen(true);
+                            return;
+                          }
+
+                          const nextIsLiked = !isLiked;
+                          setIsLiked(nextIsLiked);
+
+                          const revert = () => setIsLiked(!nextIsLiked);
+
+                          if (nextIsLiked) {
+                            likePostMutate(parsedPostId, { onError: revert });
+                          } else {
+                            unlikePostMutate(parsedPostId, { onError: revert });
+                          }
+                        }}
+                      >
+                        {isLiked ? (
+                          <IcHeartFill className="h-[1.7455rem] w-[1.7455rem] text-blue-60" />
+                        ) : (
+                          <IcHeart className="h-[1.7455rem] w-[1.7455rem] text-black-100" />
+                        )}
+                      </IconWrapper>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="flex items-stretch justify-between self-stretch max-sm:gap-[1.4rem] max-731:flex-col">
@@ -334,7 +460,7 @@ const PostDetailPage = () => {
 
           {/** 작성자 기준 화면: 마감하기, 수정하기 버튼 */}
           {isMyPost && postDetail?.recruiting && (
-            <div className="flex w-[32rem] items-start gap-[1.2rem] pb-[6.6rem] pt-[1.2rem] max-sm:pb-[15.4rem] max-731:w-full">
+            <div className="flex w-[32rem] items-start justify-center gap-[1.2rem] pb-[6.6rem] pt-[1.2rem] max-sm:pb-[15.4rem] max-731:w-full">
               <BaseButton
                 size="lg"
                 color="secondary"
