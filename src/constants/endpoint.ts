@@ -1,6 +1,11 @@
 // Base URL 설정
 export const BASE_URL = import.meta.env.VITE_BASE_URL;
 
+// 댓글 API
+export const COMMENT_DETAIL_URL = (commentId: number) =>
+  `/comments/${commentId}`; // 댓글 수정, 삭제
+export const COMMENT_URL = (postId: number) => `/posts/${postId}/comments`; // 댓글 목록 커서 페이지네이션 조회, 댓글 답글 작성
+
 // 모집글 API
 export const POST_URL = '/posts'; // 모집글 목록 커서 페이지네이션 조회, 모집글 생성
 export const POST_DETAIL_URL = (postId: number) => `/posts/${postId}`; // 모집글 상세 조회, 수정, 삭제
@@ -42,7 +47,8 @@ export const REFRESH_TOKEN_URL = '/auth/refresh'; // 액세스 토큰 재발급
 export const OAUTH_REDEEM_URL = '/auth/oauth/redeem'; // OAuth 콜백 OTT를 액세스 토큰으로 교환
 
 // 좋아요 API
-export const COMMENTS_LIKE_URL = (commentId: number) => `/comments/${commentId}/like`; // 댓글 좋아요 / 좋아요 취소
+export const COMMENTS_LIKE_URL = (commentId: number) =>
+  `/comments/${commentId}/like`; // 댓글 좋아요 / 좋아요 취소
 export const POSTS_LIKE_URL = (postId: number) => `/posts/${postId}/like`; // 모집글 좋아요 / 좋아요 취소
 
 // 팀 API

@@ -40,11 +40,12 @@ import ApplyModal from '../components/Modal/ApplyModal';
 import WaitingModal from '../components/Modal/WaitingModal';
 import LoginModal from '../components/Modal/LoginModal';
 import IconWrapper from '../components/common/IconWrapper';
+import Comment from '../components/Comment';
+import SEO from '../components/seo';
 
 import { useAuthStore } from '../stores/authStore';
 import { useToastCenterStore } from '../stores/toastCenterStore';
 import { trackEvent } from '../lib/ga';
-import SEO from '../components/seo';
 
 type RecruitmentCountKey =
   | 'plan'
@@ -457,6 +458,12 @@ const PostDetailPage = () => {
               <FieldViewer content={postDetail?.content} />
             </div>
           </div>
+
+          <Comment
+            postId={postDetail?.id}
+            myUserId={myUserId}
+            commentCount={postDetail?.commentCount ?? 0}
+          />
 
           {/** 작성자 기준 화면: 마감하기, 수정하기 버튼 */}
           {isMyPost && postDetail?.recruiting && (
