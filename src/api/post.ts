@@ -52,7 +52,7 @@ export const getPosts = async (
         q: params.q || undefined,
         positions: params.positions?.length ? params.positions : undefined,
         skills: params.skills?.length ? params.skills : undefined,
-        cursor: typeof params.cursor === 'number' ? params.cursor : undefined,
+        cursor: params.cursor,
         size: typeof params.size === 'number' ? params.size : undefined,
         sort: params.sort || undefined,
       },
