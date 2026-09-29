@@ -11,6 +11,7 @@ import {
 } from '../../hooks/useComment';
 import { FieldTextarea } from '../Field/FieldBody';
 import type { CommentResponse } from '../../types/api/comment';
+import DecisionModal from '../Modal/DecisionModal';
 
 // Icons
 import HeartIcon from '../../assets/icons/normal/ic_heart.svg?react';
@@ -30,6 +31,8 @@ const CommentItem = ({ comment, postId, myUserId }: CommentItemProps) => {
   const [isSelectBoxOpen, setIsSelectBoxOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState('');
+  const [isCommentDeleteModalOpen, setIsCommentDeleteModalOpen] =
+    useState(false);
 
   const { mutate: deleteComment } = useDeleteComment(comment.id, postId!);
   const { mutate: likeComment } = useLikeComment(comment.id);
@@ -143,7 +146,7 @@ const CommentItem = ({ comment, postId, myUserId }: CommentItemProps) => {
                           icon: <DeleteIcon />,
                           label: '삭제하기',
                           onClick: () => {
-                            deleteComment();
+                            setIsCommentDeleteModalOpen(true);
                           },
                           variant: 'danger',
                         },
@@ -198,6 +201,15 @@ const CommentItem = ({ comment, postId, myUserId }: CommentItemProps) => {
           </span>
         </div>
       )}
+      <DecisionModal
+        isOpen={isCommentDeleteModalOpen}
+        onClose={() => setIsCommentDeleteModalOpen(false)}
+        handleDone={() => deleteComment()}
+        title="이 댓글을 삭제할까요?"
+        description="삭제하면 되돌릴 수 없어요."
+        confirmText="삭제"
+        cancelText="취소"
+      />
     </div>
   );
 };
