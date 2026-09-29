@@ -11,8 +11,7 @@ import TeamNav from '../components/Team/TeamNav';
 import IconWrapper from '../components/common/IconWrapper';
 import BaseButton from '../components/common/Button';
 import BaseTag from '../components/common/Tag';
-import ApproveModal from '../components/Modal/ApproveModal';
-import RejectModal from '../components/Modal/RejectModal';
+import DecisionModal from '../components/Modal/DecisionModal';
 import { POSITION_CONVERTER } from '../utils/position';
 import { formatKstYyyyMmDd } from '../utils/kst-time';
 
@@ -776,19 +775,27 @@ const TeamApplicantPage = () => {
           </div>
         </div>
       </div>
-      <ApproveModal
+      <DecisionModal
         isOpen={isApproveModalOpen}
         onClose={() => setIsApproveModalOpen(false)}
         handleDone={() =>
           handleDecideApplicant('APPROVED', () => setIsApproveModalOpen(false))
         }
+        title="해당 지원자를 승인하시겠습니까?"
+        description="승인하면 해당 지원자는 프로젝트에 참여하게 됩니다."
+        confirmText="승인 확정"
+        cancelText="아니요"
       />
-      <RejectModal
+      <DecisionModal
         isOpen={isRejectModalOpen}
         onClose={() => setIsRejectModalOpen(false)}
         handleDone={() =>
           handleDecideApplicant('REJECTED', () => setIsRejectModalOpen(false))
         }
+        title="정말 거절하시겠습니까?"
+        description="거절하면 해당 지원자는 대기 목록에서 처리됨으로 이동하며, 이후 되돌릴 수 없습니다."
+        confirmText="거절 확정"
+        cancelText="아니요"
       />
     </>
   );
