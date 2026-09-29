@@ -11,7 +11,7 @@ import TeamNav from '../components/Team/TeamNav';
 import IconWrapper from '../components/common/IconWrapper';
 import BaseButton from '../components/common/Button';
 import BaseTag from '../components/common/Tag';
-import DescisionModal from '../components/Modal/DecisionModal';
+import DecisionModal from '../components/Modal/DecisionModal';
 import { POSITION_CONVERTER } from '../utils/position';
 import { formatKstYyyyMmDd } from '../utils/kst-time';
 
@@ -775,7 +775,7 @@ const TeamApplicantPage = () => {
           </div>
         </div>
       </div>
-      <DescisionModal
+      <DecisionModal
         isOpen={isApproveModalOpen}
         onClose={() => setIsApproveModalOpen(false)}
         handleDone={() =>
@@ -786,7 +786,7 @@ const TeamApplicantPage = () => {
         confirmText="승인 확정"
         cancelText="아니요"
       />
-      <DescisionModal
+      <DecisionModal
         isOpen={isRejectModalOpen}
         onClose={() => setIsRejectModalOpen(false)}
         handleDone={() =>

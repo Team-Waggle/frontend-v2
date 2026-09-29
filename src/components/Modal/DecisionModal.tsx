@@ -11,7 +11,7 @@ interface DescisionModalProps extends ModalProps {
   cancelText: string;
 }
 
-const DescisionModal = ({
+const DecisionModal = ({
   isOpen,
   onClose,
   handleDone,
@@ -64,4 +64,4 @@ const DescisionModal = ({
   );
 };
 
-export default DescisionModal;
+export default DecisionModal;
