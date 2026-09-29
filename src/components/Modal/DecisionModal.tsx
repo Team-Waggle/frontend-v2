@@ -4,7 +4,7 @@ import BaseButton from '../common/Button';
 import ModalOverlay from './ModalOverlay';
 import ModalPortal from './ModalPortal';
 
-interface DescisionModalProps extends ModalProps {
+interface DecisionModalProps extends ModalProps {
   title: string;
   description: string;
   confirmText: string;
@@ -19,7 +19,7 @@ const DecisionModal = ({
   description,
   confirmText,
   cancelText,
-}: DescisionModalProps) => {
+}: DecisionModalProps) => {
   useModal({ isOpen, onClose });
   if (!isOpen) return null;
   return (
