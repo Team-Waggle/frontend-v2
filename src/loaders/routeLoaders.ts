@@ -7,7 +7,10 @@ import { queryClient } from '../lib/queryClient';
 import { getUserDetail, getUserMe, getUserMeTeam } from '../api/user';
 import { useAuthStore } from '../stores/authStore';
 import type { TeamResponse } from '../types/api/team';
-import { isAccessTokenExpired } from '../utils/authToken';
+import {
+  ensureFreshAccessToken,
+  isAccessTokenExpired,
+} from '../utils/authToken';
 
 type RouteLoader = (args: LoaderFunctionArgs) => Promise<unknown> | unknown;
 
@@ -108,8 +111,10 @@ export const teamLoader = ({ params }: LoaderFunctionArgs) => {
   return validateEntity(() => GetTeamDetail(teamId));
 };
 
-export const postLoader = ({ params }: LoaderFunctionArgs) => {
+export const postLoader = async ({ params }: LoaderFunctionArgs) => {
   const postId = parsePositiveIntegerParam(params.postId);
+
+  await ensureFreshAccessToken();
 
   return validateEntity(() =>
     queryClient.ensureQueryData(postDetailQueryOptions(postId)),
