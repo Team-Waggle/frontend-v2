@@ -4,7 +4,22 @@ import BaseButton from '../common/Button';
 import ModalOverlay from './ModalOverlay';
 import ModalPortal from './ModalPortal';
 
-const ApproveModal = ({ isOpen, onClose, handleDone }: ModalProps) => {
+interface DecisionModalProps extends ModalProps {
+  title: string;
+  description: string;
+  confirmText: string;
+  cancelText: string;
+}
+
+const DecisionModal = ({
+  isOpen,
+  onClose,
+  handleDone,
+  title,
+  description,
+  confirmText,
+  cancelText,
+}: DecisionModalProps) => {
   useModal({ isOpen, onClose });
   if (!isOpen) return null;
   return (
@@ -15,14 +30,14 @@ const ApproveModal = ({ isOpen, onClose, handleDone }: ModalProps) => {
         aria-modal="true"
       >
         <ModalOverlay onClose={onClose} />
-        <div className="relative h-[24.4rem] w-[44.6rem] rounded-[2rem] bg-black-5 px-[4rem] pt-[4rem]">
+        <div className="relative w-[44.6rem] rounded-[2rem] bg-black-5 px-[4rem] pt-[4rem]">
           <div className="flex flex-col gap-[4rem]">
             <div className="flex flex-col gap-[1.2rem]">
               <span className="text-[2.4rem] font-bold text-black-100">
-                해당 지원자를 승인하시겠습니까?
+                {title}
               </span>
               <span className="text-[1.6rem] font-medium text-black-80">
-                승인하면 해당 지원자는 프로젝트에 참여하게 됩니다.
+                {description}
               </span>
             </div>
             <div className="flex gap-[1rem] pb-[3.8rem]">
@@ -32,14 +47,14 @@ const ApproveModal = ({ isOpen, onClose, handleDone }: ModalProps) => {
                 onClick={onClose}
                 className="w-full"
               >
-                아니요
+                {cancelText}
               </BaseButton>
               <BaseButton
                 size="lg"
                 onClick={handleDone}
                 className="w-full whitespace-nowrap"
               >
-                승인 확정
+                {confirmText}
               </BaseButton>
             </div>
           </div>
@@ -49,4 +64,4 @@ const ApproveModal = ({ isOpen, onClose, handleDone }: ModalProps) => {
   );
 };
 
-export default ApproveModal;
+export default DecisionModal;
