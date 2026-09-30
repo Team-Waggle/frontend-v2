@@ -39,6 +39,7 @@ import { FieldViewer } from '../components/Field/FieldViewer';
 import ApplyModal from '../components/Modal/ApplyModal';
 import WaitingModal from '../components/Modal/WaitingModal';
 import LoginModal from '../components/Modal/LoginModal';
+import DecisionModal from '../components/Modal/DecisionModal';
 import IconWrapper from '../components/common/IconWrapper';
 
 import { useAuthStore } from '../stores/authStore';
@@ -99,6 +100,7 @@ const PostDetailPage = () => {
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [isApplyWaitingModalOpen, setIsApplyWaitingModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
 
   const { accessToken } = useAuthStore();
@@ -301,25 +303,7 @@ const PostDetailPage = () => {
                         shape="circle"
                         className="!h-[3.2rem] !w-[3.2rem] cursor-pointer"
                         disabled={isDeletingPost}
-                        onClick={() => {
-                          if (!parsedPostId) return;
-
-                          deletePostMutate(parsedPostId, {
-                            onSuccess: () => {
-                              toast.success('모집글이 삭제되었습니다.');
-                              navigate(
-                                postDetail?.team?.id
-                                  ? `/team/${postDetail.team.id}`
-                                  : '/',
-                              );
-                            },
-                            onError: () => {
-                              toast.error(
-                                '모집글 삭제 중 오류가 발생했습니다.',
-                              );
-                            },
-                          });
-                        }}
+                        onClick={() => setIsDeleteModalOpen(true)}
                       >
                         <IcDelete className="h-[1.7455rem] w-[1.7455rem] text-black-100" />
                       </IconWrapper>
@@ -566,6 +550,30 @@ const PostDetailPage = () => {
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
+      />
+      <DecisionModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        handleDone={() => {
+          if (!parsedPostId || isDeletingPost) return;
+
+          deletePostMutate(parsedPostId, {
+            onSuccess: () => {
+              setIsDeleteModalOpen(false);
+              toast.success('모집글이 삭제되었습니다.');
+              navigate(
+                postDetail?.team?.id ? `/team/${postDetail.team.id}` : '/',
+              );
+            },
+            onError: () => {
+              toast.error('모집글 삭제 중 오류가 발생했습니다.');
+            },
+          });
+        }}
+        title="모집글을 삭제할까요?"
+        description="삭제하면 되돌릴 수 없어요."
+        confirmText="삭제"
+        cancelText="취소"
       />
     </>
   );
