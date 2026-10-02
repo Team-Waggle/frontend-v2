@@ -547,6 +547,7 @@ const PostDetailPage = () => {
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
         title={postDetail?.title}
+      />
       <DecisionModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
