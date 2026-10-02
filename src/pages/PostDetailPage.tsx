@@ -39,6 +39,7 @@ import { FieldViewer } from '../components/Field/FieldViewer';
 import ApplyModal from '../components/Modal/ApplyModal';
 import WaitingModal from '../components/Modal/WaitingModal';
 import LoginModal from '../components/Modal/LoginModal';
+import ShareModal from '../components/Modal/ShareModal';
 import IconWrapper from '../components/common/IconWrapper';
 
 import { useAuthStore } from '../stores/authStore';
@@ -99,6 +100,7 @@ const PostDetailPage = () => {
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [isApplyWaitingModalOpen, setIsApplyWaitingModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
 
   const { accessToken } = useAuthStore();
@@ -281,17 +283,7 @@ const PostDetailPage = () => {
                       color="outline"
                       shape="circle"
                       className="!h-[3.2rem] !w-[3.2rem] cursor-pointer"
-                      onClick={async () => {
-                        try {
-                          await navigator.clipboard.writeText(
-                            window.location.href,
-                          );
-                          toast.success('주소가 복사되었습니다.');
-                        } catch (error) {
-                          console.error(error);
-                          toast.error('주소 복사 중 오류가 발생했습니다.');
-                        }
-                      }}
+                      onClick={() => setIsShareModalOpen(true)}
                     >
                       <IcShare className="h-[1.7455rem] w-[1.7455rem] text-black-100" />
                     </IconWrapper>
@@ -566,6 +558,11 @@ const PostDetailPage = () => {
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
+      />
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        title={postDetail?.title}
       />
     </>
   );
