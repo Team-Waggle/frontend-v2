@@ -87,7 +87,7 @@ export type CursorResponsePostDetailResponse = {
   hasNext: boolean;
 };
 
-export type PostsSort = 'NEWEST' | 'OLDEST';
+export type PostsSort = 'NEWEST' | 'OLDEST' | 'MOST_VIEWED' | 'MOST_LIKED';
 
 export type GetPostsParams = {
   q?: string;
