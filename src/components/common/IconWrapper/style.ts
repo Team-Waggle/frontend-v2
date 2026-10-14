@@ -7,6 +7,7 @@ export const ICONWRAPPER_COLOR_STYLES = {
   filled:
     'bg-blue-80 text-black-5 hover:bg-hover-80 disabled:bg-black-20 disabled:text-black-40',
   transparent: 'bg-transparent text-black-100 hover:bg-black-5',
+  transparentTwo: 'bg-transparent text-black-100 hover:bg-hover-5',
 };
 
 export const ICONWRAPPER_SHAPE_STYLES = {

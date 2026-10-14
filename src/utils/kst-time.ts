@@ -128,6 +128,37 @@ export const formatPostListCreatedAt = (createdAtUtcIso: string): string => {
   return formatKstYyMmDd(createdAtUtcIso);
 };
 
+export const formatCommentCreatedAt = (createdAtUtcIso: string): string => {
+  const createdAtMs = parseUtcIsoToMs(createdAtUtcIso);
+  const diffMs = Date.now() - createdAtMs;
+
+  if (diffMs < 0) {
+    return formatKstYyMmDdHm(createdAtUtcIso);
+  }
+
+  const diffMinutes = Math.floor(diffMs / (60 * 1000));
+  const diffHours = Math.floor(diffMs / (60 * 60 * 1000));
+  const diffDays = Math.floor(diffMs / (24 * 60 * 60 * 1000));
+
+  if (diffMinutes < 3) {
+    return '방금 전';
+  }
+
+  if (diffMinutes < 60) {
+    return `${diffMinutes}분 전`;
+  }
+
+  if (diffHours < 24) {
+    return `${diffHours}시간 전`;
+  }
+
+  if (diffDays < 7) {
+    return `${diffDays}일 전`;
+  }
+
+  return formatKstYyMmDdHm(createdAtUtcIso);
+};
+
 /**
  *
  * 모집글 상세보기 createdAt 표시

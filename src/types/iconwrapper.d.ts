@@ -1,4 +1,8 @@
-export type IconWrapperColor = 'outline' | 'filled' | 'transparent';
+export type IconWrapperColor =
+  | 'outline'
+  | 'filled'
+  | 'transparent'
+  | 'transparentTwo';
 export type IconWrapperShape = 'square' | 'circle';
 
 export interface IconWrapperProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
