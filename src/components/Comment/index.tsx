@@ -6,6 +6,8 @@ import IconWrapper from '../common/IconWrapper';
 
 // Icons
 import SendIcon from '../../assets/icons/normal/ic_send.svg?react';
+import { getByteLength } from '../../utils/getByteLength';
+import { useRef } from 'react';
 
 interface CommentProps {
   postId?: number;
@@ -20,11 +22,15 @@ interface FormValues {
 const Comment = ({ postId, myUserId, commentCount }: CommentProps) => {
   const { register, handleSubmit, reset } = useForm<FormValues>();
 
+  const contentField = register('content');
+  const lastValidValue = useRef('');
+
   const { data: commentData } = useGetComment(postId!);
 
   const { mutate: createComment } = useCreateComment();
 
   const onSubmit = (data: FormValues) => {
+    if (!data.content.trim()) return;
     createComment(
       {
         postId: postId!,
@@ -51,7 +57,16 @@ const Comment = ({ postId, myUserId, commentCount }: CommentProps) => {
       >
         <div className="flex gap-[2rem]">
           <input
-            {...register('content')}
+            {...contentField}
+            onChange={(e) => {
+              if (getByteLength(e.target.value) > 900) {
+                e.target.value = lastValidValue.current;
+                return;
+              }
+
+              lastValidValue.current = e.target.value;
+              contentField.onChange(e);
+            }}
             placeholder="메시지를 입력해주세요."
             className="h-[4.4rem] w-[60rem] rounded-full bg-black-10 py-[0.8rem] pl-[2.8rem] pr-[2.4rem] text-[1.4rem] font-medium text-black-100 placeholder:text-black-60"
           />

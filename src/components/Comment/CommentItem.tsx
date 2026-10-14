@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import IconWrapper from '../common/IconWrapper';
 import SelectBox from '../common/SelectBox';
 import BaseButton from '../common/Button';
-import { formatPostListCreatedAt } from '../../utils/kst-time';
+import { formatCommentCreatedAt } from '../../utils/kst-time';
+import { getByteLength } from '../../utils/getByteLength';
 import {
   useDeleteComment,
   useLikeComment,
@@ -40,6 +41,13 @@ const CommentItem = ({ comment, postId, myUserId }: CommentItemProps) => {
   const { mutate: updateComment, isPending: isUpdating } = useUpdateComment(
     comment.id,
   );
+
+  const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    const byteLength = getByteLength(value);
+    if (byteLength > 900) return;
+    setEditContent(e.target.value);
+  };
 
   const selectBoxRef = useRef<HTMLDivElement | null>(null);
 
@@ -85,7 +93,7 @@ const CommentItem = ({ comment, postId, myUserId }: CommentItemProps) => {
               {comment.user.username}
             </span>
             <span className="whitespace-nowrap text-[1.4rem] font-normal text-black-60">
-              {formatPostListCreatedAt(comment.createdAt)}
+              {formatCommentCreatedAt(comment.createdAt)}
             </span>
           </div>
         </div>
@@ -166,8 +174,9 @@ const CommentItem = ({ comment, postId, myUserId }: CommentItemProps) => {
             placeholder="수정할 내용을 입력해주세요."
             className="w-full"
             value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
+            onChange={handleCommentChange}
             disabled={isUpdating}
+            maxLength={900}
           />
           <BaseButton
             size="sm"
