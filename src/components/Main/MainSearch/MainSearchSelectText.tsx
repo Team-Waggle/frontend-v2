@@ -6,13 +6,20 @@ import IcChevronDown from '../../../assets/icons/normal/chevron/ic_chevronDown.s
 import IcChevronUp from '../../../assets/icons/normal/chevron/ic_chevronUp.svg?react';
 
 /**
- * MainSearch: 오래된순, 최신순 Select Box
+ * MainSearch: 모집글 정렬 Select Box
  */
 
 type MainSearchSelectTextProps = {
   sort: PostsSort;
   onChangeSort: (sort: PostsSort) => void;
 };
+
+const SORT_OPTIONS: { value: PostsSort; label: string }[] = [
+  { value: 'NEWEST', label: '최신순' },
+  { value: 'OLDEST', label: '오래된순' },
+  { value: 'MOST_VIEWED', label: '조회순' },
+  { value: 'MOST_LIKED', label: '좋아요순' },
+];
 
 const MainSearchSelectText = ({
   sort,
@@ -22,9 +29,7 @@ const MainSearchSelectText = ({
 
   const wrapRef = useRef<HTMLDivElement | null>(null);
 
-  const label = sort === 'NEWEST' ? '최신순' : '오래된순';
-  const optionLabel = sort === 'NEWEST' ? '오래된순' : '최신순';
-  const nextSort: PostsSort = sort === 'NEWEST' ? 'OLDEST' : 'NEWEST';
+  const label = SORT_OPTIONS.find((option) => option.value === sort)?.label;
 
   useEffect(() => {
     const onMouseDown = (e: MouseEvent) => {
@@ -45,8 +50,17 @@ const MainSearchSelectText = ({
   }, []);
 
   return (
-    <div ref={wrapRef} className="relative">
-      <div
+    <div
+      ref={wrapRef}
+      className="relative shrink-0"
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') setOpen(false);
+      }}
+    >
+      <button
+        type="button"
+        aria-label={`모집글 정렬: ${label}`}
+        aria-expanded={open}
         onClick={() => setOpen((prev) => !prev)}
         className="flex h-[4rem] w-[9.4rem] cursor-pointer items-center justify-between rounded-[0.4rem] bg-white pl-[1.2rem] pr-[1rem]"
       >
@@ -56,21 +70,26 @@ const MainSearchSelectText = ({
         ) : (
           <IcChevronDown className="h-[1.6rem] w-[1.6rem] text-[#878B96]" />
         )}
-      </div>
+      </button>
 
       {open && (
-        <div
-          onClick={() => {
-            onChangeSort(nextSort);
-            setOpen(false);
-          }}
-          className="absolute flex w-[9.4rem] cursor-pointer flex-col items-start justify-center rounded-[0.6rem] bg-white py-[0.6rem] shadow-search-select-box"
-        >
-          <div className="flex h-[3.2rem] w-[9.4rem] items-center gap-[1rem] px-[1rem] py-[0.2rem]">
-            <span className="text-[1.3rem] font-[400] text-[#0E0E0F]">
-              {optionLabel}
-            </span>
-          </div>
+        <div className="absolute right-0 z-20 flex w-[9.4rem] flex-col items-start justify-center rounded-[0.6rem] bg-white py-[0.6rem] shadow-search-select-box">
+          {SORT_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              aria-pressed={sort === option.value}
+              onClick={() => {
+                onChangeSort(option.value);
+                setOpen(false);
+              }}
+              className={`flex h-[3.2rem] w-full items-center px-[1rem] py-[0.2rem] text-left text-[1.3rem] text-[#0E0E0F] hover:bg-black-10 ${
+                sort === option.value ? 'font-[500]' : 'font-[400]'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
         </div>
       )}
     </div>
