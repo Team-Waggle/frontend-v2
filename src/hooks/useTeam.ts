@@ -103,7 +103,7 @@ export const useGetTeamApplications = (
         cursor: pageParam,
         direction: 'AFTER',
       }),
-    initialPageParam: undefined as number | undefined,
+    initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => {
       if (!lastPage.hasNext) return undefined;
       return lastPage.nextCursor;

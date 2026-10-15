@@ -83,7 +83,7 @@ export type PostDetailResponse = {
 
 export type CursorResponsePostDetailResponse = {
   data: PostDetailResponse[];
-  nextCursor: number | null;
+  nextCursor: string | null;
   hasNext: boolean;
 };
 
@@ -93,7 +93,7 @@ export type GetPostsParams = {
   q?: string;
   positions?: string[];
   skills?: string[];
-  cursor?: number;
+  cursor?: string;
   size?: number;
   sort?: PostsSort;
 };

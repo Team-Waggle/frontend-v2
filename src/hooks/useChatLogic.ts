@@ -71,7 +71,8 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
     isFetchingPreviousPage,
   } = useGetMessages(
     partnerId,
-    highlightCursor !== null ? highlightCursor + 1 : undefined,
+    // 서버가 숫자 커서를 id 커서로 받아주는 동안만 유효하며 anchor 파라미터로 대체 예정
+    highlightCursor !== null ? String(highlightCursor + 1) : undefined,
   );
 
   // highlight 모드에서 커서 이후(newer) 메시지를 채우기 위한 AFTER 방향 쿼리
@@ -80,7 +81,10 @@ export const useChatLogic = (partnerId: string, highlight?: string | null) => {
     fetchNextPage: fetchNextAfterPage,
     hasNextPage: hasNextAfterPage,
     isFetchingNextPage: isFetchingNextAfterPage,
-  } = useGetMessagesAfter(partnerId, highlightCursor);
+  } = useGetMessagesAfter(
+    partnerId,
+    highlightCursor !== null ? String(highlightCursor) : null,
+  );
 
   const { data: conversationsData } = useGetConversations();
 

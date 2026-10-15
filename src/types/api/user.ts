@@ -30,7 +30,7 @@ export type MyApplicationItem = {
 
 export type MyApplicationsResponse = {
   data: MyApplicationItem[];
-  nextCursor: number | null;
+  nextCursor: string | null;
   hasNext: boolean;
 };
 

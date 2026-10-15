@@ -13,8 +13,8 @@ export const useGetConversations = (q?: string) => {
   return useInfiniteQuery({
     queryKey: ['conversations', q],
     queryFn: ({ pageParam }) =>
-      getConversations(pageParam as number | undefined, q),
-    initialPageParam: undefined as number | undefined,
+      getConversations(pageParam as string | undefined, q),
+    initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) =>
       lastPage.hasNext ? (lastPage.nextCursor ?? undefined) : undefined,
     enabled: !!accessToken,
@@ -23,7 +23,7 @@ export const useGetConversations = (q?: string) => {
 };
 
 // 메시지 내역 - BEFORE 방향 (최신 → 과거, 위로 스크롤 시 이전 페이지 로드)
-export const useGetMessages = (partnerId: string, initialCursor?: number) => {
+export const useGetMessages = (partnerId: string, initialCursor?: string) => {
   const accessToken = useAuthStore((state) => state.accessToken);
 
   return useInfiniteQuery({
@@ -32,8 +32,8 @@ export const useGetMessages = (partnerId: string, initialCursor?: number) => {
         ? ['messages', partnerId, initialCursor]
         : ['messages', partnerId],
     queryFn: ({ pageParam }) =>
-      getMessages(partnerId, pageParam as number | undefined, 'BEFORE'),
-    initialPageParam: initialCursor as number | undefined,
+      getMessages(partnerId, pageParam as string | undefined, 'BEFORE'),
+    initialPageParam: initialCursor,
     getPreviousPageParam: (firstPage) =>
       firstPage.hasNext ? (firstPage.nextCursor ?? undefined) : undefined,
     getNextPageParam: () => undefined,
@@ -43,14 +43,14 @@ export const useGetMessages = (partnerId: string, initialCursor?: number) => {
 };
 
 // 메시지 내역 - AFTER 방향 (커서 이후 메시지, 하이라이트 이동 시 최신까지 채우기)
-export const useGetMessagesAfter = (partnerId: string, cursor: number | null) => {
+export const useGetMessagesAfter = (partnerId: string, cursor: string | null) => {
   const accessToken = useAuthStore((state) => state.accessToken);
 
   return useInfiniteQuery({
     queryKey: ['messages', partnerId, 'after', cursor],
     queryFn: ({ pageParam }) =>
-      getMessages(partnerId, pageParam as number | undefined, 'AFTER'),
-    initialPageParam: cursor as number | undefined,
+      getMessages(partnerId, pageParam as string | undefined, 'AFTER'),
+    initialPageParam: cursor ?? undefined,
     getNextPageParam: (lastPage) =>
       lastPage.hasNext ? (lastPage.nextCursor ?? undefined) : undefined,
     getPreviousPageParam: () => undefined,
