@@ -87,7 +87,7 @@ API 서버(WaggleAPIServer)와 웹을 함께 바꿔야 하는 항목을 모은 �
   - 서버는 이 정책을 강제하지 않는다. 그래서 서버 계획은 완료를 최종 상태로 막고, 완료된 팀의 지원, 승인, 모집글 수정을 거부하고, 리뷰 요청 알림은 처음 완료될 때만 보내는 것이다
 - **웹에서 바꿀 곳**
   - 서버가 바뀐 뒤 상태 변경 요청을 하나로 줄이고, `team-detail`, `user-me-team` 캐시를 무효화한다. 줄일 곳은 `hooks/usePost.ts:171-186`(첫 모집글 뒤 진행 중 전환)과 `pages/TeamStatusPage.tsx:280-319`(완료 전 모집글 마감)이다. 같은 완료 버튼의 중복 제출 방지는 [프론트엔드 개선 백로그](backlog.md) P1-3에 있다
-  - 서버가 완료된 팀의 지원, 승인, 모집글 수정을 거부하게 되면, 그 요청의 실패 안내를 띄운다. 오류 코드는 서버를 구현할 때 정한다
+  - 서버가 완료된 팀의 지원, 승인, 모집글 수정을 거부하게 되면, 그 요청의 실패 안내를 띄운다. 서버 백로그의 권장안은 `INVALID_STATE`(400)다. 이 코드는 다른 거부에도 쓰이므로 요청마다 안내 문구를 따로 둔다
 - **확인**: 코드 추적 (웹과 서버 양쪽)
 - **배포**: 서버 선행
 
@@ -114,7 +114,7 @@ API 서버(WaggleAPIServer)와 웹을 함께 바꿔야 하는 항목을 모은 �
   - 서버: 모집글 삭제는 작성자인지만 확인하고, 지원서가 있는지는 보지 않는다. 삭제하면 그 글의 지원서도 함께 soft delete되어, 지원자의 지원 내역이 알림 없이 사라진다
   - 웹: 지원자가 있어도 삭제 버튼이 활성화되어 있다. 모집글 관리 탭의 "모집 글 삭제" 버튼(`components/Team/TeamPostItem.tsx:138-145`)은 확인 없이 바로 삭제 요청을 보낸다. 모집글 상세의 삭제 아이콘(`pages/PostDetailPage.tsx:299`)은 확인 모달을 거쳐 `deletePostMutate`(`:564`)를 부른다
 - **근거 문서**: 노션 RC-02(모집글 상세)와 TM-07(모집글 관리)은 지원자가 있는 모집글을 삭제할 수 없다고 정했다. TM-07은 지원자가 0명일 때만 삭제할 수 있고, 목록에 지원자 수를 함께 보여 준다
-- **서버 계획**: 삭제되지 않은 지원서(대기 `PENDING`, 승인 `APPROVED`, 거절 `REJECTED`)가 하나라도 있으면 삭제를 거부한다. 지원자가 취소한 지원서는 soft delete되므로 세지 않는다. 오류 코드는 서버를 구현할 때 정한다
+- **서버 계획**: 삭제되지 않은 지원서(대기 `PENDING`, 승인 `APPROVED`, 거절 `REJECTED`)가 하나라도 있으면 삭제를 거부한다. 지원자가 취소한 지원서는 soft delete되므로 세지 않는다. 서버 백로그의 권장안은 `INVALID_STATE`(400)로 거부하는 것이다. 이 코드는 다른 거부에도 쓰이므로, 삭제 요청의 실패로 이 코드가 오면 지원자가 있어 삭제할 수 없다고 안내한다
 - **지원자 수를 얻는 곳**
   - 팀 모집글 목록 응답(`GET /teams/{teamId}/posts`)의 `applicantCount`는 서버가 삭제되지 않은 지원서를 상태와 상관없이 센 값이라, 서버의 삭제 거부 기준과 같다. `TeamPostItem`이 prop으로 받아 `{applicantCount}명`으로 그린다(`TeamPostItem.tsx:109`)
   - 모집글 상세 응답에는 지원자 수가 없다. 웹은 팀 모집글 목록 타입을 상세 타입으로 재사용한다(`GetTeamPostsResponse = PostDetailResponse[]`, `types/api/posts.ts:112`). 그래서 `PostDetailResponse.applicantCount`(`:80`)는 목록에서는 값이 오고, 상세에서는 늘 `undefined`다
@@ -168,6 +168,7 @@ API 서버(WaggleAPIServer)와 웹을 함께 바꿔야 하는 항목을 모은 �
 - **서버 계획**: 위 범위대로 바꾼다. 팀 삭제 알림 타입을 새로 추가한다(이름은 서버가 정함. 예: `TEAM_DELETED`). 검토 중 지원서의 종료를 새 지원 상태로 둘지(지금 지원 상태는 `PENDING`, `APPROVED`, `REJECTED` 셋), 기존 상태로 처리할지도 서버가 정한다
 - **웹에서 바꿀 곳**
   - **새 알림 타입**: 알림 화면은 타입별 설정 객체(`components/Notifications/index.tsx`의 `NOTIFICATION_CONFIG`)에서 아이콘, 문구, 이동 경로를 꺼낸다. 모르는 타입을 받으면 렌더 중 예외로 화면 전체가 404가 되므로([프론트엔드 개선 백로그](backlog.md) P0-1), 새 타입의 설정을 서버 배포 전에 추가한다(S6). 알림 문구와 아이콘은 다른 타입처럼 웹이 정한다. 새 지원 상태가 생기면 상태를 따로 선언하거나 세는 곳을 모두 바꾼다: `types/api/user.ts:4`(`ApplicationStatus`), `:39-40`(화면 표기 `ApplicationStatusLabel`), `types/api/posts.ts:79`(`PostDetailResponse.applicationStatus`), `types/api/team.ts:35`(`ApplicantResponse.status`), `components/Profile/ProfileApplicationSection.tsx:34`(상태별 집계)
+  - **팀 정보가 빠진 알림**: 서버는 알림을 만들 때 찾지 못한 팀과 모집글을 `metadata`에서 뺀다. 지금 `NOTIFICATION_CONFIG`의 문구와 경로는 `metadata.team`이 항상 있다고 가정하므로, 알림을 남기기 시작하면 이 경우를 먼저 처리한다
   - **삭제된 팀의 알림 클릭**: 지금은 알림을 누르면 읽음 처리 뒤 `getRoute`의 경로(대부분 `/team/{teamId}`)로 이동한다(`components/Notifications/index.tsx:163-169`). 삭제된 팀이면 그 화면이 404가 되므로, 이동하지 않고 "삭제된 팀이에요" 토스트를 띄운다
   - **완료된 팀 이력**: 프로필의 팀 목록(`components/Profile/ProfileTeamSection.tsx`의 `MyPageCard`)에서 삭제된 완료 팀을 "삭제된 팀"으로 표시한다. 서버가 삭제된 팀도 이 목록에 내려 주도록 바뀐 뒤의 일이다. TM-04는 완료된 팀만 이력에 남긴다고 적었으므로, 완료 전에 삭제된 팀은 지금처럼 목록에서 빠지는 것으로 본다
 - **정할 것**: 팀 삭제 알림 타입의 이름과 `metadata` 모양, 검토 중 지원서의 종료 상태 값, 삭제된 팀을 응답에서 어떻게 나타낼지. 알림 `metadata.team`, 프로필 팀 목록의 팀에 삭제 여부 필드(예: `deleted: true`)를 둘지, 팀을 `null`로 줄지. 웹이 위 세 가지를 판정하는 기준이 된다
